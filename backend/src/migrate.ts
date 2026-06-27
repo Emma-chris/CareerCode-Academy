@@ -550,6 +550,8 @@ async function migrate() {
     console.log('✓ all indexes created');
 
     console.log('Migration completed successfully!');
+    await syncAllLearningPaths();
+    console.log('✓ learning paths synced');
     process.exit(0);
   } catch (error) {
     console.error('Migration failed:', error);
@@ -558,3 +560,69 @@ async function migrate() {
 }
 
 migrate();
+
+async function syncAllLearningPaths() {
+  const { rows } = await query(
+    `SELECT DISTINCT category, level FROM courses WHERE published = true`
+  );
+
+  function pathSlug(category: string, level: string): string {
+    return category.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '') + '-' + level;
+  }
+
+  const levelColors: Record<string, string> = {
+    beginner: 'from-emerald-500 to-teal-600',
+    intermediate: 'from-blue-500 to-indigo-600',
+    advanced: 'from-purple-500 to-pink-600',
+  };
+  const levelIcons: Record<string, string> = {
+    beginner: 'BookOpen',
+    intermediate: 'BarChart',
+    advanced: 'Rocket',
+  };
+
+  for (const row of rows) {
+    const slug = pathSlug(row.category, row.level);
+    const lvl: string = row.level;
+    const title = `${row.category} for ${lvl.charAt(0).toUpperCase() + lvl.slice(1)}`;
+    const icon = levelIcons[lvl] || 'GitBranch';
+    const color = levelColors[lvl] || 'from-blue-600 to-cyan-600';
+
+    const existing = await query('SELECT id FROM learning_paths WHERE slug = $1', [slug]);
+    let pathId: string;
+    if (existing.rows.length > 0) {
+      pathId = existing.rows[0].id;
+      await query(
+        `UPDATE learning_paths SET title = $1, icon = $2, color = $3, level = $4, updated_at = NOW() WHERE slug = $5`,
+        [title, icon, color, lvl, slug]
+      );
+    } else {
+      const ins = await query(
+        `INSERT INTO learning_paths (title, description, icon, color, level, slug)
+         VALUES ($1, $2, $3, $4, $5, $6)
+         RETURNING id`,
+        [title, `${row.category} path for ${lvl} learners`, icon, color, lvl, slug]
+      );
+      pathId = ins.rows[0].id;
+    }
+
+    const courses = await query(
+      `SELECT id FROM courses WHERE category = $1 AND level = $2 AND published = true ORDER BY created_at ASC`,
+      [row.category, lvl]
+    );
+
+    await query('DELETE FROM learning_path_courses WHERE path_id = $1', [pathId]);
+    for (let i = 0; i < courses.rows.length; i++) {
+      await query(
+        `INSERT INTO learning_path_courses (path_id, course_id, order_index) VALUES ($1, $2, $3)`,
+        [pathId, courses.rows[i].id, i]
+      );
+    }
+  }
+
+  await query(
+    `DELETE FROM learning_paths lp WHERE NOT EXISTS (
+      SELECT 1 FROM learning_path_courses lpc WHERE lpc.path_id = lp.id
+    )`
+  );
+}

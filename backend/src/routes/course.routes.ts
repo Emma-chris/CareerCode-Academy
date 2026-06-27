@@ -7,6 +7,7 @@ import * as LessonModel from '../models/lesson';
 import * as EnrollmentModel from '../models/enrollment';
 import * as PaymentModel from '../models/payment';
 import * as ReviewModel from '../models/review';
+import { syncLearningPathForCourse } from '../models/learningPath';
 import { uploadSingle, getFileUrl } from '../middleware/upload';
 import { emitDashboardUpdate, emitStudentUpdate } from '../config/socket';
 import { slugify } from '../utils/helpers';
@@ -177,6 +178,8 @@ router.post(
         slug,
       });
 
+      await syncLearningPathForCourse(course);
+
       res.status(201).json({ success: true, data: course });
     } catch (error) {
       next(error);
@@ -215,6 +218,12 @@ router.put(
       }
 
       const updated = await CourseModel.updateCourse(req.params.id, data);
+      if (!updated) throw new NotFoundError('Course');
+      await syncLearningPathForCourse(
+        { id: req.params.id, category: updated.category, level: updated.level },
+        course.category,
+        course.level
+      );
       res.json({ success: true, data: updated });
     } catch (error) {
       next(error);
@@ -239,6 +248,9 @@ router.delete(
       }
 
       await CourseModel.deleteCourse(req.params.id);
+      await syncLearningPathForCourse(
+        { id: req.params.id, category: course.category, level: course.level }
+      );
       res.json({ success: true, message: 'Course deleted successfully' });
     } catch (error) {
       next(error);

@@ -19,6 +19,7 @@ import { validate } from '../middleware/validate';
 import { logAudit } from '../middleware/audit';
 import { io, emitDashboardUpdate } from '../config/socket';
 import { uploadSingle } from '../middleware/upload';
+import { syncLearningPathForCourse } from '../models/learningPath';
 
 const adminCreateCourseSchema = z.object({
   title: z.string().min(3).max(200),
@@ -283,10 +284,12 @@ router.get('/courses', async (req: Request, res: Response, next: NextFunction) =
 router.delete('/courses/:id', async (req: AuthRequest, res: Response, next: NextFunction) => {
   try {
     const { id } = req.params;
-    const deleted = await CourseModel.deleteCourse(id);
-    if (!deleted) {
+    const course = await CourseModel.getCourseById(id);
+    if (!course) {
       return res.status(404).json({ success: false, message: 'Course not found' });
     }
+    const deleted = await CourseModel.deleteCourse(id);
+    await syncLearningPathForCourse({ id, category: course.category, level: course.level });
     await logAudit({ adminId: req.user!.userId, action: 'delete', resourceType: 'course', resourceId: id, ipAddress: req.ip });
     res.json({ success: true, message: 'Course deleted successfully' });
   } catch (error) {
@@ -326,6 +329,7 @@ router.post('/courses', validate(adminCreateCourseSchema), async (req: AuthReque
 
     await logAudit({ adminId: req.user!.userId, action: 'create', resourceType: 'course', resourceId: course.id, ipAddress: req.ip });
     const final = await CourseModel.getCourseById(course.id);
+    await syncLearningPathForCourse(final || course);
     res.status(201).json({ success: true, data: final || course });
   } catch (error) {
     next(error);
@@ -363,8 +367,15 @@ router.put('/courses/:id', validate(adminUpdateCourseSchema), async (req: AuthRe
       await CourseModel.updateCourseStatus(req.params.id, status, undefined, req.user!.userId);
     }
 
-    await logAudit({ adminId: req.user!.userId, action: 'update', resourceType: 'course', resourceId: req.params.id, ipAddress: req.ip });
     const updated = await CourseModel.getCourseById(req.params.id);
+
+    await syncLearningPathForCourse(
+      { id: req.params.id, category: updated?.category || existing.category, level: updated?.level || existing.level },
+      existing.category,
+      existing.level
+    );
+
+    await logAudit({ adminId: req.user!.userId, action: 'update', resourceType: 'course', resourceId: req.params.id, ipAddress: req.ip });
     res.json({ success: true, data: updated });
   } catch (error) {
     next(error);
