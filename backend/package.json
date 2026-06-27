@@ -11,6 +11,8 @@
     "seed:admin": "tsx --require dotenv/config src/seed-admin.ts",
     "seed:exam": "tsx --require dotenv/config src/seed-exam-questions.ts",
     "seed:cert": "tsx --require dotenv/config src/seed-certificate-assets.ts",
+    "seed:yt": "tsx --require dotenv/config src/seed-youtube-videos.ts",
+    "seed:yt:urls": "tsx --require dotenv/config src/seed-youtube-videos.ts --urls-only",
     "generate-videos": "tsx --require dotenv/config src/generate-lesson-videos.ts",
     "migrate": "tsx --require dotenv/config src/migrate.ts",
     "migrate:s3": "tsx --require dotenv/config src/migrate-local-to-s3.ts",
