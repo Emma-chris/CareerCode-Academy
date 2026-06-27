@@ -93,7 +93,10 @@ export default function Checkout() {
         provider,
       });
 
-      if (data.data?.authorizationUrl) {
+      if (data.data?.course_slug) {
+        toast.success('Enrolled successfully!');
+        navigate(`/student/courses/${data.data.course_slug}`);
+      } else if (data.data?.authorizationUrl) {
         window.location.href = data.data.authorizationUrl;
       } else {
         toast.success('Enrolled successfully!');
@@ -258,6 +261,12 @@ export default function Checkout() {
                       <span>Original Price</span>
                       <span>₦{Number(course.price).toLocaleString()}</span>
                     </div>
+                    {course.discount_percentage > 0 && (
+                      <div className="flex justify-between text-emerald-600 dark:text-emerald-400">
+                        <span>Discount ({course.discount_percentage}%)</span>
+                        <span>-₦{Number(course.price * course.discount_percentage / 100).toLocaleString()}</span>
+                      </div>
+                    )}
                     <div className="flex justify-between text-gray-600 dark:text-gray-400">
                       <span>Platform Fee</span>
                       <span className="text-emerald-600 dark:text-emerald-400 font-medium">Free</span>
@@ -272,7 +281,7 @@ export default function Checkout() {
                         <span className="text-gray-800 dark:text-gray-300 font-medium">Total Amount</span>
                         <div className="text-right">
                           <span className="text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-purple-600 dark:from-blue-400 dark:to-purple-400">
-                            ₦{Number(course.price).toLocaleString()}
+                            ₦{Number(course.price * (1 - (course.discount_percentage || 0) / 100)).toLocaleString()}
                           </span>
                         </div>
                       </div>

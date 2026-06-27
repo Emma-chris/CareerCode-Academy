@@ -37,6 +37,26 @@ router.post(
         throw new NotFoundError('Course');
       }
 
+      const discount = course.discount_percentage || 0;
+      const effectivePrice = course.price * (1 - discount / 100);
+
+      if (effectivePrice <= 0) {
+        const existingEnrollment = await EnrollmentModel.getEnrollment(userId, courseId);
+        if (!existingEnrollment) {
+          await EnrollmentModel.createEnrollment({ user_id: userId, course_id: courseId });
+        }
+        emitDashboardUpdate();
+        emitStudentUpdate(userId);
+        return res.json({
+          success: true,
+          data: {
+            amount: 0,
+            course_slug: course.slug,
+            message: 'Enrolled successfully (100% discount applied)',
+          }
+        });
+      }
+
       if (course.price === 0) {
         return res.status(400).json({
           success: false,
@@ -55,7 +75,7 @@ router.post(
       const payment = await PaymentModel.createPayment({
         user_id: userId,
         course_id: courseId,
-        amount: course.price,
+        amount: effectivePrice,
         currency,
         provider,
         reference,
@@ -66,6 +86,7 @@ router.post(
         reference: payment.reference,
         amount: payment.amount,
         currency: payment.currency,
+        course_slug: course.slug,
       };
 
       const paystackKey = process.env.PAYSTACK_SECRET_KEY || '';
@@ -214,7 +235,8 @@ router.get(
       }
 
       const updatedPayment = await verifyPaymentByReference(reference);
-      res.json({ success: true, data: updatedPayment, enrollment: true });
+      const courseSlug = await getCourseSlugByPayment(updatedPayment);
+      res.json({ success: true, data: { ...updatedPayment, course_slug: courseSlug }, enrollment: true });
     } catch (error) {
       next(error);
     }
@@ -242,12 +264,19 @@ router.post(
       }
 
       const updatedPayment = await verifyPaymentByReference(reference);
-      res.json({ success: true, data: updatedPayment, enrollment: true });
+      const courseSlug = await getCourseSlugByPayment(updatedPayment);
+      res.json({ success: true, data: { ...updatedPayment, course_slug: courseSlug }, enrollment: true });
     } catch (error) {
       next(error);
     }
   }
 );
+
+async function getCourseSlugByPayment(payment: any): Promise<string | null> {
+  if (!payment?.course_id) return null;
+  const { rows } = await query('SELECT slug FROM courses WHERE id = $1', [payment.course_id]);
+  return rows[0]?.slug || null;
+}
 
 function verifyPaystackWebhook(req: Request): boolean {
   const secret = process.env.PAYSTACK_SECRET_KEY;

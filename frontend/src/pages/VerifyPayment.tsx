@@ -12,6 +12,7 @@ export default function VerifyPayment() {
   const reference = searchParams.get('reference') || searchParams.get('trxref');
   const [state, setState] = useState<'loading' | 'success' | 'error'>('loading');
   const [message, setMessage] = useState('');
+  const [courseSlug, setCourseSlug] = useState<string | null>(null);
   const [countdown, setCountdown] = useState(5);
 
   useEffect(() => {
@@ -29,9 +30,9 @@ export default function VerifyPayment() {
       return () => clearTimeout(timer);
     }
     if (state === 'success' && countdown === 0) {
-      navigate('/student/dashboard');
+      navigate(courseSlug ? `/student/courses/${courseSlug}` : '/student/dashboard');
     }
-  }, [state, countdown, navigate]);
+  }, [state, countdown, navigate, courseSlug]);
 
   const verifyPayment = async () => {
     setState('loading');
@@ -40,6 +41,7 @@ export default function VerifyPayment() {
       if (data.enrollment || data.data?.status === 'completed') {
         setState('success');
         setMessage('Payment verified successfully!');
+        if (data.data?.course_slug) setCourseSlug(data.data.course_slug);
       } else {
         setState('success');
         setMessage('Payment successful!');
@@ -100,7 +102,7 @@ export default function VerifyPayment() {
                 <span className="text-sm font-medium">Receipt confirmed</span>
               </div>
               
-              <Link to="/student/dashboard" className="block w-full">
+              <Link to={courseSlug ? `/student/courses/${courseSlug}` : '/student/dashboard'} className="block w-full">
                 <Button className="w-full h-12 bg-emerald-600 hover:bg-emerald-700 text-white shadow-lg shadow-emerald-600/20 group">
                   Go to Dashboard 
                   <span className="bg-emerald-700 rounded px-2 py-0.5 ml-2 text-xs font-mono group-hover:bg-emerald-800 transition-colors">

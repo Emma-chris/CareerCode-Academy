@@ -24,6 +24,7 @@ const adminCreateCourseSchema = z.object({
   title: z.string().min(3).max(200),
   description: z.string().min(10).max(5000),
   price: z.number().min(0),
+  discountPercentage: z.number().min(0).max(100).optional(),
   category: z.string().min(2),
   level: z.enum(['beginner', 'intermediate', 'advanced']),
   duration: z.number().min(1),
@@ -37,6 +38,7 @@ const adminUpdateCourseSchema = z.object({
   title: z.string().min(3).max(200).optional(),
   description: z.string().min(10).max(5000).optional(),
   price: z.number().min(0).optional(),
+  discountPercentage: z.number().min(0).max(100).optional(),
   category: z.string().min(2).optional(),
   level: z.enum(['beginner', 'intermediate', 'advanced']).optional(),
   duration: z.number().min(1).optional(),
@@ -308,10 +310,11 @@ router.get('/courses/:id', async (req: Request, res: Response, next: NextFunctio
 // POST /admin/courses
 router.post('/courses', validate(adminCreateCourseSchema), async (req: AuthRequest, res: Response, next: NextFunction) => {
   try {
-    const { title, description, price, category, level, duration, thumbnail, status, instructor_id, learning_outcomes } = req.body;
+    const { title, description, price, discountPercentage, category, level, duration, thumbnail, status, instructor_id, learning_outcomes } = req.body;
     const slug = slugify(title);
     const course = await CourseModel.createCourse({
       title, description, price, category, level, duration, instructor_id, slug,
+      discount_percentage: discountPercentage ?? 0,
       thumbnail: thumbnail || undefined,
       learning_outcomes: learning_outcomes || undefined,
     });
@@ -337,12 +340,13 @@ router.put('/courses/:id', validate(adminUpdateCourseSchema), async (req: AuthRe
       return res.status(404).json({ success: false, message: 'Course not found' });
     }
 
-    const { title, description, price, category, level, duration, thumbnail, status, instructor_id, learning_outcomes } = req.body;
+    const { title, description, price, discountPercentage, category, level, duration, thumbnail, status, instructor_id, learning_outcomes } = req.body;
 
     const updateData: Record<string, any> = {};
     if (title !== undefined) updateData.title = title;
     if (description !== undefined) updateData.description = description;
     if (price !== undefined) updateData.price = price;
+    if (discountPercentage !== undefined) updateData.discount_percentage = discountPercentage;
     if (category !== undefined) updateData.category = category;
     if (level !== undefined) updateData.level = level;
     if (duration !== undefined) updateData.duration = duration;

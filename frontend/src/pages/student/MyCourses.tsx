@@ -6,7 +6,7 @@ import { GlassCard } from '@/components/ui/GlassCard';
 import { Badge } from '@/components/ui/Badge';
 import { Button } from '@/components/ui/Button';
 import { Pagination } from '@/components/ui/Pagination';
-import { BookOpen, ArrowRight, Clock, PlayCircle } from 'lucide-react';
+import { BookOpen, ArrowRight, Clock, PlayCircle, Plus } from 'lucide-react';
 import { optimizeImageUrl } from '@/lib/cloudinary';
 import { PageSkeleton, CardSkeleton } from '@/components/student/SkeletonLoader';
 import toast from 'react-hot-toast';
@@ -106,6 +106,9 @@ export default function MyCourses() {
               : 'Start learning today!'}
           </p>
         </div>
+        <Link to="/courses">
+          <Button variant="outline" size="sm" icon={<Plus className="w-4 h-4" />}>Add Course</Button>
+        </Link>
       </div>
 
       {enrollments.length === 0 ? (

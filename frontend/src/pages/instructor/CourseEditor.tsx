@@ -32,6 +32,7 @@ export default function CourseEditor() {
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [price, setPrice] = useState('');
+  const [discountPercentage, setDiscountPercentage] = useState('');
   const [category, setCategory] = useState('Web Development');
   const [level, setLevel] = useState('beginner');
   const [duration, setDuration] = useState('');
@@ -53,6 +54,7 @@ export default function CourseEditor() {
         setTitle(c.title);
         setDescription(c.description);
         setPrice(c.price.toString());
+        setDiscountPercentage(c.discount_percentage?.toString() || '');
         setCategory(c.category);
         setLevel(c.level);
         setDuration(c.duration?.toString() || '');
@@ -83,7 +85,7 @@ export default function CourseEditor() {
   const handleSaveCourse = async () => {
     setIsSaving(true);
     try {
-      const payload = { title, description, price: parseFloat(price) || 0, category, level, published, duration: parseInt(duration) || 0 };
+      const payload = { title, description, price: parseFloat(price) || 0, discountPercentage: parseFloat(discountPercentage) || 0, category, level, published, duration: parseInt(duration) || 0 };
 
       if (isNew) {
         const { data } = await api.post('/courses', payload);
@@ -378,6 +380,7 @@ export default function CourseEditor() {
               <div className="grid grid-cols-3 gap-4">
                 <Input label="Duration (hours)" type="number" value={duration} onChange={(e) => setDuration(e.target.value)} placeholder="40" />
                 <Input label="Price (₦)" type="number" value={price} onChange={(e) => setPrice(e.target.value)} placeholder="25000" />
+                <Input label="Discount (%)" type="number" value={discountPercentage} onChange={(e) => setDiscountPercentage(e.target.value)} placeholder="0" min="0" max="100" />
                 <div className="space-y-1.5">
                   <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Category</label>
                   <select value={category} onChange={(e) => setCategory(e.target.value)} className="w-full rounded-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800/50 px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500/50">

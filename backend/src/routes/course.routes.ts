@@ -19,6 +19,7 @@ const createCourseSchema = z.object({
   title: z.string().min(3, 'Title must be at least 3 characters').max(200),
   description: z.string().min(10, 'Description must be at least 10 characters').max(5000),
   price: z.number().min(0, 'Price must be 0 or more'),
+  discountPercentage: z.number().min(0).max(100).optional(),
   category: z.string().min(2, 'Category is required'),
   level: z.enum(['beginner', 'intermediate', 'advanced']),
   duration: z.number().min(1, 'Duration must be at least 1 minute'),
@@ -30,6 +31,7 @@ const updateCourseSchema = z.object({
   title: z.string().min(3).max(200).optional(),
   description: z.string().min(10).max(5000).optional(),
   price: z.number().min(0).optional(),
+  discountPercentage: z.number().min(0).max(100).optional(),
   category: z.string().min(2).optional(),
   level: z.enum(['beginner', 'intermediate', 'advanced']).optional(),
   duration: z.number().min(1).optional(),
@@ -162,6 +164,10 @@ router.post(
   async (req: AuthRequest, res: Response, next: NextFunction) => {
     try {
       const data = req.body;
+      if (data.discountPercentage !== undefined) {
+        data.discount_percentage = data.discountPercentage;
+        delete data.discountPercentage;
+      }
       const slug = slugify(data.title);
 
       const course = await CourseModel.createCourse({
@@ -197,6 +203,10 @@ router.put(
       }
 
       const data: any = { ...req.body };
+      if (data.discountPercentage !== undefined) {
+        data.discount_percentage = data.discountPercentage;
+        delete data.discountPercentage;
+      }
       if (data.title) {
         data.slug = slugify(data.title);
       }

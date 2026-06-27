@@ -6,6 +6,7 @@ export interface Course {
   description: string;
   thumbnail: string | null;
   price: number;
+  discount_percentage: number;
   category: string;
   instructor_id: string;
   level: 'beginner' | 'intermediate' | 'advanced';
@@ -27,6 +28,7 @@ export interface CreateCourseInput {
   description: string;
   thumbnail?: string;
   price: number;
+  discount_percentage?: number;
   category: string;
   instructor_id: string;
   level: 'beginner' | 'intermediate' | 'advanced';
@@ -41,6 +43,7 @@ export interface UpdateCourseInput {
   description?: string;
   thumbnail?: string;
   price?: number;
+  discount_percentage?: number;
   category?: string;
   level?: 'beginner' | 'intermediate' | 'advanced';
   duration?: number;
@@ -50,10 +53,10 @@ export interface UpdateCourseInput {
 
 export async function createCourse(input: CreateCourseInput): Promise<Course> {
   const { rows } = await query<Course>(
-    `INSERT INTO courses (title, description, thumbnail, price, category, instructor_id, level, duration, slug, learning_outcomes)
-     VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
+    `INSERT INTO courses (title, description, thumbnail, price, discount_percentage, category, instructor_id, level, duration, slug, learning_outcomes)
+     VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)
      RETURNING *`,
-    [input.title, input.description, input.thumbnail || null, input.price, input.category, input.instructor_id, input.level, input.duration, input.slug, input.learning_outcomes || []]
+    [input.title, input.description, input.thumbnail || null, input.price, input.discount_percentage ?? 0, input.category, input.instructor_id, input.level, input.duration, input.slug, input.learning_outcomes || []]
   );
   return rows[0];
 }

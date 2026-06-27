@@ -44,6 +44,7 @@ async function migrate() {
         description TEXT NOT NULL,
         thumbnail TEXT,
         price DECIMAL(10, 2) NOT NULL DEFAULT 0,
+        discount_percentage DECIMAL(5,2) NOT NULL DEFAULT 0,
         category VARCHAR(100) NOT NULL,
         instructor_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
         level VARCHAR(20) NOT NULL DEFAULT 'beginner' CHECK (level IN ('beginner', 'intermediate', 'advanced')),
@@ -421,6 +422,9 @@ async function migrate() {
     await query('ALTER TABLE course_proposals ADD COLUMN IF NOT EXISTS reviewed_at TIMESTAMPTZ');
 
     await query('ALTER TABLE lessons ADD COLUMN IF NOT EXISTS module_id UUID REFERENCES modules(id) ON DELETE SET NULL');
+
+    await query('ALTER TABLE courses ADD COLUMN IF NOT EXISTS discount_percentage DECIMAL(5,2) NOT NULL DEFAULT 0');
+    console.log('✓ discount_percentage column added to courses');
 
     // Create indexes
     await query('CREATE INDEX IF NOT EXISTS idx_refresh_tokens_user ON refresh_tokens(user_id)');

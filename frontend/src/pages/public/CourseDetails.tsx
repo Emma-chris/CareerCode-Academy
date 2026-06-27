@@ -85,7 +85,7 @@ export default function CourseDetails() {
       if (isFree) {
         await enrollCourse(course.id);
         toast.success('Enrolled successfully!');
-        navigate('/student/dashboard');
+        navigate(`/student/courses/${course.slug}`);
       } else {
         const result: any = await initializePayment(course.id, 'paystack');
         if (result?.authorizationUrl) {
@@ -227,6 +227,12 @@ export default function CourseDetails() {
                   <div className="text-3xl font-bold text-white">
                     {isFree ? (
                       <span className="text-emerald-400">Free</span>
+                    ) : course.discount_percentage > 0 ? (
+                      <div className="flex items-center gap-3">
+                        <span className="text-2xl line-through text-gray-500">₦{Number(course.price).toLocaleString()}</span>
+                        <span className="text-emerald-400">₦{Number(course.price * (1 - course.discount_percentage / 100)).toLocaleString()}</span>
+                        <span className="text-sm bg-emerald-500/20 text-emerald-400 px-2 py-0.5 rounded-full">-{course.discount_percentage}%</span>
+                      </div>
                     ) : (
                       <>₦{Number(course.price).toLocaleString()}</>
                     )}
