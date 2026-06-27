@@ -44,15 +44,15 @@ export default defineConfig({
     host: true,
     proxy: {
       '/api': {
-        target: 'https://careercode-academy-1.onrender.com',
+        target: 'https://careercode-academy.onrender.com',
         changeOrigin: true,
       },
       '/uploads': {
-        target: 'https://careercode-academy-1.onrender.com',
+        target: 'https://careercode-academy.onrender.com',
         changeOrigin: true,
       },
       '/socket.io': {
-        target: 'https://careercode-academy-1.onrender.com',
+        target: 'https://careercode-academy.onrender.com',
         ws: true,
         changeOrigin: true,
       },
