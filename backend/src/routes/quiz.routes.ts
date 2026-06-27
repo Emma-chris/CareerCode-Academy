@@ -6,6 +6,32 @@ import { NotFoundError, ForbiddenError } from '../utils/errors';
 
 const router = Router();
 
+// GET /quizzes/lesson/:lessonId - Get quiz for a lesson (returns null if none)
+router.get('/lesson/:lessonId', authenticate, async (req: AuthRequest, res: Response, next: NextFunction) => {
+  try {
+    const { lessonId } = req.params;
+    const { rows } = await query('SELECT * FROM quizzes WHERE lesson_id = $1 LIMIT 1', [lessonId]);
+    const quiz = rows[0] || null;
+
+    if (quiz) {
+      const questions = await QuizModel.getQuestionsByQuiz(quiz.id);
+      const isInstructorOrAdmin = ['instructor', 'admin', 'super_admin'].includes(req.user!.role);
+      quiz.questions = questions.map(q => ({
+        id: q.id,
+        question: q.question,
+        options: q.options,
+        points: q.points,
+        order_index: q.order_index,
+        ...(isInstructorOrAdmin ? { correct_answer: q.correct_answer } : {}),
+      }));
+    }
+
+    res.json({ success: true, data: quiz });
+  } catch (error) {
+    next(error);
+  }
+});
+
 // GET /quizzes/course/:courseId - Get quizzes for a course (with questions count)
 router.get('/course/:courseId', authenticate, async (req: AuthRequest, res: Response, next: NextFunction) => {
   try {

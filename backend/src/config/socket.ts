@@ -13,6 +13,7 @@ export function createSocketServer(server: http.Server) {
           process.env.FRONTEND_URL,
           'https://career-code-academy.vercel.app',
           'https://careercode-academy-1.onrender.com',
+          'https://careercode-academy.onrender.com',
           ...(process.env.CORS_ORIGINS ? process.env.CORS_ORIGINS.split(',') : []),
         ].filter(Boolean);
         if (!origin || allowed.includes(origin)) {

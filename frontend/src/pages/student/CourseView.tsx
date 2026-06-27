@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useCallback } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { api } from '../../lib/axios';
@@ -8,11 +8,12 @@ import { Badge } from '../../components/ui/Badge';
 import { Button } from '../../components/ui/Button';
 import { Loader } from '../../components/ui/Loader';
 import SolveChallenge from '../../components/student/SolveChallenge';
-import { optimizeImageUrl, optimizeVideoThumbnail } from '../../lib/cloudinary';
+import VideoPlayer from '../../components/VideoPlayer';
+import { optimizeImageUrl } from '../../lib/cloudinary';
 import toast from 'react-hot-toast';
 import {
   PlayCircle, CheckCircle, Lock, ChevronLeft, ChevronRight,
-  FileText, Download, Maximize, BookOpen, Clock, Award,
+  FileText, Download, BookOpen, Clock, Award,
   ChevronDown, ChevronUp, PenLine, HelpCircle, Monitor, Code,
   Bookmark, BookmarkCheck, Gauge, Minimize2, PartyPopper,
   Megaphone, BarChart3, Brain, Palette, Image, Briefcase,
@@ -52,8 +53,7 @@ export default function CourseView() {
   const [playbackSpeed, setPlaybackSpeed] = useState(1);
   const [autoPlayNext, setAutoPlayNext] = useState(true);
   const [showCompletion, setShowCompletion] = useState(false);
-  const videoRef = useRef<HTMLVideoElement>(null);
-  const courseContainerRef = useRef<HTMLDivElement>(null);
+
 
   useEffect(() => {
     localStorage.setItem('bookmarkedLessons', JSON.stringify(bookmarkedLessons));
@@ -270,12 +270,18 @@ export default function CourseView() {
       if (e.key === 'ArrowRight') {
         if (currentLessonIndex < totalLessons - 1) goToLesson(currentLessonIndex + 1);
       }
-      if (e.key === ' ' && videoRef.current) {
-        e.preventDefault();
-        videoRef.current.paused ? videoRef.current.play() : videoRef.current.pause();
+      if (e.key === ' ') {
+        const video = document.querySelector('video');
+        if (video) {
+          e.preventDefault();
+          video.paused ? video.play() : video.pause();
+        }
       }
-      if ((e.key === 'm' || e.key === 'M') && videoRef.current) {
-        videoRef.current.muted = !videoRef.current.muted;
+      if (e.key === 'm' || e.key === 'M') {
+        const video = document.querySelector('video');
+        if (video) {
+          video.muted = !video.muted;
+        }
       }
     };
     window.addEventListener('keydown', handler);
@@ -500,62 +506,16 @@ export default function CourseView() {
         {/* Main Content */}
         <div className="flex-1 flex flex-col overflow-hidden">
           {/* Video Area */}
-          <div className="bg-black flex items-center justify-center relative" style={{ maxHeight: '55vh' }} ref={courseContainerRef}>
-            {currentLesson?.video_url ? (
-              <>
-                <video
-                  ref={videoRef}
-                  className="w-full h-full object-contain"
-                  src={currentLesson.video_url}
-                  controls
-                  poster={optimizeVideoThumbnail(currentLesson.video_url, 1280, 720)}
-                  onTimeUpdate={() => handleWatchProgress(currentLesson.id)}
-                  onPause={() => handleWatchProgress(currentLesson.id)}
-                  onRateChange={() => { if (videoRef.current) videoRef.current.playbackRate = playbackSpeed; }}
-                />
-                {/* Speed Control */}
-                <div className="absolute bottom-2 right-14 z-10 flex gap-1">
-                  {[0.5, 1, 1.25, 1.5, 2].map(speed => (
-                    <button
-                      key={speed}
-                      onClick={() => {
-                        setPlaybackSpeed(speed);
-                        if (videoRef.current) videoRef.current.playbackRate = speed;
-                      }}
-                      className={`px-1.5 py-0.5 text-[10px] font-medium rounded transition-colors ${
-                        playbackSpeed === speed
-                          ? 'bg-blue-500 text-white'
-                          : 'bg-gray-800/80 text-gray-300 hover:bg-gray-700/80'
-                      }`}
-                    >
-                      {speed}x
-                    </button>
-                  ))}
-                </div>
-                {/* Fullscreen Toggle */}
-                <button
-                  onClick={() => {
-                    if (document.fullscreenElement) {
-                      document.exitFullscreen();
-                    } else {
-                      courseContainerRef.current?.requestFullscreen();
-                    }
-                  }}
-                  className="absolute bottom-2 right-2 p-1.5 rounded-lg bg-gray-800/80 text-gray-300 hover:bg-gray-700/80 transition-colors z-10"
-                  title="Toggle fullscreen"
-                >
-                  <Maximize className="w-4 h-4" />
-                </button>
-              </>
-            ) : (
-              <div className="text-center p-12">
-                <PlayCircle className="w-20 h-20 text-blue-400/50 mx-auto mb-4" />
-                <p className="text-gray-500 text-lg">{currentLesson?.title || 'Select a lesson to begin'}</p>
-                {currentLesson?.description && (
-                  <p className="text-gray-600 text-sm mt-2 max-w-lg mx-auto">{currentLesson.description}</p>
-                )}
-              </div>
-            )}
+          <div className="bg-black" style={{ maxHeight: '55vh' }}>
+            <VideoPlayer
+              videoUrl={currentLesson?.video_url || null}
+              lessonId={currentLesson?.id || null}
+              title={currentLesson?.title}
+              description={currentLesson?.description}
+              playbackSpeed={playbackSpeed}
+              onProgress={handleWatchProgress}
+              onSpeedChange={setPlaybackSpeed}
+            />
           </div>
 
           {/* Tabs + Content */}

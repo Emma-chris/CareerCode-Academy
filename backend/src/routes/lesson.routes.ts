@@ -5,6 +5,7 @@ import { authenticate, authorize, AuthRequest } from '../middleware/auth';
 import * as LessonModel from '../models/lesson';
 import * as CourseModel from '../models/course';
 import * as EnrollmentModel from '../models/enrollment';
+import * as LessonNoteModel from '../models/lessonNote';
 import { uploadSingle, getFileUrl } from '../middleware/upload';
 import { NotFoundError, ForbiddenError } from '../utils/errors';
 
@@ -149,5 +150,26 @@ router.delete(
     }
   }
 );
+
+// GET /lessons/:id/notes - Get lesson notes for current user
+router.get('/:id/notes', authenticate, async (req: AuthRequest, res: Response, next: NextFunction) => {
+  try {
+    const content = await LessonNoteModel.getNote(req.user!.userId, req.params.id);
+    res.json({ success: true, data: content });
+  } catch (error) {
+    next(error);
+  }
+});
+
+// POST /lessons/:id/notes - Save lesson notes for current user
+router.post('/:id/notes', authenticate, async (req: AuthRequest, res: Response, next: NextFunction) => {
+  try {
+    const { content } = req.body;
+    await LessonNoteModel.upsertNote(req.user!.userId, req.params.id, content || '');
+    res.json({ success: true, message: 'Notes saved' });
+  } catch (error) {
+    next(error);
+  }
+});
 
 export default router;
