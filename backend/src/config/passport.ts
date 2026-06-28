@@ -10,9 +10,6 @@ const GOOGLE_CLIENT_SECRET = process.env.GOOGLE_CLIENT_SECRET;
 function getCallbackUrl(): string {
   if (process.env.GOOGLE_CALLBACK_URL) return process.env.GOOGLE_CALLBACK_URL;
   const port = process.env.PORT || '5000';
-  if (process.env.NODE_ENV === 'production') {
-    return `https://careercode-academy.onrender.com/api/v1/auth/google/callback`;
-  }
   return `http://localhost:${port}/api/v1/auth/google/callback`;
 }
 
