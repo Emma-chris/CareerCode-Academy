@@ -10,6 +10,7 @@ import { BookOpen, ArrowRight, Clock, PlayCircle, Plus } from 'lucide-react';
 import { optimizeImageUrl } from '@/lib/cloudinary';
 import { PageSkeleton, CardSkeleton } from '@/components/student/SkeletonLoader';
 import toast from 'react-hot-toast';
+import SEO from '@/components/seo/SEO';
 
 const statusColors: Record<string, string> = {
   active: 'bg-success-500/20 text-success-400',
@@ -97,6 +98,7 @@ export default function MyCourses() {
 
   return (
     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
+      <SEO title="My Courses" />
       <div className="flex items-center justify-between mb-8">
         <div>
           <h1 className="text-2xl sm:text-3xl font-bold">My Courses</h1>

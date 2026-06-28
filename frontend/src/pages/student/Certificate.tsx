@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { api } from '@/lib/axios';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Award, Share2, Calendar, Search, ExternalLink, X, Sparkles } from 'lucide-react';
+import { Award, Share2, Calendar, Search, ExternalLink, Download, X, Sparkles } from 'lucide-react';
 import { GlassCard } from '@/components/ui/GlassCard';
 import { Button } from '@/components/ui/Button';
 import { Pagination } from '@/components/ui/Pagination';
@@ -183,6 +183,13 @@ export default function Certificate() {
                         onClick={() => window.open(`/verify-certificate?code=${cert.verification_code}`, '_blank')}
                       >
                         <ExternalLink className="w-4 h-4 mr-1" /> View
+                      </Button>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => window.open(`/api/v1/certificates/${cert.id}/download`, '_blank')}
+                      >
+                        <Download className="w-4 h-4 mr-1" /> PDF
                       </Button>
                     </div>
                   </div>

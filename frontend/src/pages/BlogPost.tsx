@@ -6,6 +6,7 @@ import { GlassCard } from '@/components/ui/GlassCard';
 import { Badge } from '@/components/ui/Badge';
 import { Button } from '@/components/ui/Button';
 import { formatDate } from '@/lib/utils';
+import SEO from '@/components/seo/SEO';
 
 const postData = {
   'landing-first-dev-job': {
@@ -95,6 +96,7 @@ export default function BlogPost() {
 
   return (
     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
+      <SEO title={post?.title || 'Blog Post'} description={post?.content?.slice(0, 160)} type="article" />
       <div className="relative h-[40vh] overflow-hidden">
         <img src={post.image} alt={post.title} className="w-full h-full object-cover" />
         <div className="absolute inset-0 bg-gradient-to-t from-gray-950 via-gray-950/60 to-transparent" />

@@ -17,6 +17,7 @@ import { useAuthStore } from '@/store/authStore';
 import { useThemeStore } from '@/store/themeStore';
 import { Button } from '@/components/ui/Button';
 import { NotificationsBell } from './NotificationsBell';
+import { PageGuideButton } from '@/guides/PageGuideButton';
 
 const navLinks = [
   { label: 'Home', path: '/' },
@@ -107,6 +108,7 @@ export function Navbar() {
           </div>
 
           <div className="flex items-center gap-3">
+            <PageGuideButton className="p-2 rounded-xl text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors hidden lg:flex" />
             <button
               onClick={toggleDarkMode}
               aria-label={darkMode ? 'Switch to light mode' : 'Switch to dark mode'}

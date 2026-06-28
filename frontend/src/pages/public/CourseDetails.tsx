@@ -15,6 +15,7 @@ import {
 import toast from 'react-hot-toast';
 import { optimizeImageUrl } from '@/lib/cloudinary';
 import { api } from '@/lib/axios';
+import SEO from '@/components/seo/SEO';
 
 const levelColors: Record<string, string> = {
   beginner: 'bg-green-500/20 text-green-400 border-green-500/30',
@@ -152,6 +153,7 @@ export default function CourseDetails() {
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-950">
+      <SEO title={course?.title || 'Course Details'} description={course?.description?.slice(0, 160)} />
       {/* Header / Hero */}
       <div className="relative bg-gradient-to-b from-blue-900/40 dark:to-gray-950 to-white pt-20 pb-12">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">

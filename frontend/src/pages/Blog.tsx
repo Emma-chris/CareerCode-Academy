@@ -6,6 +6,7 @@ import { GlassCard } from '@/components/ui/GlassCard';
 import { Badge } from '@/components/ui/Badge';
 import { formatDate } from '@/lib/utils';
 import api from '@/lib/axios';
+import SEO from '@/components/seo/SEO';
 
 export default function Blog() {
   const [posts, setPosts] = useState<any[]>([]);
@@ -26,6 +27,7 @@ export default function Blog() {
   }, []);
   return (
     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
+      <SEO title="Blog" description="Read articles and tutorials on software development, career tips, and tech industry insights." />
       <section className="py-20 relative">
         <div className="absolute inset-0 gradient-bg-subtle" />
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative">

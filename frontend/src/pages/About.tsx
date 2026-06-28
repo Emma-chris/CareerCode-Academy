@@ -4,6 +4,7 @@ import { Target, Eye, Heart, Users, Award, Globe, Code2, BookOpen, Lightbulb, Ar
 import { GlassCard } from '@/components/ui/GlassCard';
 import { Button } from '@/components/ui/Button';
 import { Link } from 'react-router-dom';
+import SEO from '@/components/seo/SEO';
 
 const team = [
   {
@@ -55,6 +56,7 @@ export default function About() {
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
     >
+      <SEO title="About" description="Learn about CareerCode Academy's mission to help beginners become job-ready software developers." />
       <section className="py-20 relative">
         <div className="absolute inset-0 gradient-bg-subtle" />
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative">

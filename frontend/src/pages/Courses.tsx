@@ -20,6 +20,7 @@ import { GlassCard } from '@/components/ui/GlassCard';
 import { Badge } from '@/components/ui/Badge';
 import { Input } from '@/components/ui/Input';
 import { useCourseStore } from '@/store/courseStore';
+import SEO from '@/components/seo/SEO';
 
 const categories = ['All', 'Web Development', 'Data Science', 'Mobile', 'DevOps', 'Security', 'Design', 'AI', 'Programming', 'Computer Science', 'Databases', 'Networking', 'Cloud Computing', 'Software Engineering'];
 const levels = ['All Levels', 'Beginner', 'Intermediate', 'Advanced'];
@@ -73,6 +74,7 @@ export default function Courses() {
 
   return (
     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
+      <SEO title="Courses" description="Browse our comprehensive catalog of software development, data science, cybersecurity, and cloud computing courses." />
       <section className="py-20 relative">
         <div className="absolute inset-0 gradient-bg-subtle" />
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative">

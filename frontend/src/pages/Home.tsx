@@ -6,6 +6,7 @@ import { StatsCounter } from '@/components/home/StatsCounter';
 import { Testimonials } from '@/components/home/Testimonials';
 import { FAQ } from '@/components/home/FAQ';
 import { Newsletter } from '@/components/home/Newsletter';
+import SEO from '@/components/seo/SEO';
 
 export default function Home() {
   return (
@@ -14,6 +15,7 @@ export default function Home() {
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
     >
+      <SEO title="Home" />
       <Hero />
       <FeaturedCourses />
       <StatsCounter />

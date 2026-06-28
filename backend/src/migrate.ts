@@ -26,6 +26,25 @@ async function migrate() {
     `);
     console.log('✓ users table created');
 
+    // Add instructor profile columns
+    const columns = [
+      { name: 'headline', type: 'VARCHAR(200)' },
+      { name: 'location', type: 'VARCHAR(100)' },
+      { name: 'website', type: 'VARCHAR(255)' },
+      { name: 'github', type: 'VARCHAR(255)' },
+      { name: 'twitter', type: 'VARCHAR(255)' },
+      { name: 'linkedin', type: 'VARCHAR(255)' },
+      { name: 'expertise', type: 'TEXT[] DEFAULT ARRAY[]::TEXT[]' },
+    ];
+    for (const col of columns) {
+      try {
+        await query(`ALTER TABLE users ADD COLUMN IF NOT EXISTS ${col.name} ${col.type}`);
+        console.log(`  ✓ users.${col.name} column added`);
+      } catch {
+        // column may already exist
+      }
+    }
+
     await query(`
       CREATE TABLE IF NOT EXISTS refresh_tokens (
         id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -372,6 +391,7 @@ async function migrate() {
         passing_score INTEGER NOT NULL DEFAULT 70,
         max_attempts INTEGER NOT NULL DEFAULT 1,
         published BOOLEAN DEFAULT false,
+        due_date TIMESTAMPTZ,
         created_at TIMESTAMPTZ DEFAULT NOW(),
         updated_at TIMESTAMPTZ DEFAULT NOW()
       )
@@ -406,6 +426,7 @@ async function migrate() {
     `);
     console.log('✓ quiz_attempts table created');
 
+    await query('ALTER TABLE quizzes ADD COLUMN IF NOT EXISTS due_date TIMESTAMPTZ');
     await query('CREATE INDEX IF NOT EXISTS idx_quizzes_course ON quizzes(course_id)');
     await query('CREATE INDEX IF NOT EXISTS idx_quizzes_lesson ON quizzes(lesson_id)');
     await query('CREATE INDEX IF NOT EXISTS idx_quiz_questions_quiz ON quiz_questions(quiz_id)');

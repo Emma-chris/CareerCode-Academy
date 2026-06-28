@@ -5,6 +5,8 @@ import { DashboardLayout } from '@/components/layout/DashboardLayout';
 import { Loader } from '@/components/ui/Loader';
 import { useAuthStore } from '@/store/authStore';
 import api from '@/lib/axios';
+import { OnboardingProvider } from '@/guides/OnboardingContext';
+import { OnboardingModal } from '@/guides/OnboardingModal';
 
 function SuspenseWrapper({ children }: { children: React.ReactNode }) {
   return (
@@ -33,6 +35,7 @@ const VerifyEmail = lazy(() => import('@/pages/VerifyEmail'));
 const VerifyPending = lazy(() => import('@/pages/VerifyPending'));
 const Verified = lazy(() => import('@/pages/Verified'));
 const VerificationError = lazy(() => import('@/pages/VerificationError'));
+const SocialCallback = lazy(() => import('@/pages/SocialCallback'));
 const BecomeInstructor = lazy(() => import('@/pages/BecomeInstructor'));
 const Apply = lazy(() => import('@/pages/Apply'));
 const NotFound = lazy(() => import('@/pages/NotFound'));
@@ -47,8 +50,6 @@ const Terms = lazy(() => import('@/pages/Terms'));
 const Privacy = lazy(() => import('@/pages/Privacy'));
 const Cookies = lazy(() => import('@/pages/Cookies'));
 const Accessibility = lazy(() => import('@/pages/Accessibility'));
-const UserGuide = lazy(() => import('@/pages/Guide'));
-
 // Student pages
 const StudentDashboard = lazy(() => import('@/pages/student/Dashboard'));
 const StudentMyCourses = lazy(() => import('@/pages/student/MyCourses'));
@@ -87,6 +88,7 @@ const InstructorSchedule = lazy(() => import('@/pages/instructor/Schedule'));
 const InstructorCourseProposals = lazy(() => import('@/pages/instructor/CourseProposals'));
 const InstructorQuizzes = lazy(() => import('@/pages/instructor/Quizzes'));
 const InstructorPayouts = lazy(() => import('@/pages/instructor/Payouts'));
+const InstructorProfile = lazy(() => import('@/pages/instructor/Profile'));
 
 // Admin pages
 const AdminDashboard = lazy(() => import('@/pages/admin/Dashboard'));
@@ -158,6 +160,7 @@ function App() {
   }
 
   return (
+    <OnboardingProvider>
       <Routes>
         <Route element={<MainLayout />}>
           <Route path="/" element={<GuestRoute><SuspenseWrapper><Home /></SuspenseWrapper></GuestRoute>} />
@@ -177,6 +180,7 @@ function App() {
           <Route path="/auth/verify-pending" element={<SuspenseWrapper><VerifyPending /></SuspenseWrapper>} />
           <Route path="/auth/verified" element={<SuspenseWrapper><Verified /></SuspenseWrapper>} />
           <Route path="/auth/verification-error" element={<SuspenseWrapper><VerificationError /></SuspenseWrapper>} />
+          <Route path="/auth/callback" element={<SuspenseWrapper><SocialCallback /></SuspenseWrapper>} />
           <Route path="/become-instructor" element={<SuspenseWrapper><BecomeInstructor /></SuspenseWrapper>} />
           <Route path="/apply" element={<SuspenseWrapper><Apply /></SuspenseWrapper>} />
           <Route path="/verify-payment" element={<SuspenseWrapper><VerifyPayment /></SuspenseWrapper>} />
@@ -187,7 +191,6 @@ function App() {
           <Route path="/partners" element={<SuspenseWrapper><Partners /></SuspenseWrapper>} />
           <Route path="/press" element={<SuspenseWrapper><Press /></SuspenseWrapper>} />
           <Route path="/help" element={<SuspenseWrapper><Help /></SuspenseWrapper>} />
-          <Route path="/guide" element={<SuspenseWrapper><UserGuide /></SuspenseWrapper>} />
           <Route path="/terms" element={<SuspenseWrapper><Terms /></SuspenseWrapper>} />
           <Route path="/privacy" element={<SuspenseWrapper><Privacy /></SuspenseWrapper>} />
           <Route path="/cookies" element={<SuspenseWrapper><Cookies /></SuspenseWrapper>} />
@@ -237,7 +240,7 @@ function App() {
           <Route path="exams" element={<SuspenseWrapper><AdminExams /></SuspenseWrapper>} />
           <Route path="exams/:examId" element={<SuspenseWrapper><AdminExams /></SuspenseWrapper>} />
           <Route path="exams/monitor" element={<SuspenseWrapper><AdminExamMonitor /></SuspenseWrapper>} />
-          <Route path="profile" element={<SuspenseWrapper><StudentProfile /></SuspenseWrapper>} />
+          <Route path="profile" element={<SuspenseWrapper><InstructorProfile /></SuspenseWrapper>} />
         </Route>
 
         <Route path="/admin" element={<DashboardLayout requiredRole="admin" />}>
@@ -266,6 +269,8 @@ function App() {
 
         <Route path="*" element={<SuspenseWrapper><NotFound /></SuspenseWrapper>} />
       </Routes>
+      <OnboardingModal />
+    </OnboardingProvider>
   );
 }
 

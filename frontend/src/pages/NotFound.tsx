@@ -4,10 +4,12 @@ import { motion } from 'framer-motion';
 import { Home, ArrowLeft, Search } from 'lucide-react';
 import { NeonButton } from '@/components/ui/NeonButton';
 import { Button } from '@/components/ui/Button';
+import SEO from '@/components/seo/SEO';
 
 export default function NotFound() {
   return (
     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
+      <SEO title="Page Not Found" />
       <section className="min-h-screen flex items-center justify-center relative">
         <div className="absolute inset-0 gradient-bg-subtle" />
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_rgba(99,102,241,0.05),transparent_50%)]" />

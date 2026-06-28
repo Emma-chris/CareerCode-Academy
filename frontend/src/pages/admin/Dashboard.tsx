@@ -16,6 +16,7 @@ import { Button } from '@/components/ui/Button';
 import { StatsSkeleton, ChartSkeleton } from '@/components/student/SkeletonLoader';
 import { useAdminStore } from '@/store/adminStore';
 import { useSocket } from '@/hooks/useSocket';
+import SEO from '@/components/seo/SEO';
 
 function formatRelativeTime(ms: number): string {
   const seconds = Math.floor((Date.now() - ms) / 1000);
@@ -142,6 +143,7 @@ export default function AdminDashboard() {
 
   return (
     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-6">
+      <SEO title="Admin Dashboard" />
       {/* Header */}
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>

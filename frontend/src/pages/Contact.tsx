@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
 import api from '@/lib/axios';
 import toast from 'react-hot-toast';
+import SEO from '@/components/seo/SEO';
 
 const contactInfo = [
   { icon: Mail, label: 'Email', value: 'hello@careercode.academy', href: 'mailto:hello@careercode.academy' },
@@ -35,6 +36,7 @@ export default function Contact() {
 
   return (
     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
+      <SEO title="Contact" description="Get in touch with CareerCode Academy. We'd love to hear from you." />
       <section className="py-20 relative">
         <div className="absolute inset-0 gradient-bg-subtle" />
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative">

@@ -6,6 +6,7 @@ import { GlassCard } from '@/components/ui/GlassCard';
 import { Button } from '@/components/ui/Button';
 import { NeonButton } from '@/components/ui/NeonButton';
 import { cn } from '@/lib/utils';
+import SEO from '@/components/seo/SEO';
 
 const plans = [
   {
@@ -74,6 +75,7 @@ export default function Pricing() {
 
   return (
     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
+      <SEO title="Pricing" description="Choose the perfect learning plan for your career goals at CareerCode Academy." />
       <section className="py-20 relative">
         <div className="absolute inset-0 gradient-bg-subtle" />
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative">

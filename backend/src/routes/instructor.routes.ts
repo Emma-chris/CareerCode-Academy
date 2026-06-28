@@ -5,6 +5,7 @@ import { io } from '../config/socket';
 import { createNotification } from '../models/notification';
 import { sendMail } from '../config/mailer';
 import { getEnrollmentsByCourse } from '../models/enrollment';
+import { getUserById, updateUser, UpdateUserInput } from '../models/user';
 
 const router = Router();
 
@@ -1132,6 +1133,51 @@ router.delete('/mentoring-slots/:id', async (req: AuthRequest, res: Response, ne
     );
     if (rowCount === 0) return res.status(404).json({ success: false, message: 'Slot not found' });
     res.json({ success: true, message: 'Slot deleted' });
+  } catch (error) { next(error); }
+});
+
+// ----------------------------------------------------------------------
+// INSTRUCTOR PROFILE
+// ----------------------------------------------------------------------
+
+// GET /instructor/profile - Get instructor profile with stats
+router.get('/profile', async (req: AuthRequest, res: Response, next: NextFunction) => {
+  try {
+    const userId = req.user!.userId;
+    const user = await getUserById(userId);
+    if (!user) return res.status(404).json({ success: false, message: 'User not found' });
+
+    // Get instructor stats
+    const statsResult = await query(
+      `SELECT
+        (SELECT COUNT(*) FROM courses WHERE instructor_id = $1)::int as total_courses,
+        (SELECT COUNT(*) FROM courses WHERE instructor_id = $1 AND published = true)::int as published_courses,
+        (SELECT COUNT(DISTINCT e.user_id) FROM enrollments e JOIN courses c ON e.course_id = c.id WHERE c.instructor_id = $1)::int as total_students,
+        (SELECT COALESCE(SUM(p.amount), 0) FROM payments p JOIN courses c ON p.course_id = c.id WHERE c.instructor_id = $1 AND p.status = 'completed')::float as total_revenue,
+        (SELECT COALESCE(AVG(r.rating), 0) FROM reviews r JOIN courses c ON r.course_id = c.id WHERE c.instructor_id = $1)::float as average_rating`,
+      [userId]
+    );
+
+    res.json({ success: true, data: { ...user, stats: statsResult.rows[0] } });
+  } catch (error) { next(error); }
+});
+
+// PUT /instructor/profile - Update instructor profile
+router.put('/profile', async (req: AuthRequest, res: Response, next: NextFunction) => {
+  try {
+    const userId = req.user!.userId;
+    const allowedFields: (keyof UpdateUserInput)[] = [
+      'name', 'bio', 'headline', 'location', 'website', 'github', 'twitter', 'linkedin', 'expertise', 'avatar'
+    ];
+    const input: UpdateUserInput = {};
+    for (const field of allowedFields) {
+      if (req.body[field] !== undefined) {
+        (input as any)[field] = req.body[field];
+      }
+    }
+    const user = await updateUser(userId, input);
+    if (!user) return res.status(404).json({ success: false, message: 'User not found' });
+    res.json({ success: true, data: user });
   } catch (error) { next(error); }
 });
 

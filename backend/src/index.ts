@@ -42,6 +42,7 @@ import examRoutes from './routes/exam.routes';
 import payoutRoutes from './routes/payout.routes';
 import testRoutes from './routes/test.routes';
 import { query } from './config/db';
+import passport, { configurePassport } from './config/passport';
 
 const app = express();
 app.set('trust proxy', 1);
@@ -80,6 +81,10 @@ app.use(cookieParser());
 
 // Static files for uploads
 app.use('/uploads', express.static(path.join(process.cwd(), 'uploads')));
+
+// Initialize Passport
+configurePassport();
+app.use(passport.initialize());
 
 // Health check
 app.get('/health', (_req, res) => {

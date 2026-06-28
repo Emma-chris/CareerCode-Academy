@@ -72,6 +72,30 @@ router.post(
       }
       const { course_id: courseId } = lessonRes.rows[0];
 
+      // If marking complete, check quiz gate
+      if (completed) {
+        const quizRes = await query(
+          'SELECT id, passing_score FROM quizzes WHERE lesson_id = $1 AND published = true',
+          [lessonId]
+        );
+        if (quizRes.rows.length > 0) {
+          const quiz = quizRes.rows[0];
+          const attemptRes = await query(
+            'SELECT passed FROM quiz_attempts WHERE quiz_id = $1 AND user_id = $2',
+            [quiz.id, userId]
+          );
+          const passed = attemptRes.rows.length > 0 && attemptRes.rows[0].passed;
+          if (!passed) {
+            return res.status(403).json({
+              success: false,
+              error: 'You must pass the lesson quiz before marking this lesson complete',
+              quizRequired: true,
+              quizId: quiz.id,
+            });
+          }
+        }
+      }
+
       // Upsert lesson progress
       const existing = await query(
         'SELECT id FROM lesson_progress WHERE user_id = $1 AND lesson_id = $2',

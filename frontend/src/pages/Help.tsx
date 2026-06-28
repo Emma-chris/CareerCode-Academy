@@ -4,9 +4,10 @@ import { LifeBuoy, BookOpen, MessageCircle, Mail, ArrowRight, Search, FileText, 
 import { GlassCard } from '@/components/ui/GlassCard';
 import { Button } from '@/components/ui/Button';
 import { Link } from 'react-router-dom';
+import { useOnboarding } from '@/guides/OnboardingContext';
 
 const helpCategories = [
-  { icon: BookOpen, title: 'Getting Started Guide', desc: 'New here? Learn the basics of navigating our platform.', href: '/faq' },
+  { icon: BookOpen, title: 'Getting Started Guide', desc: 'New here? Learn the basics of navigating our platform.', href: '#' },
   { icon: FileText, title: 'Documentation', desc: 'Detailed guides for all platform features and tools.', href: '#' },
   { icon: Video, title: 'Video Tutorials', desc: 'Watch step-by-step walkthroughs of common tasks.', href: '#' },
   { icon: Users, title: 'Community Forums', desc: 'Get help from fellow learners and experienced mentors.', href: '/community' },
@@ -24,6 +25,8 @@ const popularArticles = [
 ];
 
 export default function Help() {
+  const { startOnboarding } = useOnboarding();
+
   return (
     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
       <section className="py-20 relative">
@@ -57,7 +60,7 @@ export default function Help() {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: i * 0.1 }}
               >
-                <Link to={cat.href}>
+                <Link to={cat.href} onClick={(e) => { if (cat.href === '#') { e.preventDefault(); startOnboarding(); } }}>
                   <GlassCard hover className="p-6 h-full">
                     <div className="w-12 h-12 rounded-xl bg-primary-500/10 flex items-center justify-center mb-4">
                       <cat.icon className="w-6 h-6 text-primary-500" />

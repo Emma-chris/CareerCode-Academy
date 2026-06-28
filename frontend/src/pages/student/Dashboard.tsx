@@ -20,6 +20,7 @@ import { RecommendedCourses } from '@/components/student/RecommendedCourses';
 import { AchievementCenter } from '@/components/student/AchievementCenter';
 import { AIStudyAssistant } from '@/components/student/AIStudyAssistant';
 import { HeroSkeleton, StatsSkeleton, CardSkeleton, ChartSkeleton } from '@/components/student/SkeletonLoader';
+import SEO from '@/components/seo/SEO';
 
 function ProgressRing({ progress, size = 56, strokeWidth = 4 }: { progress: number; size?: number; strokeWidth?: number }) {
   const radius = (size - strokeWidth) / 2;
@@ -102,6 +103,7 @@ export default function StudentDashboard() {
 
   return (
     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-8">
+      <SEO title="Dashboard" />
       {/* Hero Welcome Section */}
       <HeroSection />
 

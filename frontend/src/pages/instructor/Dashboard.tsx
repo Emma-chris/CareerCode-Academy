@@ -16,6 +16,7 @@ import { Button } from '@/components/ui/Button';
 import { useInstructorStore } from '@/store/instructorStore';
 import { useAuthStore } from '@/store/authStore';
 import { useSocket } from '@/hooks/useSocket';
+import SEO from '@/components/seo/SEO';
 import { StatsSkeleton, CardSkeleton, ChartSkeleton } from '@/components/student/SkeletonLoader';
 
 const quickActions = [
@@ -116,6 +117,7 @@ export default function InstructorDashboard() {
 
   return (
     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-8">
+      <SEO title="Instructor Dashboard" />
       {/* Header */}
       <motion.div variants={item}>
         <div className="flex flex-wrap items-center justify-between gap-3">

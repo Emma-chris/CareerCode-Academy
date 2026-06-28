@@ -1,6 +1,11 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useEditor, EditorContent } from '@tiptap/react';
+import StarterKit from '@tiptap/starter-kit';
+import UnderlineExt from '@tiptap/extension-underline';
+import HighlightExt from '@tiptap/extension-highlight';
+import PlaceholderExt from '@tiptap/extension-placeholder';
 import { api } from '../../lib/axios';
 import { useAuthStore } from '../../store/authStore';
 import { GlassCard } from '../../components/ui/GlassCard';
@@ -17,7 +22,9 @@ import {
   ChevronDown, ChevronUp, PenLine, HelpCircle, Monitor, Code,
   Bookmark, BookmarkCheck, Gauge, Minimize2, PartyPopper,
   Megaphone, BarChart3, Brain, Palette, Image, Briefcase,
+  Bold, Italic, Underline, Highlighter, Undo, Redo,
 } from 'lucide-react';
+import SEO from '@/components/seo/SEO';
 
 type Tab = 'notes' | 'quiz' | 'resources' | 'challenge' | 'announcements' | 'analytics';
 
@@ -39,6 +46,7 @@ export default function CourseView() {
   const [expandedModules, setExpandedModules] = useState<Record<string, boolean>>({});
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [resources, setResources] = useState<any[]>([]);
+  const [resourceView, setResourceView] = useState<'formatted' | 'plain'>('formatted');
   const [lessonQuiz, setLessonQuiz] = useState<any>(null);
   const [challenges, setChallenges] = useState<any[]>([]);
   const [announcements, setAnnouncements] = useState<any[]>([]);
@@ -53,6 +61,44 @@ export default function CourseView() {
   const [playbackSpeed, setPlaybackSpeed] = useState(1);
   const [autoPlayNext, setAutoPlayNext] = useState(true);
   const [showCompletion, setShowCompletion] = useState(false);
+  const saveTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const [saveStatus, setSaveStatus] = useState<'saved' | 'saving' | ''>('');
+  const currentLessonIdRef = useRef<string | null>(null);
+  const courseIdRef = useRef<string | null>(null);
+
+  const editor = useEditor({
+    extensions: [
+      StarterKit,
+      UnderlineExt,
+      HighlightExt,
+      PlaceholderExt.configure({ placeholder: 'Write your notes for this lesson here...' }),
+    ],
+    onUpdate: ({ editor: ed }) => {
+      const lessonId = currentLessonIdRef.current;
+      if (!lessonId) return;
+      const html = ed.getHTML();
+      setSaveStatus('saving');
+      if (saveTimerRef.current) clearTimeout(saveTimerRef.current);
+      saveTimerRef.current = setTimeout(async () => {
+        try {
+          await api.post(`/lessons/${lessonId}/notes`, { content: html });
+          setSaveStatus('saved');
+          setTimeout(() => setSaveStatus(''), 2000);
+        } catch {
+          setSaveStatus('');
+        }
+      }, 1500);
+    },
+  });
+
+  const handlePositionUpdate = useCallback((lessonId: string, cId: string, position: number, percentage: number) => {
+    api.put('/progress/watch-position', {
+      lessonId,
+      courseId: cId,
+      watchPosition: position,
+      watchPercentage: percentage,
+    }).catch(() => {});
+  }, []);
 
 
   useEffect(() => {
@@ -74,6 +120,7 @@ export default function CourseView() {
 
       const courseData = courseRes.data.data;
       setCourse(courseData);
+      courseIdRef.current = courseData.id;
 
       const enrollmentData = enrollmentRes.data.data || [];
       const myEnrollment = enrollmentData.find((e: any) => e.course_id === courseData.id);
@@ -199,7 +246,12 @@ export default function CourseView() {
         setTimeout(() => goToLesson(currentLessonIndex + 1), 800);
       }
     } catch (error: any) {
-      toast.error(error?.response?.data?.error || 'Failed to update progress');
+      if (error?.response?.data?.quizRequired) {
+        toast.error('Complete the lesson quiz first!');
+        setActiveTab('quiz');
+      } else {
+        toast.error(error?.response?.data?.error || 'Failed to update progress');
+      }
     }
   };
 
@@ -213,12 +265,20 @@ export default function CourseView() {
 
   const loadLessonContent = async (lesson: any) => {
     if (!lesson) return;
+    currentLessonIdRef.current = lesson.id;
     // Load notes
     try {
       const { data } = await api.get(`/lessons/${lesson.id}/notes`);
-      setNotes(data.data || '');
+      const content = data.data || '';
+      setNotes(content);
+      if (editor) {
+        editor.commands.setContent(content, { emitUpdate: false });
+      }
     } catch {
       setNotes('');
+      if (editor) {
+        editor.commands.setContent('', { emitUpdate: false });
+      }
     }
     // Load resources
     try {
@@ -243,18 +303,7 @@ export default function CourseView() {
     }
   };
 
-  const saveNotes = async () => {
-    if (!currentLesson) return;
-    setSavingNotes(true);
-    try {
-      await api.post(`/lessons/${currentLesson.id}/notes`, { content: notes });
-      toast.success('Notes saved');
-    } catch {
-      toast.error('Failed to save notes');
-    } finally {
-      setSavingNotes(false);
-    }
-  };
+  const saveNotes = async () => {};  // Replaced by auto-save via Tiptap onUpdate
 
   const moduleCompletedCount = (moduleLessons: any[]) => {
     return moduleLessons.filter((l: any) => lessonProgress[l.id]).length;
@@ -263,7 +312,7 @@ export default function CourseView() {
   // Keyboard shortcuts
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {
-      if (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement) return;
+      if (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement || (e.target as HTMLElement)?.isContentEditable) return;
       if (e.key === 'ArrowLeft') {
         if (currentLessonIndex > 0) goToLesson(currentLessonIndex - 1);
       }
@@ -350,6 +399,7 @@ export default function CourseView() {
 
   return (
     <div className="min-h-screen bg-gray-950 flex flex-col">
+      <SEO title={course?.title ? `${course.title} | Learning` : 'Course'} />
       {/* Top Bar */}
       <div className="bg-gray-900 border-b border-gray-800 px-4 py-2 flex items-center justify-between shrink-0">
         <div className="flex items-center gap-3 min-w-0">
@@ -507,15 +557,18 @@ export default function CourseView() {
         <div className="flex-1 flex flex-col overflow-hidden">
           {/* Video Area */}
           <div className="bg-black" style={{ maxHeight: '55vh' }}>
-            <VideoPlayer
-              videoUrl={currentLesson?.video_url || null}
-              lessonId={currentLesson?.id || null}
-              title={currentLesson?.title}
-              description={currentLesson?.description}
-              playbackSpeed={playbackSpeed}
-              onProgress={handleWatchProgress}
-              onSpeedChange={setPlaybackSpeed}
-            />
+                  <VideoPlayer
+                    videoUrl={currentLesson?.video_url || null}
+                    lessonId={currentLesson?.id || null}
+                    courseId={course?.id}
+                    title={currentLesson?.title}
+                    description={currentLesson?.description}
+                    playbackSpeed={playbackSpeed}
+                    initialPosition={watchPosition[currentLesson?.id] || 0}
+                    onProgress={handleWatchProgress}
+                    onPositionUpdate={handlePositionUpdate}
+                    onSpeedChange={setPlaybackSpeed}
+                  />
           </div>
 
           {/* Tabs + Content */}
@@ -551,16 +604,65 @@ export default function CourseView() {
                 <div className="space-y-3">
                   <div className="flex items-center justify-between">
                     <h3 className="text-white text-sm font-medium">Your Notes</h3>
-                    <Button size="sm" onClick={saveNotes} disabled={savingNotes}>
-                      {savingNotes ? 'Saving...' : 'Save Notes'}
-                    </Button>
+                    {saveStatus && (
+                      <span className={`text-xs ${saveStatus === 'saved' ? 'text-emerald-400' : 'text-gray-400'}`}>
+                        {saveStatus === 'saving' ? 'Saving...' : 'Saved ✓'}
+                      </span>
+                    )}
                   </div>
-                  <textarea
-                    className="w-full h-40 rounded-xl border border-gray-800 bg-gray-950 text-gray-200 p-3 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500/50 resize-none"
-                    placeholder="Write your notes for this lesson here..."
-                    value={notes}
-                    onChange={(e) => setNotes(e.target.value)}
-                  />
+                  <div className="rounded-xl border border-gray-800 bg-gray-950 overflow-hidden">
+                    <div className="flex items-center gap-0.5 px-2 py-1.5 border-b border-gray-800 bg-gray-900/50">
+                      <button
+                        onClick={() => editor?.chain().focus().toggleBold().run()}
+                        className={`p-1.5 rounded transition-colors ${editor?.isActive('bold') ? 'bg-blue-500/20 text-blue-400' : 'text-gray-400 hover:text-white hover:bg-gray-800'}`}
+                        title="Bold"
+                      >
+                        <Bold className="w-3.5 h-3.5" />
+                      </button>
+                      <button
+                        onClick={() => editor?.chain().focus().toggleItalic().run()}
+                        className={`p-1.5 rounded transition-colors ${editor?.isActive('italic') ? 'bg-blue-500/20 text-blue-400' : 'text-gray-400 hover:text-white hover:bg-gray-800'}`}
+                        title="Italic"
+                      >
+                        <Italic className="w-3.5 h-3.5" />
+                      </button>
+                      <button
+                        onClick={() => editor?.chain().focus().toggleUnderline().run()}
+                        className={`p-1.5 rounded transition-colors ${editor?.isActive('underline') ? 'bg-blue-500/20 text-blue-400' : 'text-gray-400 hover:text-white hover:bg-gray-800'}`}
+                        title="Underline"
+                      >
+                        <Underline className="w-3.5 h-3.5" />
+                      </button>
+                      <button
+                        onClick={() => editor?.chain().focus().toggleHighlight().run()}
+                        className={`p-1.5 rounded transition-colors ${editor?.isActive('highlight') ? 'bg-blue-500/20 text-blue-400' : 'text-gray-400 hover:text-white hover:bg-gray-800'}`}
+                        title="Highlight"
+                      >
+                        <Highlighter className="w-3.5 h-3.5" />
+                      </button>
+                      <span className="w-px h-4 bg-gray-700 mx-1" />
+                      <button
+                        onClick={() => editor?.chain().focus().undo().run()}
+                        disabled={!editor?.can().undo()}
+                        className="p-1.5 rounded text-gray-400 hover:text-white hover:bg-gray-800 disabled:opacity-30 disabled:cursor-not-allowed"
+                        title="Undo"
+                      >
+                        <Undo className="w-3.5 h-3.5" />
+                      </button>
+                      <button
+                        onClick={() => editor?.chain().focus().redo().run()}
+                        disabled={!editor?.can().redo()}
+                        className="p-1.5 rounded text-gray-400 hover:text-white hover:bg-gray-800 disabled:opacity-30 disabled:cursor-not-allowed"
+                        title="Redo"
+                      >
+                        <Redo className="w-3.5 h-3.5" />
+                      </button>
+                    </div>
+                    <EditorContent
+                      editor={editor}
+                      className="prose prose-invert max-w-none text-sm text-gray-200 p-3 min-h-[160px] focus:outline-none [&_.ProseMirror]:outline-none [&_.ProseMirror]:min-h-[120px]"
+                    />
+                  </div>
                 </div>
               )}
 
@@ -575,27 +677,81 @@ export default function CourseView() {
               )}
 
               {activeTab === 'resources' && (
-                <div className="space-y-2">
-                  {resources.length === 0 ? (
-                    <p className="text-gray-500 text-sm">No resources available for this lesson.</p>
-                  ) : (
-                    resources.map((res: any) => (
-                      <a
-                        key={res.id}
-                        href={res.file_url}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="flex items-center gap-3 p-3 rounded-xl bg-gray-800/50 hover:bg-gray-800 transition-colors"
-                      >
-                        <Download className="w-4 h-4 text-blue-400 shrink-0" />
-                        <div className="min-w-0">
-                          <p className="text-sm text-white truncate">{res.title}</p>
-                          {res.file_type && (
-                            <p className="text-xs text-gray-500">{res.file_type}</p>
-                          )}
+                <div className="space-y-4">
+                  {/* Lesson Description as Primary Resource */}
+                  {currentLesson?.description && (
+                    <div className="rounded-xl bg-gray-800/50 border border-gray-700/50 overflow-hidden">
+                      <div className="flex items-center justify-between px-4 py-3 border-b border-gray-700/50">
+                        <div className="flex items-center gap-2">
+                          <FileText className="w-4 h-4 text-blue-400" />
+                          <span className="text-sm font-medium text-white">Lesson Summary</span>
                         </div>
-                      </a>
-                    ))
+                        <div className="flex bg-gray-900 rounded-lg p-0.5">
+                          <button
+                            onClick={() => setResourceView('formatted')}
+                            className={`px-3 py-1 text-xs rounded-md transition-colors ${
+                              resourceView === 'formatted' ? 'bg-blue-500 text-white' : 'text-gray-400 hover:text-white'
+                            }`}
+                          >
+                            Formatted
+                          </button>
+                          <button
+                            onClick={() => setResourceView('plain')}
+                            className={`px-3 py-1 text-xs rounded-md transition-colors ${
+                              resourceView === 'plain' ? 'bg-blue-500 text-white' : 'text-gray-400 hover:text-white'
+                            }`}
+                          >
+                            Plain Text
+                          </button>
+                        </div>
+                      </div>
+                      <div className="p-4">
+                        {resourceView === 'formatted' ? (
+                          <div className="prose prose-invert prose-sm max-w-none">
+                            <h4 className="text-white font-semibold text-base mb-2">{currentLesson?.title}</h4>
+                            <p className="text-gray-300 leading-relaxed whitespace-pre-wrap">{currentLesson?.description}</p>
+                          </div>
+                        ) : (
+                          <pre className="text-gray-300 text-sm font-mono whitespace-pre-wrap bg-gray-900/50 p-3 rounded-lg">
+                            {currentLesson?.description}
+                          </pre>
+                        )}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Uploaded File Resources */}
+                  {resources.length > 0 && (
+                    <div>
+                      <h4 className="text-sm font-medium text-gray-400 mb-2 flex items-center gap-2">
+                        <Download className="w-4 h-4" />
+                        Downloadable Resources
+                      </h4>
+                      <div className="space-y-2">
+                        {resources.map((res: any) => (
+                          <a
+                            key={res.id}
+                            href={res.file_url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="flex items-center gap-3 p-3 rounded-xl bg-gray-800/50 hover:bg-gray-800 transition-colors"
+                          >
+                            <Download className="w-4 h-4 text-blue-400 shrink-0" />
+                            <div className="min-w-0">
+                              <p className="text-sm text-white truncate">{res.title}</p>
+                              {res.file_type && (
+                                <p className="text-xs text-gray-500">{res.file_type}</p>
+                              )}
+                            </div>
+                          </a>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Empty State */}
+                  {!currentLesson?.description && resources.length === 0 && (
+                    <p className="text-gray-500 text-sm">No resources available for this lesson.</p>
                   )}
                 </div>
               )}

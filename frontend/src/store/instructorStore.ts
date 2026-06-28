@@ -57,6 +57,13 @@ interface InstructorState {
   fetchLiveClasses: () => Promise<void>;
   createLiveClass: (data: any) => Promise<void>;
   fetchSchedule: () => Promise<void>;
+
+  assignments: any[];
+  assignmentSubmissions: Record<string, any[]>;
+  fetchAssignmentsByCourse: (courseId: string) => Promise<void>;
+  createAssignment: (payload: any) => Promise<any>;
+  updateAssignment: (id: string, payload: any) => Promise<void>;
+  deleteAssignment: (id: string) => Promise<void>;
 }
 
 export const useInstructorStore = create<InstructorState>((set, get) => ({
@@ -75,6 +82,8 @@ export const useInstructorStore = create<InstructorState>((set, get) => ({
   liveClasses: [],
   schedule: [],
   courseProposals: [],
+  assignments: [],
+  assignmentSubmissions: {},
 
   fetchDashboardStats: async () => {
     set({ isLoading: true, error: null });
@@ -233,6 +242,52 @@ export const useInstructorStore = create<InstructorState>((set, get) => ({
     } catch (error) {
       console.error(error);
       set({ isLoading: false });
+    }
+  },
+
+  fetchAssignmentsByCourse: async (courseId: string) => {
+    set({ isLoading: true });
+    try {
+      const { data } = await api.get(`/assignments/course/${courseId}`);
+      set({ assignments: data.data || [], isLoading: false });
+    } catch (error) {
+      console.error(error);
+      set({ isLoading: false });
+    }
+  },
+
+  createAssignment: async (payload: any) => {
+    try {
+      const { data } = await api.post('/assignments', payload);
+      set({ assignments: [data.data, ...get().assignments] });
+      return data.data;
+    } catch (error) {
+      console.error(error);
+      throw error;
+    }
+  },
+
+  updateAssignment: async (id: string, payload: any) => {
+    try {
+      const { data } = await api.put(`/assignments/${id}`, payload);
+      set({
+        assignments: get().assignments.map(a =>
+          a.id === id ? { ...a, ...data.data } : a
+        )
+      });
+    } catch (error) {
+      console.error(error);
+      throw error;
+    }
+  },
+
+  deleteAssignment: async (id: string) => {
+    try {
+      await api.delete(`/assignments/${id}`);
+      set({ assignments: get().assignments.filter(a => a.id !== id) });
+    } catch (error) {
+      console.error(error);
+      throw error;
     }
   }
 }));

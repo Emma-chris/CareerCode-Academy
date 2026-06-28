@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
 import api from '@/lib/axios';
 import toast from 'react-hot-toast';
+import SEO from '@/components/seo/SEO';
 
 export default function ForgotPassword() {
   const [email, setEmail] = useState('');
@@ -29,6 +30,7 @@ export default function ForgotPassword() {
 
   return (
     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
+      <SEO title="Forgot Password" />
       <section className="min-h-screen flex items-center justify-center py-20 relative">
         <div className="absolute inset-0 gradient-bg-subtle" />
         <div className="max-w-md w-full mx-auto px-4 relative">

@@ -20,6 +20,7 @@ import {
   ShieldAlert,
   Map,
   Target,
+  User,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useAuthStore } from '@/store/authStore';
@@ -66,6 +67,7 @@ const roleSidebarLinks: Record<string, { label: string; path: string; icon: any 
     { label: 'Messages', path: '/instructor/messages', icon: Users },
     { label: 'Schedule', path: '/instructor/schedule', icon: Calendar },
     { label: 'Payouts', path: '/instructor/payouts', icon: LayoutDashboard },
+    { label: 'Profile', path: '/instructor/profile', icon: User },
   ],
   admin: [
     { label: 'Dashboard', path: '/admin/dashboard', icon: LayoutDashboard },

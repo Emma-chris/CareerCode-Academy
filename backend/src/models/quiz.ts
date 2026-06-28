@@ -10,6 +10,7 @@ export interface Quiz {
   passing_score: number;
   max_attempts: number;
   published: boolean;
+  due_date: Date | null;
   created_at: Date;
   updated_at: Date;
 }
@@ -42,12 +43,13 @@ export async function createQuiz(input: {
   time_limit?: number;
   passing_score?: number;
   max_attempts?: number;
+  due_date?: string;
 }): Promise<Quiz> {
   const { rows } = await query<Quiz>(`
-    INSERT INTO quizzes (course_id, lesson_id, title, description, time_limit, passing_score, max_attempts)
-    VALUES ($1, $2, $3, $4, $5, $6, $7)
+    INSERT INTO quizzes (course_id, lesson_id, title, description, time_limit, passing_score, max_attempts, due_date)
+    VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
     RETURNING *
-  `, [input.course_id, input.lesson_id || null, input.title, input.description || null, input.time_limit || 0, input.passing_score || 70, input.max_attempts || 1]);
+  `, [input.course_id, input.lesson_id || null, input.title, input.description || null, input.time_limit || 0, input.passing_score || 70, input.max_attempts || 1, input.due_date || null]);
   return rows[0];
 }
 

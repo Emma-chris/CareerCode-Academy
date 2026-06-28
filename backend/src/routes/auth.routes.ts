@@ -2,6 +2,7 @@ import { Router, Request, Response, NextFunction } from 'express';
 import bcrypt from 'bcryptjs';
 import { z } from 'zod';
 import rateLimit from 'express-rate-limit';
+import passport from 'passport';
 import { validate } from '../middleware/validate';
 import { authenticate, AuthRequest } from '../middleware/auth';
 import * as UserModel from '../models/user';
@@ -488,6 +489,29 @@ router.put(
     } catch (error) {
       next(error);
     }
+  }
+);
+
+// GET /google - Initiate Google OAuth
+router.get(
+  '/google',
+  passport.authenticate('google', { scope: ['profile', 'email'], session: false })
+);
+
+// GET /google/callback - Google OAuth callback
+router.get(
+  '/google/callback',
+  (req: Request, res: Response, next: NextFunction) => {
+    passport.authenticate('google', { session: false }, (err: any, data: any) => {
+      if (err || !data) {
+        const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:3000';
+        return res.redirect(`${frontendUrl}/login?error=google_auth_failed`);
+      }
+      const { user, token, refreshToken } = data;
+      setAuthCookies(res, token, refreshToken);
+      const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:3000';
+      res.redirect(`${frontendUrl}/auth/callback?token=${token}&refreshToken=${refreshToken}`);
+    })(req, res, next);
   }
 );
 

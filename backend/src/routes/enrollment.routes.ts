@@ -80,6 +80,27 @@ router.post(
       // Add lesson to completed
       completedLessons.push(lessonId);
 
+      // Check quiz gate
+      const quizRes = await query(
+        'SELECT id FROM quizzes WHERE lesson_id = $1 AND published = true',
+        [lessonId]
+      );
+      if (quizRes.rows.length > 0) {
+        const attemptRes = await query(
+          'SELECT passed FROM quiz_attempts WHERE quiz_id = $1 AND user_id = $2',
+          [quizRes.rows[0].id, userId]
+        );
+        const passed = attemptRes.rows.length > 0 && attemptRes.rows[0].passed;
+        if (!passed) {
+          return res.status(403).json({
+            success: false,
+            error: 'You must pass the lesson quiz before marking this lesson complete',
+            quizRequired: true,
+            quizId: quizRes.rows[0].id,
+          });
+        }
+      }
+
       // Count total lessons in course
       const lessonsRes = await query(
         'SELECT COUNT(*) as count FROM lessons WHERE course_id = $1',
