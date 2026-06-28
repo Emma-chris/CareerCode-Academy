@@ -6,7 +6,15 @@ import { generateToken, generateRefreshToken } from '../utils/helpers';
 
 const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID;
 const GOOGLE_CLIENT_SECRET = process.env.GOOGLE_CLIENT_SECRET;
-const GOOGLE_CALLBACK_URL = process.env.GOOGLE_CALLBACK_URL || 'http://localhost:5000/api/v1/auth/google/callback';
+
+function getCallbackUrl(): string {
+  if (process.env.GOOGLE_CALLBACK_URL) return process.env.GOOGLE_CALLBACK_URL;
+  const port = process.env.PORT || '5000';
+  if (process.env.NODE_ENV === 'production') {
+    return `https://careercode-academy.onrender.com/api/v1/auth/google/callback`;
+  }
+  return `http://localhost:${port}/api/v1/auth/google/callback`;
+}
 
 export function configurePassport() {
   if (!GOOGLE_CLIENT_ID || !GOOGLE_CLIENT_SECRET) {
@@ -19,7 +27,7 @@ export function configurePassport() {
       {
         clientID: GOOGLE_CLIENT_ID,
         clientSecret: GOOGLE_CLIENT_SECRET,
-        callbackURL: GOOGLE_CALLBACK_URL,
+        callbackURL: getCallbackUrl(),
       },
       async (_accessToken, _refreshToken, profile, done) => {
         try {

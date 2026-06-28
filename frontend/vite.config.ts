@@ -44,15 +44,15 @@ export default defineConfig({
     host: true,
     proxy: {
       '/api': {
-        target: 'https://careercode-academy.onrender.com',
+        target: process.env.VITE_PROXY_TARGET || 'http://localhost:5000',
         changeOrigin: true,
       },
       '/uploads': {
-        target: 'https://careercode-academy.onrender.com',
+        target: process.env.VITE_PROXY_TARGET || 'http://localhost:5000',
         changeOrigin: true,
       },
       '/socket.io': {
-        target: 'https://careercode-academy.onrender.com',
+        target: process.env.VITE_PROXY_TARGET || 'http://localhost:5000',
         ws: true,
         changeOrigin: true,
       },
