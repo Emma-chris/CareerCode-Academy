@@ -59,7 +59,7 @@ export default function About() {
       <SEO title="About" description="Learn about CareerCode Academy's mission to help beginners become job-ready software developers." />
       <section className="py-20 relative">
         <div className="absolute inset-0 gradient-bg-subtle" />
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative">
+        <div className="max-w-screen-4xl mx-auto px-4 sm:px-6 lg:px-8 relative">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -106,7 +106,7 @@ export default function About() {
       </section>
 
       <section className="py-16">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="max-w-screen-4xl mx-auto px-4 sm:px-6 lg:px-8">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
@@ -139,7 +139,7 @@ export default function About() {
       </section>
 
       <section className="py-16 relative">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="max-w-screen-4xl mx-auto px-4 sm:px-6 lg:px-8">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
@@ -176,7 +176,7 @@ export default function About() {
       </section>
 
       <section className="py-16">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="max-w-screen-4xl mx-auto px-4 sm:px-6 lg:px-8">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
@@ -212,7 +212,7 @@ export default function About() {
       </section>
 
       <section className="py-16">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="max-w-screen-4xl mx-auto px-4 sm:px-6 lg:px-8">
           <GlassCard className="p-12 text-center">
             <Heart className="w-12 h-12 text-primary-500 mx-auto mb-4" />
             <h2 className="text-3xl font-bold mb-4">Ready to Start Your Journey?</h2>

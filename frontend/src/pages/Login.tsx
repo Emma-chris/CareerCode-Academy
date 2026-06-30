@@ -104,7 +104,7 @@ export default function Login() {
               <div className="relative flex justify-center text-sm"><span className="px-3 bg-white dark:bg-gray-900 text-gray-600 dark:text-gray-400">or continue with</span></div>
             </div>
 
-            <div className="grid grid-cols-2 gap-3">
+            <div className="grid grid-cols-1 xs:grid-cols-2 gap-3">
               <Button variant="outline" icon={<Github className="w-4 h-4" />} aria-label="Sign in with GitHub" onClick={() => toast('Social login coming soon')}>GitHub</Button>
               <Button variant="outline" icon={
                 <svg viewBox="0 0 24 24" className="w-4 h-4" fill="none">

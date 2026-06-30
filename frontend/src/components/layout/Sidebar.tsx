@@ -170,7 +170,7 @@ export function Sidebar({ isOpen, onToggle }: SidebarProps) {
 
       <aside
         className={cn(
-          'fixed top-16 left-0 bottom-0 z-40 glass border-r border-white/20 dark:border-gray-800/50 overflow-y-auto scrollbar-thin transition-transform duration-300 lg:translate-x-0',
+          'fixed top-14 sm:top-16 left-0 bottom-0 z-40 glass border-r border-white/20 dark:border-gray-800/50 overflow-y-auto scrollbar-thin transition-transform duration-300 lg:translate-x-0 safe-bottom',
           collapsed ? 'w-16' : 'w-64',
           isOpen ? 'translate-x-0' : '-translate-x-full'
         )}

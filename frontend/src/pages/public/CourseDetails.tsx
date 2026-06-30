@@ -156,7 +156,7 @@ export default function CourseDetails() {
       <SEO title={course?.title || 'Course Details'} description={course?.description?.slice(0, 160)} />
       {/* Header / Hero */}
       <div className="relative bg-gradient-to-b from-blue-900/40 dark:to-gray-950 to-white pt-20 pb-12">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="max-w-screen-4xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid lg:grid-cols-3 gap-8">
             {/* Left: Main Info */}
             <div className="lg:col-span-2 space-y-6">
@@ -292,7 +292,7 @@ export default function CourseDetails() {
       </div>
 
       {/* Main Content */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-20">
+      <div className="max-w-screen-4xl mx-auto px-4 sm:px-6 lg:px-8 pb-20">
         <div className="grid lg:grid-cols-3 gap-8">
           <div className="lg:col-span-2 space-y-8">
             {/* Learning Outcomes */}

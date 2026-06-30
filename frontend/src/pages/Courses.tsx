@@ -77,7 +77,7 @@ export default function Courses() {
       <SEO title="Courses" description="Browse our comprehensive catalog of software development, data science, cybersecurity, and cloud computing courses." />
       <section className="py-20 relative">
         <div className="absolute inset-0 gradient-bg-subtle" />
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative">
+        <div className="max-w-screen-4xl mx-auto px-4 sm:px-6 lg:px-8 relative">
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="text-center mb-12">
             <h1 className="text-4xl sm:text-5xl font-bold mb-4">
               Explore Our <span className="gradient-text">Courses</span>
@@ -87,8 +87,8 @@ export default function Courses() {
             </p>
           </motion.div>
 
-          <div className="flex flex-col sm:flex-row gap-4 mb-8">
-            <div className="flex-1">
+          <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 mb-6 sm:mb-8">
+            <div className="flex-1 min-w-0">
               <Input
                 icon={<Search className="w-4 h-4" />}
                 placeholder="Search courses..."
@@ -96,11 +96,11 @@ export default function Courses() {
                 onChange={(e) => setSearch(e.target.value)}
               />
             </div>
-            <div className="flex gap-3">
+            <div className="flex gap-2 sm:gap-3">
               <select
                 value={category}
                 onChange={(e) => setCategory(e.target.value)}
-                className="px-4 py-2.5 rounded-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800/50 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500/50"
+                className="flex-1 sm:flex-none px-3 sm:px-4 py-2.5 rounded-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800/50 text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-primary-500/50"
               >
                 {categories.map((c) => (
                   <option key={c} value={c}>{c}</option>
@@ -109,7 +109,7 @@ export default function Courses() {
               <select
                 value={level}
                 onChange={(e) => setLevel(e.target.value)}
-                className="px-4 py-2.5 rounded-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800/50 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500/50"
+                className="flex-1 sm:flex-none px-3 sm:px-4 py-2.5 rounded-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800/50 text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-primary-500/50"
               >
                 {levels.map((l) => (
                   <option key={l} value={l}>{l}</option>
@@ -124,7 +124,7 @@ export default function Courses() {
             </div>
           ) : (
             <>
-              <div className="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+              <div className="grid grid-cols-1 xs:grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 3xl:grid-cols-5 5xl:grid-cols-6 gap-4 sm:gap-6">
                 {filtered.map((course, i) => {
                   const style = getCategoryStyles(course.category);
                   const Icon = style.icon;

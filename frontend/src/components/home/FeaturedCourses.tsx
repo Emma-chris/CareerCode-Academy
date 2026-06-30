@@ -33,7 +33,7 @@ export function FeaturedCourses() {
   const featured = courses.slice(0, 4);
   return (
     <section className="py-20 relative">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="max-w-screen-4xl mx-auto px-4 sm:px-6 lg:px-8">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -48,7 +48,7 @@ export function FeaturedCourses() {
           </p>
         </motion.div>
 
-        <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div className="grid grid-cols-1 xs:grid-cols-2 lg:grid-cols-4 3xl:grid-cols-5 5xl:grid-cols-6 gap-4 sm:gap-6">
           {featured.map((course, index) => {
             const cfg = categoryConfig[course.category] || { icon: BookOpen, color: 'from-blue-500 to-cyan-500' };
             const Icon = cfg.icon;

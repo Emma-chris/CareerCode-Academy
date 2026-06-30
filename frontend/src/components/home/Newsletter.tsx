@@ -18,7 +18,7 @@ export function Newsletter() {
   return (
     <section className="py-20 relative">
       <div className="absolute inset-0 gradient-bg opacity-5" />
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="max-w-screen-4xl mx-auto px-4 sm:px-6 lg:px-8">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}

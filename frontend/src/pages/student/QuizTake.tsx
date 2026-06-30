@@ -101,7 +101,7 @@ export default function StudentQuizTake() {
           </div>
           <h2 className="text-2xl font-bold mb-1">{result.passed ? 'Congratulations!' : 'Not this time'}</h2>
           <p className="text-gray-500 text-sm mb-6">{result.passed ? 'You passed the quiz!' : 'Keep studying and try again.'}</p>
-          <div className="grid grid-cols-3 gap-4 mb-6">
+          <div className="grid grid-cols-1 xs:grid-cols-3 gap-3 mb-6">
             <div className="bg-gray-50 dark:bg-gray-800 rounded-xl p-3">
               <p className="text-2xl font-bold text-primary-500">{result.score}%</p>
               <p className="text-xs text-gray-500">Your Score</p>

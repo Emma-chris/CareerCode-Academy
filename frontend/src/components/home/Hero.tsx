@@ -61,7 +61,7 @@ export function Hero() {
   };
 
   return (
-    <section className="relative min-h-[90vh] flex items-center overflow-hidden">
+    <section className="relative min-h-[70vh] sm:min-h-[90vh] flex items-center overflow-hidden">
       <div className="absolute inset-0 gradient-bg-subtle" />
       <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_rgba(99,102,241,0.1),transparent_50%)]" />
       <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_bottom_left,_rgba(34,197,94,0.08),transparent_50%)]" />
@@ -86,7 +86,7 @@ export function Hero() {
         </motion.div>
       ))}
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 relative">
+      <div className="max-w-screen-4xl mx-auto px-4 sm:px-6 lg:px-8 py-20 relative">
         <motion.div
           variants={containerVariants}
           initial="hidden"

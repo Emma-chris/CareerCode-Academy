@@ -258,7 +258,7 @@ export function AIStudyAssistant() {
               animate={{ opacity: 1, y: 0, scale: 1 }}
               exit={{ opacity: 0, y: 100, scale: 0.9 }}
               transition={{ type: 'spring', damping: 25, stiffness: 300 }}
-              className="fixed bottom-20 right-4 lg:bottom-24 lg:right-8 z-50 w-[360px] sm:w-[400px] h-[560px] max-h-[80vh] glass-card flex flex-col overflow-hidden shadow-2xl"
+              className="fixed bottom-20 right-4 lg:bottom-24 lg:right-8 z-50 w-[calc(100vw-2rem)] xs:w-[360px] sm:w-[400px] h-[60vh] sm:h-[560px] max-h-[80vh] glass-card flex flex-col overflow-hidden shadow-2xl"
               role="dialog"
               aria-label="AI Study Assistant"
             >

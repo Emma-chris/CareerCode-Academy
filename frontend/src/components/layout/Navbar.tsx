@@ -38,6 +38,12 @@ export function Navbar() {
   const navigate = useNavigate();
   const { user, isAuthenticated, logout } = useAuthStore();
   const { darkMode, toggleDarkMode } = useThemeStore();
+  const isMobile = typeof window !== 'undefined' && window.innerWidth < 640;
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   useEffect(() => {
     function handleClickOutside(e: MouseEvent) {
@@ -79,13 +85,13 @@ export function Navbar() {
 
   return (
     <nav className="fixed top-0 left-0 right-0 z-50 glass border-b border-white/20 dark:border-gray-800/50">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-16">
-          <Link to="/" className="flex items-center gap-2 group" aria-label="Go to homepage">
-            <div className="w-9 h-9 gradient-bg rounded-lg flex items-center justify-center overflow-hidden">
+      <div className="max-w-screen-5xl mx-auto px-3 sm:px-6 lg:px-8">
+        <div className="flex items-center justify-between h-14 sm:h-16">
+          <Link to="/" className="flex items-center gap-2 group flex-shrink-0" aria-label="Go to homepage">
+            <div className="w-8 h-8 sm:w-9 sm:h-9 gradient-bg rounded-lg flex items-center justify-center overflow-hidden">
               <img src="/screen.png" alt="CareerCode Logo" className="w-full h-full object-contain" />
             </div>
-            <span className="text-xl font-bold gradient-text">CareerCode</span>
+            <span className="text-lg sm:text-xl font-bold gradient-text hidden xs:inline">CareerCode</span>
           </Link>
 
           <div className="hidden lg:flex items-center gap-1" role="list">
@@ -107,12 +113,12 @@ export function Navbar() {
             ))}
           </div>
 
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-1 sm:gap-3">
             <PageGuideButton className="p-2 rounded-xl text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors hidden lg:flex" />
             <button
               onClick={toggleDarkMode}
               aria-label={darkMode ? 'Switch to light mode' : 'Switch to dark mode'}
-              className="p-2 rounded-xl text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+              className="p-2 rounded-xl text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors touch-target flex items-center justify-center"
             >
               {darkMode ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
             </button>
@@ -128,15 +134,15 @@ export function Navbar() {
                   aria-haspopup="true"
                   aria-expanded={showDropdown}
                   aria-label="User menu"
-                  className="flex items-center gap-2 px-3 py-2 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+                  className="flex items-center gap-2 px-2 sm:px-3 py-2 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors touch-target"
                 >
-                  <div className="w-8 h-8 gradient-bg rounded-full flex items-center justify-center text-white text-sm font-semibold">
+                  <div className="w-7 h-7 sm:w-8 sm:h-8 gradient-bg rounded-full flex items-center justify-center text-white text-xs sm:text-sm font-semibold flex-shrink-0">
                     {user?.name?.charAt(0) || 'U'}
                   </div>
-                  <span className="hidden sm:block text-sm font-medium text-gray-700 dark:text-gray-300">
+                  <span className="hidden md:block text-sm font-medium text-gray-700 dark:text-gray-300 max-w-[120px] truncate">
                     {user?.name?.split(' ')[0]}
                   </span>
-                  <ChevronDown className="w-4 h-4 text-gray-400" />
+                  <ChevronDown className="hidden md:block w-4 h-4 text-gray-400 flex-shrink-0" />
                 </button>
                 <AnimatePresence>
                   {showDropdown && (
@@ -145,24 +151,24 @@ export function Navbar() {
                       initial={{ opacity: 0, y: 10 }}
                       animate={{ opacity: 1, y: 0 }}
                       exit={{ opacity: 0, y: 10 }}
-                      className="absolute right-0 mt-2 w-56 glass-card p-2 shadow-xl"
+                      className="absolute right-0 mt-2 w-56 sm:w-60 glass-card p-2 shadow-xl right-0 sm:right-0 -left-20 sm:left-auto"
                     >
                       <Link
                         to={getDashboardLink()}
                         role="menuitem"
                         onClick={() => setShowDropdown(false)}
-                        className="flex items-center gap-2 px-3 py-2 rounded-lg text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+                        className="flex items-center gap-2 px-3 py-2.5 rounded-lg text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
                       >
-                        <BookOpen className="w-4 h-4" />
+                        <BookOpen className="w-4 h-4 flex-shrink-0" />
                         Dashboard
                       </Link>
                       <Link
                         to={getProfileLink()}
                         role="menuitem"
                         onClick={() => setShowDropdown(false)}
-                        className="flex items-center gap-2 px-3 py-2 rounded-lg text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+                        className="flex items-center gap-2 px-3 py-2.5 rounded-lg text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
                       >
-                        <User className="w-4 h-4" />
+                        <User className="w-4 h-4 flex-shrink-0" />
                         Profile
                       </Link>
                       <hr className="my-1 border-gray-200 dark:border-gray-700" />
@@ -173,9 +179,9 @@ export function Navbar() {
                           logout();
                           navigate('/');
                         }}
-                        className="flex items-center gap-2 w-full px-3 py-2 rounded-lg text-sm text-red-600 hover:bg-red-50 dark:hover:bg-red-950/30 transition-colors"
+                        className="flex items-center gap-2 w-full px-3 py-2.5 rounded-lg text-sm text-red-600 hover:bg-red-50 dark:hover:bg-red-950/30 transition-colors"
                       >
-                        <LogOut className="w-4 h-4" />
+                        <LogOut className="w-4 h-4 flex-shrink-0" />
                         Log Out
                       </button>
                     </motion.div>
@@ -199,9 +205,9 @@ export function Navbar() {
               onClick={() => setIsOpen(!isOpen)}
               aria-label={isOpen ? 'Close navigation menu' : 'Open navigation menu'}
               aria-expanded={isOpen}
-              className="lg:hidden p-2 rounded-xl text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-800"
+              className="lg:hidden p-2 rounded-xl text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-800 touch-target flex items-center justify-center"
             >
-              {isOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+              {isOpen ? <X className="w-5 h-5 sm:w-6 sm:h-6" /> : <Menu className="w-5 h-5 sm:w-6 sm:h-6" />}
             </button>
           </div>
         </div>
@@ -215,7 +221,7 @@ export function Navbar() {
             exit={{ opacity: 0, height: 0 }}
             className="lg:hidden border-t border-white/20 dark:border-gray-800/50 overflow-hidden"
           >
-            <div className="px-4 py-3 space-y-1">
+            <div className="px-3 sm:px-4 py-3 space-y-1 max-h-[calc(100dvh-4rem)] overflow-y-auto safe-bottom">
               {navLinks.map((link) => (
                 <Link
                   key={link.path}
@@ -223,7 +229,7 @@ export function Navbar() {
                   onClick={() => setIsOpen(false)}
                   aria-current={location.pathname === link.path ? 'page' : undefined}
                   className={cn(
-                    'block px-3 py-2 rounded-lg text-sm font-medium transition-colors',
+                    'block px-3 py-2.5 rounded-lg text-sm font-medium transition-colors touch-target flex items-center',
                     location.pathname === link.path
                       ? 'text-primary-600 dark:text-primary-400 bg-primary-50 dark:bg-primary-950/40'
                       : 'text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800'
@@ -233,13 +239,13 @@ export function Navbar() {
                 </Link>
               ))}
               {!isAuthenticated && (
-                <div className="flex items-center gap-2 pt-2 border-t border-gray-200 dark:border-gray-700 mt-2">
-                  <Link to="/login" className="flex-1" onClick={() => setIsOpen(false)}>
+                <div className="flex flex-col gap-2 pt-2 border-t border-gray-200 dark:border-gray-700 mt-2">
+                  <Link to="/login" className="w-full" onClick={() => setIsOpen(false)}>
                     <Button variant="outline" className="w-full" size="sm">
                       Sign In
                     </Button>
                   </Link>
-                  <Link to="/signup" className="flex-1" onClick={() => setIsOpen(false)}>
+                  <Link to="/signup" className="w-full" onClick={() => setIsOpen(false)}>
                     <Button className="w-full" size="sm">
                       Get Started
                     </Button>

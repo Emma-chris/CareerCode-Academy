@@ -377,7 +377,7 @@ export default function CourseEditor() {
                   placeholder="Describe what students will learn..."
                 />
               </div>
-              <div className="grid grid-cols-3 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                 <Input label="Duration (hours)" type="number" value={duration} onChange={(e) => setDuration(e.target.value)} placeholder="40" />
                 <Input label="Price (₦)" type="number" value={price} onChange={(e) => setPrice(e.target.value)} placeholder="25000" />
                 <Input label="Discount (%)" type="number" value={discountPercentage} onChange={(e) => setDiscountPercentage(e.target.value)} placeholder="0" min="0" max="100" />
@@ -492,7 +492,7 @@ export default function CourseEditor() {
               {/* Challenge Type Selector */}
               <div className="mb-4">
                 <label className="block text-xs font-medium text-gray-500 mb-2 uppercase">Challenge Type</label>
-                <div className="grid grid-cols-3 gap-2">
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
                   {CHALLENGE_TYPES.map(t => {
                     const Icon = t.icon;
                     const isActive = challengeForm.type === t.value;

@@ -110,7 +110,7 @@ export default function Checkout() {
   };
 
   if (loading) return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-950 flex flex-col items-center justify-center relative overflow-hidden">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-950 flex flex-col items-center justify-center relative">
       <div className="absolute top-[-20%] left-[-10%] w-96 h-96 bg-blue-500/20 rounded-full blur-[100px] pointer-events-none" />
       <div className="absolute bottom-[-20%] right-[-10%] w-96 h-96 bg-purple-500/20 rounded-full blur-[100px] pointer-events-none" />
       <Loader size="lg" className="text-blue-500" />
@@ -121,7 +121,7 @@ export default function Checkout() {
   if (!course) return null;
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-950 pt-24 pb-16 relative overflow-hidden">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-950 pt-24 pb-16 relative">
       {/* Dynamic Background */}
       <div className="absolute top-0 inset-x-0 h-96 bg-gradient-to-b from-blue-900/10 to-transparent pointer-events-none" />
       <div className="absolute -top-48 -right-48 w-96 h-96 bg-purple-500/10 rounded-full blur-[120px] pointer-events-none" />

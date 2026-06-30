@@ -272,8 +272,8 @@ export default function AdminUsers() {
         </div>
       )}
 
-      {/* Table */}
-      <GlassCard className="overflow-hidden" hover={false}>
+      {/* Desktop Table - hidden on small screens */}
+      <GlassCard className="overflow-hidden hidden sm:block" hover={false}>
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
             <thead>
@@ -360,23 +360,80 @@ export default function AdminUsers() {
             </tbody>
           </table>
         </div>
-
-        {/* Pagination */}
-        <div className="flex items-center justify-between p-3 border-t border-gray-100 dark:border-gray-800">
-          <div className="flex items-center gap-2 text-xs text-gray-500">
-            <span>Rows:</span>
-            <select value={pageSize} onChange={e => { setPageSize(Number(e.target.value)); setPage(1); }} className="bg-transparent border-0 text-sm font-medium outline-none">
-              {PAGE_SIZE_OPTIONS.map(s => <option key={s} value={s}>{s}</option>)}
-            </select>
-            <span className="ml-2">{filtered.length} total</span>
-          </div>
-          <div className="flex items-center gap-1">
-            <button onClick={() => setPage(p => Math.max(1, p - 1))} disabled={page === 1} className="px-3 py-1.5 rounded-lg text-sm font-medium disabled:opacity-30 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">Prev</button>
-            <span className="px-2 text-sm text-gray-500">{page} / {totalPages || 1}</span>
-            <button onClick={() => setPage(p => Math.min(totalPages, p + 1))} disabled={page >= totalPages} className="px-3 py-1.5 rounded-lg text-sm font-medium disabled:opacity-30 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">Next</button>
-          </div>
-        </div>
       </GlassCard>
+
+      {/* Mobile Card View - visible only on small screens */}
+      <div className="space-y-3 sm:hidden">
+        {paginated.map((user) => (
+          <GlassCard key={user._id} hover={false} className="p-4" onClick={() => openDetail(user)}>
+            <div className="flex items-start gap-3">
+              <input
+                type="checkbox"
+                checked={selected.has(user._id)}
+                onChange={() => toggleSelect(user._id)}
+                className="mt-1 rounded border-gray-300 dark:border-gray-600 flex-shrink-0"
+                onClick={e => e.stopPropagation()}
+              />
+              <div className="w-10 h-10 rounded-full bg-gradient-to-br from-primary-500 to-accent-500 flex items-center justify-center text-sm font-bold text-white shrink-0">
+                {user.name?.charAt(0)}
+              </div>
+              <div className="flex-1 min-w-0">
+                <div className="flex items-start justify-between gap-2">
+                  <div>
+                    <p className="font-medium text-sm">{user.name}</p>
+                    <p className="text-xs text-gray-400 truncate">{user.email}</p>
+                  </div>
+                  <div className="flex items-center gap-1.5 flex-shrink-0">
+                    {roleBadge(user.role)}
+                    <Badge variant={user.is_suspended ? 'danger' : 'success'} size="sm">
+                      {user.is_suspended ? 'Suspended' : 'Active'}
+                    </Badge>
+                  </div>
+                </div>
+                <div className="flex items-center gap-2 mt-2 text-xs text-gray-400">
+                  <span>Joined {new Date(user.created_at).toLocaleDateString()}</span>
+                  <span className="w-1 h-1 rounded-full bg-gray-300" />
+                  <span>{formatRelative(user.lastLogin)}</span>
+                </div>
+                <div className="flex items-center gap-1.5 mt-3" onClick={e => e.stopPropagation()}>
+                  <Button size="sm" variant="ghost" onClick={() => window.location.href = `mailto:${user.email}`} title="Send email">
+                    <Mail className="w-3.5 h-3.5 text-gray-500" />
+                  </Button>
+                  <Button size="sm" variant="ghost" onClick={() => setConfirmAction({ type: 'change-role', userId: user._id, userName: user.name })} title="Change role">
+                    {user.role === 'admin' || user.role === 'super_admin' ? <ShieldOff className="w-3.5 h-3.5" /> : <Shield className="w-3.5 h-3.5" />}
+                  </Button>
+                  <Button size="sm" variant="ghost" onClick={() => setConfirmAction({ type: user.is_suspended ? 'reactivate' : 'suspend', userId: user._id, userName: user.name })} disabled={actionLoading === user._id}>
+                    {actionLoading === user._id ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> :
+                      user.is_suspended ? <UserCheck className="w-3.5 h-3.5 text-success-500" /> : <UserX className="w-3.5 h-3.5 text-amber-500" />}
+                  </Button>
+                  <Button size="sm" variant="ghost" onClick={() => setConfirmAction({ type: 'delete', userId: user._id, userName: user.name })} disabled={actionLoading === user._id}>
+                    <Trash2 className="w-3.5 h-3.5 text-danger-500" />
+                  </Button>
+                </div>
+              </div>
+            </div>
+          </GlassCard>
+        ))}
+        {paginated.length === 0 && (
+          <div className="text-center py-12 text-gray-400">No users found</div>
+        )}
+      </div>
+
+      {/* Pagination */}
+      <div className="flex flex-col xs:flex-row items-center justify-between gap-2 p-3 border-t border-gray-100 dark:border-gray-800 rounded-b-2xl bg-white/70 dark:bg-gray-900/70 backdrop-blur-xl">
+        <div className="flex items-center gap-2 text-xs text-gray-500">
+          <span className="hidden xs:inline">Rows:</span>
+          <select value={pageSize} onChange={e => { setPageSize(Number(e.target.value)); setPage(1); }} className="bg-transparent border-0 text-sm font-medium outline-none">
+            {PAGE_SIZE_OPTIONS.map(s => <option key={s} value={s}>{s}</option>)}
+          </select>
+          <span className="ml-2">{filtered.length} total</span>
+        </div>
+        <div className="flex items-center gap-1">
+          <button onClick={() => setPage(p => Math.max(1, p - 1))} disabled={page === 1} className="px-3 py-1.5 rounded-lg text-sm font-medium disabled:opacity-30 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors touch-target flex items-center justify-center">Prev</button>
+          <span className="px-2 text-sm text-gray-500 tabular-nums">{page} / {totalPages || 1}</span>
+          <button onClick={() => setPage(p => Math.min(totalPages, p + 1))} disabled={page >= totalPages} className="px-3 py-1.5 rounded-lg text-sm font-medium disabled:opacity-30 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors touch-target flex items-center justify-center">Next</button>
+        </div>
+      </div>
 
       {/* User Detail Drawer */}
       <AnimatePresence>

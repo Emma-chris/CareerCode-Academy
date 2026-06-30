@@ -3,6 +3,17 @@ export default {
   content: ['./index.html', './src/**/*.{js,ts,jsx,tsx}'],
   darkMode: 'class',
   theme: {
+    screens: {
+      'xs': '320px',
+      'sm': '640px',
+      'md': '768px',
+      'lg': '1024px',
+      'xl': '1280px',
+      '2xl': '1536px',
+      '3xl': '1920px',
+      '4xl': '2560px',
+      '5xl': '3840px',
+    },
     extend: {
       colors: {
         primary: {
@@ -130,7 +141,40 @@ export default {
         'gradient-radial': 'radial-gradient(var(--tw-gradient-stops))',
         'hero-pattern': "url('data:image/svg+xml,...')",
       },
+      maxWidth: {
+        'screen-3xl': '1920px',
+        'screen-4xl': '2560px',
+        'screen-5xl': '3840px',
+      },
     },
   },
-  plugins: [],
+  plugins: [
+    function ({ addUtilities }) {
+      addUtilities({
+        '.scrollbar-hide': {
+          '-ms-overflow-style': 'none',
+          'scrollbar-width': 'none',
+          '&::-webkit-scrollbar': { display: 'none' },
+        },
+        '.scrollbar-default': {
+          '-ms-overflow-style': 'auto',
+          'scrollbar-width': 'auto',
+          '&::-webkit-scrollbar': { display: 'block' },
+        },
+        '.touch-target': {
+          'min-height': '44px',
+          'min-width': '44px',
+        },
+        '.safe-bottom': {
+          'padding-bottom': 'calc(4rem + env(safe-area-inset-bottom, 0px))',
+        },
+        '.safe-bottom-margin': {
+          'margin-bottom': 'calc(4rem + env(safe-area-inset-bottom, 0px))',
+        },
+        '.text-wrap-pretty': {
+          'text-wrap': 'pretty',
+        },
+      });
+    },
+  ],
 };

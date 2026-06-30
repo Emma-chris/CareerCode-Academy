@@ -38,7 +38,7 @@ export default function BecomeInstructor() {
   return (
     <div className="pt-24 pb-16">
       {/* Hero Section */}
-      <section className="relative px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto mb-20 text-center">
+      <section className="relative px-4 sm:px-6 lg:px-8 max-w-screen-4xl mx-auto mb-20 text-center">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -60,7 +60,7 @@ export default function BecomeInstructor() {
       </section>
 
       {/* Benefits Section */}
-      <section className="px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto mb-20">
+      <section className="px-4 sm:px-6 lg:px-8 max-w-screen-4xl mx-auto mb-20">
         <div className="text-center mb-12">
           <h2 className="text-3xl font-bold mb-4">Why Teach With Us?</h2>
           <p className="text-gray-600 dark:text-gray-400">Discover the benefits of joining our instructor community.</p>
@@ -88,7 +88,7 @@ export default function BecomeInstructor() {
       </section>
 
       {/* How it Works Section */}
-      <section className="px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
+      <section className="px-4 sm:px-6 lg:px-8 max-w-screen-4xl mx-auto">
         <div className="bg-primary-50 dark:bg-primary-900/10 rounded-3xl p-8 md:p-12 lg:p-16 text-center lg:text-left flex flex-col lg:flex-row items-center gap-12">
           <div className="flex-1">
             <h2 className="text-3xl font-bold mb-6">How It Works</h2>

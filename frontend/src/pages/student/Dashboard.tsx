@@ -111,7 +111,7 @@ export default function StudentDashboard() {
       <StatsCards stats={stats} />
 
       {/* Quick Actions */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+      <div className="grid grid-cols-2 sm:grid-cols-4 3xl:grid-cols-6 gap-2 sm:gap-3">
         {[
           { label: 'Browse Courses', icon: BookMarked, color: 'text-blue-500', bg: 'bg-blue-500/10', onClick: () => navigate('/courses') },
           { label: 'Take a Quiz', icon: ListChecks, color: 'text-purple-500', bg: 'bg-purple-500/10', onClick: () => navigate('/student/courses') },
@@ -125,12 +125,12 @@ export default function StudentDashboard() {
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
             onClick={action.onClick}
-            className="flex items-center gap-3 p-3 rounded-xl border border-gray-100 dark:border-gray-800 hover:border-primary-200 dark:hover:border-primary-800 transition-all bg-white/50 dark:bg-gray-900/50"
-          >
-            <div className={`w-9 h-9 rounded-lg ${action.bg} flex items-center justify-center flex-shrink-0`}>
-              <action.icon className={`w-4 h-4 ${action.color}`} />
-            </div>
-            <span className="text-sm font-medium text-gray-700 dark:text-gray-300">{action.label}</span>
+                className="flex items-center gap-2 sm:gap-3 p-2 sm:p-3 rounded-xl border border-gray-100 dark:border-gray-800 hover:border-primary-200 dark:hover:border-primary-800 transition-all bg-white/50 dark:bg-gray-900/50"
+              >
+                <div className={`w-8 h-8 sm:w-9 sm:h-9 rounded-lg ${action.bg} flex items-center justify-center flex-shrink-0`}>
+                  <action.icon className={`w-3.5 h-3.5 sm:w-4 sm:h-4 ${action.color}`} />
+                </div>
+                <span className="text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-300 truncate">{action.label}</span>
           </motion.button>
         ))}
       </div>
@@ -168,7 +168,7 @@ export default function StudentDashboard() {
                 key={course.id}
                 initial={{ opacity: 0, x: 20 }}
                 animate={{ opacity: 1, x: 0 }}
-                className="flex-shrink-0 w-[280px] snap-start"
+                className="flex-shrink-0 w-[260px] xs:w-[280px] snap-start"
                 role="listitem"
               >
                 <Link to={`/student/courses/${course.slug}`} className="block group">
@@ -214,10 +214,9 @@ export default function StudentDashboard() {
       {/* Achievement Center */}
       <AchievementCenter />
 
-      {/* Main Grid: My Learning + Sidebar */}
-      <div className="grid lg:grid-cols-3 gap-6">
+      <div className="grid lg:grid-cols-3 xl:grid-cols-4 3xl:grid-cols-5 5xl:grid-cols-6 gap-4 sm:gap-6">
         {/* Left Column */}
-        <div className="lg:col-span-2 space-y-6">
+        <div className="lg:col-span-2 xl:col-span-3 3xl:col-span-4 5xl:col-span-5 space-y-4 sm:space-y-6">
           {/* My Learning */}
           <GlassCard className="p-6" hover={false}>
             <div className="flex items-center justify-between mb-5">

@@ -162,7 +162,7 @@ export default function StudyPlans() {
                         </button>
                       </div>
 
-                      <div className="grid grid-cols-3 gap-4 mb-3">
+                      <div className="grid grid-cols-1 xs:grid-cols-3 gap-4 mb-3">
                         <div className="flex items-center gap-2 p-2 rounded-lg bg-blue-50 dark:bg-blue-900/10">
                           <Clock className="w-4 h-4 text-blue-500" />
                           <div>

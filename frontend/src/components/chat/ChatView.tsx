@@ -544,7 +544,7 @@ export function ChatView({
                       <Smile className="w-5 h-5 text-gray-400" />
                     </button>
                     {showEmojiPicker && (
-                      <div className="absolute bottom-full left-0 mb-2 p-3 bg-white dark:bg-gray-800 shadow-xl border border-gray-200 dark:border-gray-700 rounded-xl grid grid-cols-5 gap-1 z-10">
+                      <div className="absolute bottom-full left-0 mb-2 p-3 bg-white dark:bg-gray-800 shadow-xl border border-gray-200 dark:border-gray-700 rounded-xl grid grid-cols-6 sm:grid-cols-5 gap-1 z-10">
                         {EMOJIS.map(emoji => (
                           <button key={emoji} type="button" onClick={() => insertEmoji(emoji)} className="w-8 h-8 flex items-center justify-center hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg text-lg transition-colors">
                             {emoji}

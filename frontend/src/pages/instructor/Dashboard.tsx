@@ -143,9 +143,9 @@ export default function InstructorDashboard() {
 
       <motion.div variants={container} initial="hidden" animate="show" className="space-y-8">
         {/* Stat Cards */}
-        <motion.div variants={item} className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <motion.div variants={item} className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 3xl:grid-cols-5 5xl:grid-cols-6 gap-3 sm:gap-4">
           {statCards.map((stat) => (
-            <GlassCard key={stat.label} className="p-5" hover={false}>
+            <GlassCard key={stat.label} className="p-4 sm:p-5" hover={false}>
               <div className="flex items-start justify-between mb-3">
                 <div className={`w-10 h-10 rounded-xl ${stat.bg} flex items-center justify-center`}>
                   <stat.icon className={`w-5 h-5 ${stat.color}`} />
@@ -159,24 +159,24 @@ export default function InstructorDashboard() {
 
         {/* Quick Actions */}
         <motion.div variants={item}>
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+          <div className="grid grid-cols-2 sm:grid-cols-4 3xl:grid-cols-5 gap-2 sm:gap-3">
             {quickActions.map((action) => (
               <button
                 key={action.label}
                 onClick={() => navigate(action.path)}
-                className="flex items-center gap-3 p-3 rounded-xl border border-gray-100 dark:border-gray-800 hover:border-primary-200 dark:hover:border-primary-800 transition-all bg-white/50 dark:bg-gray-900/50"
+                className="flex items-center gap-2 sm:gap-3 p-2 sm:p-3 rounded-xl border border-gray-100 dark:border-gray-800 hover:border-primary-200 dark:hover:border-primary-800 transition-all bg-white/50 dark:bg-gray-900/50"
               >
-                <div className={`w-9 h-9 rounded-lg ${action.bg} flex items-center justify-center flex-shrink-0`}>
-                  <action.icon className={`w-4 h-4 ${action.color}`} />
+                <div className={`w-8 h-8 sm:w-9 sm:h-9 rounded-lg ${action.bg} flex items-center justify-center flex-shrink-0`}>
+                  <action.icon className={`w-3.5 h-3.5 sm:w-4 sm:h-4 ${action.color}`} />
                 </div>
-                <span className="text-sm font-medium text-gray-700 dark:text-gray-300">{action.label}</span>
+                <span className="text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-300 truncate">{action.label}</span>
               </button>
             ))}
           </div>
         </motion.div>
 
         {/* Charts Row */}
-        <div className="grid lg:grid-cols-2 gap-6">
+        <div className="grid lg:grid-cols-2 3xl:grid-cols-3 gap-4 sm:gap-6">
           {/* Revenue Trend */}
           <motion.div variants={item}>
             <GlassCard className="p-5" hover={false}>
@@ -237,9 +237,9 @@ export default function InstructorDashboard() {
         </div>
 
         {/* Main Grid */}
-        <div className="grid lg:grid-cols-3 gap-6">
+        <div className="grid lg:grid-cols-3 3xl:grid-cols-4 5xl:grid-cols-5 gap-4 sm:gap-6">
           {/* Left Column */}
-          <div className="lg:col-span-2 space-y-6">
+          <div className="lg:col-span-2 3xl:col-span-3 5xl:col-span-4 space-y-4 sm:space-y-6">
             {/* Top Performing Courses */}
             <motion.div variants={item}>
               <GlassCard className="p-6" hover={false}>

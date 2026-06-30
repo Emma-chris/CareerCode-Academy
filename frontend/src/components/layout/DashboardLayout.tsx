@@ -79,32 +79,32 @@ export function DashboardLayout({ requiredRole }: DashboardLayoutProps) {
       <Navbar />
       <Sidebar isOpen={sidebarOpen} onToggle={() => setSidebarOpen(false)} />
 
-      <div className="lg:pl-64 pt-16 pb-20 lg:pb-0">
+      <div className="lg:pl-64 pt-14 sm:pt-16 safe-bottom">
         {/* Top Bar with Search */}
-        <div className="sticky top-16 z-30 glass border-b border-white/20 dark:border-gray-800/50 px-4 py-2.5 flex items-center gap-3">
+        <div className="sticky top-14 sm:top-16 z-30 glass border-b border-white/20 dark:border-gray-800/50 px-3 sm:px-4 py-2 flex items-center gap-2 sm:gap-3">
           <button
             onClick={() => setSidebarOpen(true)}
-            className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors lg:hidden"
+            className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors lg:hidden touch-target flex items-center justify-center"
             aria-label="Open sidebar"
           >
             <Menu className="w-5 h-5" />
           </button>
 
-          <span className="text-sm font-medium capitalize hidden sm:block">
+          <span className="text-sm font-medium capitalize hidden md:block flex-shrink-0">
             {roleLabel} Dashboard
           </span>
 
           {/* Global Search */}
-          <div className="flex-1 max-w-md mx-auto relative" ref={searchRef}>
+          <div className="flex-1 min-w-0 max-w-md mx-auto relative" ref={searchRef}>
             <div className="relative">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
               <input
                 type="text"
-                placeholder="Search courses, lessons, instructors..."
+                placeholder={'Search courses, lessons...'}
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 onFocus={() => searchQuery.trim().length >= 2 && setSearchOpen(true)}
-                className="w-full pl-9 pr-8 py-2 rounded-xl bg-gray-100 dark:bg-gray-800/80 border border-transparent focus:border-primary-500/50 focus:bg-white dark:focus:bg-gray-800 text-sm text-gray-900 dark:text-gray-100 placeholder-gray-400 outline-none transition-all"
+                className="w-full pl-9 pr-8 py-1.5 sm:py-2 rounded-xl bg-gray-100 dark:bg-gray-800/80 border border-transparent focus:border-primary-500/50 focus:bg-white dark:focus:bg-gray-800 text-sm text-gray-900 dark:text-gray-100 placeholder-gray-400 outline-none transition-all"
                 aria-label="Search courses, lessons, instructors, certificates"
               />
               {searchQuery && (
@@ -140,7 +140,7 @@ export function DashboardLayout({ requiredRole }: DashboardLayoutProps) {
                         className="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
                         role="option"
                       >
-                        <div className="w-8 h-8 rounded-lg bg-primary-500/10 flex items-center justify-center">
+                        <div className="w-8 h-8 rounded-lg bg-primary-500/10 flex items-center justify-center flex-shrink-0">
                           {result.type === 'course' ? <BookOpen className="w-4 h-4 text-primary-500" /> :
                            result.type === 'lesson' ? <LayoutDashboard className="w-4 h-4 text-accent-500" /> :
                            result.type === 'instructor' ? <User className="w-4 h-4 text-secondary-500" /> :
@@ -162,18 +162,18 @@ export function DashboardLayout({ requiredRole }: DashboardLayoutProps) {
             </AnimatePresence>
           </div>
 
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-1 sm:gap-2 flex-shrink-0">
             <Link
               to={`/${role}/messages`}
-              className="p-2 rounded-xl text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors relative"
+              className="p-2 rounded-xl text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors relative touch-target flex items-center justify-center"
               aria-label="Messages"
             >
-              <MessageSquare className="w-5 h-5" />
+              <MessageSquare className="w-4 h-4 sm:w-5 sm:h-5" />
             </Link>
           </div>
         </div>
 
-        <main className="p-4 sm:p-6 lg:p-8" id="main-content">
+        <main className="px-3 sm:px-6 lg:px-8 py-4 sm:py-6 lg:py-8 max-w-screen-4xl mx-auto w-full" id="main-content">
           <Outlet />
         </main>
       </div>

@@ -1074,7 +1074,7 @@ export default function ExamTake() {
               </button>
             </div>
           )}
-          <div className="grid grid-cols-3 lg:grid-cols-4 gap-1.5">
+          <div className="grid grid-cols-4 lg:grid-cols-4 gap-1">
             {questions.map((q, i) => (
               <button
                 key={q.id}

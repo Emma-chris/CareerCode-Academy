@@ -205,7 +205,7 @@ export default function AdminDashboard() {
       ) : (
         <motion.div variants={container} initial="hidden" animate="show" className="space-y-6">
           {/* Stats Cards */}
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3">
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 3xl:grid-cols-8 5xl:grid-cols-10 gap-2 sm:gap-3">
             {/* Live Online Users */}
             <motion.div variants={item}>
               <GlassCard className="p-4 group cursor-default" hover>
@@ -316,7 +316,7 @@ export default function AdminDashboard() {
           </motion.div>
 
           {/* Charts Row */}
-          <div className="grid lg:grid-cols-2 gap-6">
+          <div className="grid lg:grid-cols-2 4xl:grid-cols-3 gap-4 sm:gap-6">
             {/* Enrollment Trend */}
             <motion.div variants={item}>
               <GlassCard className="p-5" hover={false}>
@@ -377,7 +377,7 @@ export default function AdminDashboard() {
           </div>
 
           {/* Completion Trend + New Registrations + Top Courses */}
-          <div className="grid lg:grid-cols-3 gap-6">
+          <div className="grid sm:grid-cols-2 lg:grid-cols-3 4xl:grid-cols-4 gap-4 sm:gap-6">
             {/* Completion Trend */}
             <motion.div variants={item}>
               <GlassCard className="p-5" hover={false}>
@@ -479,7 +479,7 @@ export default function AdminDashboard() {
                 <TrendingUp className="w-4 h-4 text-primary-500" />
                 Platform Insights
               </h3>
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+              <div className="grid grid-cols-2 sm:grid-cols-4 3xl:grid-cols-6 gap-3 sm:gap-4">
                 <div className="p-3 rounded-xl bg-gray-50 dark:bg-gray-800/50 text-center">
                   <div className="text-lg font-bold text-primary-500">
                     {stats ? Math.round((stats.publishedCourses / Math.max(stats.totalCourses, 1)) * 100) : 0}%
@@ -513,7 +513,7 @@ export default function AdminDashboard() {
                 <Activity className="w-4 h-4 text-amber-500" />
                 Recent Activity
               </h3>
-              <div className="grid sm:grid-cols-2 gap-3">
+              <div className="grid sm:grid-cols-2 4xl:grid-cols-3 gap-3">
                 <div>
                   <p className="text-xs font-medium text-gray-500 mb-2 uppercase tracking-wider">New Users</p>
                   <div className="space-y-2">

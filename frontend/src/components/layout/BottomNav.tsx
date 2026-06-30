@@ -52,8 +52,9 @@ export function BottomNav({ role = 'student' }: BottomNavProps) {
     <nav
       className="fixed bottom-0 left-0 right-0 z-50 glass border-t border-white/20 dark:border-gray-800/50 lg:hidden"
       aria-label="Mobile navigation"
+      style={{ paddingBottom: 'env(safe-area-inset-bottom, 0px)' }}
     >
-      <div className="flex items-center justify-around px-2 py-1">
+      <div className="flex items-center justify-around px-1 sm:px-2 py-1">
         {links.map((link) => {
           const isActive = location.pathname === link.path;
           return (
@@ -61,7 +62,7 @@ export function BottomNav({ role = 'student' }: BottomNavProps) {
               key={link.path}
               to={link.path}
               className={cn(
-                'flex flex-col items-center gap-0.5 px-3 py-2 rounded-xl text-[10px] font-medium transition-all relative',
+                'flex flex-col items-center justify-center gap-0.5 min-w-[44px] min-h-[44px] p-1 sm:px-3 sm:py-2 rounded-xl text-[9px] xs:text-[10px] font-medium transition-all relative flex-1',
                 isActive
                   ? 'text-primary-600 dark:text-primary-400'
                   : 'text-gray-500 dark:text-gray-400'
@@ -74,8 +75,8 @@ export function BottomNav({ role = 'student' }: BottomNavProps) {
                   transition={{ type: 'spring', stiffness: 500, damping: 30 }}
                 />
               )}
-              <link.icon className="w-5 h-5" />
-              <span>{link.label}</span>
+              <link.icon className="w-4 h-4 sm:w-5 sm:h-5" />
+              <span className="hidden xs:inline">{link.label}</span>
             </Link>
           );
         })}

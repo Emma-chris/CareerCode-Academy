@@ -44,7 +44,7 @@ export default function Community() {
     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
       <section className="py-20 relative">
         <div className="absolute inset-0 gradient-bg-subtle" />
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative">
+        <div className="max-w-screen-4xl mx-auto px-4 sm:px-6 lg:px-8 relative">
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-8">
             <div>
               <h1 className="text-4xl sm:text-5xl font-bold mb-2">Community <span className="gradient-text">Forums</span></h1>

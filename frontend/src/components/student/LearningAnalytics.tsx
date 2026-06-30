@@ -181,7 +181,7 @@ export function LearningAnalytics() {
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }}>
           <GlassCard className="p-5" hover={false}>
             <h3 className="text-sm font-medium mb-4 text-gray-600 dark:text-gray-400">Course Progress</h3>
-            <div className="grid grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 xs:grid-cols-3 gap-4">
               {topCourses.length === 0 ? (
                 <div className="col-span-3 flex flex-col items-center justify-center py-6 text-sm text-gray-400">
                   <Lightbulb className="w-8 h-8 mb-2 text-gray-300" />

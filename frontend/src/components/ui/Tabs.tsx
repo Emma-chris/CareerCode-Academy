@@ -17,7 +17,7 @@ interface TabsProps {
 
 export function Tabs({ tabs, activeKey, onChange, variant = 'underline', className }: TabsProps) {
   return (
-    <div className={cn('flex gap-1', variant === 'underline' ? 'border-b border-gray-200 dark:border-gray-800' : '', className)}>
+    <div className={cn('flex gap-1 overflow-x-auto scrollbar-hide', variant === 'underline' ? 'border-b border-gray-200 dark:border-gray-800' : '', className)}>
       {tabs.map((tab) => {
         const active = activeKey === tab.key;
         const Icon = tab.icon;
