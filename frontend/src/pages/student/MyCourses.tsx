@@ -102,7 +102,7 @@ export default function MyCourses() {
       <div className="flex items-center justify-between mb-8">
         <div>
           <h1 className="text-2xl sm:text-3xl font-bold">My Courses</h1>
-          <p className="text-gray-500 mt-1">
+          <p className="text-gray-400 mt-1">
             {enrollments.length > 0
               ? `You are enrolled in ${enrollments.length} course${enrollments.length > 1 ? 's' : ''}.`
               : 'Start learning today!'}

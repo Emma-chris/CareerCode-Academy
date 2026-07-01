@@ -185,8 +185,8 @@ export function LearningAnalytics() {
               {topCourses.length === 0 ? (
                 <div className="col-span-3 flex flex-col items-center justify-center py-6 text-sm text-gray-400">
                   <Lightbulb className="w-8 h-8 mb-2 text-gray-300" />
-                  <p>No enrolled courses yet.</p>
-                  <p className="text-xs">Enroll in a course to see progress!</p>
+                  <p className="text-sm">No enrolled courses yet.</p>
+                  <p className="text-sm">Enroll in a course to see progress!</p>
                 </div>
               ) : topCourses.map((course, i) => (
                 <div key={course.id} className="flex flex-col items-center gap-2">
@@ -199,7 +199,7 @@ export function LearningAnalytics() {
                       {course.progress || 0}%
                     </span>
                   </div>
-                  <span className="text-[10px] text-gray-500 text-center leading-tight line-clamp-2">{course.title}</span>
+                  <span className="text-xs text-gray-400 text-center leading-tight line-clamp-2">{course.title}</span>
                 </div>
               ))}
             </div>

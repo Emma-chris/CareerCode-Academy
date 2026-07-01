@@ -53,7 +53,7 @@ export default function AdminTickets() {
     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-6">
       <div>
         <h1 className="text-2xl sm:text-3xl font-bold">Support Tickets</h1>
-        <p className="text-gray-500 mt-1">Manage support requests from users.</p>
+        <p className="text-gray-300 mt-1">Manage support requests from users.</p>
       </div>
 
       {error && (
@@ -71,7 +71,7 @@ export default function AdminTickets() {
         </div>
         <div className="flex items-center gap-1 bg-gray-100 dark:bg-gray-800 rounded-xl p-1">
           {STATUS_TABS.map((s) => (
-            <button key={s} onClick={() => setTab(s)} className={`px-3 py-1.5 rounded-lg text-xs font-medium capitalize ${tab === s ? 'bg-white dark:bg-gray-700 text-primary-600 dark:text-primary-400 shadow-sm' : 'text-gray-500 hover:text-gray-700 dark:hover:text-gray-300'}`}>{s.replace('_', ' ')}</button>
+            <button key={s} onClick={() => setTab(s)} className={`px-3 py-1.5 rounded-lg text-xs font-medium capitalize ${tab === s ? 'bg-white dark:bg-gray-700 text-primary-600 dark:text-primary-400 shadow-sm' : 'text-gray-300 hover:text-gray-700 dark:hover:text-gray-200'}`}>{s.replace('_', ' ')}</button>
           ))}
         </div>
       </div>
@@ -86,16 +86,16 @@ export default function AdminTickets() {
             >
               <div className="flex items-start justify-between mb-1">
                 <p className="font-semibold text-sm truncate flex-1">{ticket.subject}</p>
-                {ticket.priority && <span className={`text-[10px] font-bold uppercase ml-2 ${priorityColor(ticket.priority)}`}>{ticket.priority}</span>}
+                {ticket.priority && <span className={`text-xs font-bold uppercase ml-2 ${priorityColor(ticket.priority)}`}>{ticket.priority}</span>}
               </div>
-              <p className="text-xs text-gray-500 truncate mb-2">{ticket.description}</p>
-              <div className="flex items-center justify-between text-[10px] text-gray-400">
+              <p className="text-sm text-gray-300 truncate mb-2">{ticket.description}</p>
+              <div className="flex items-center justify-between text-xs text-gray-300">
                 <span>{ticket.user_name}</span>
                 <span>{new Date(ticket.created_at).toLocaleDateString()}</span>
               </div>
             </motion.div>
           ))}
-          {filtered.length === 0 && <p className="text-center text-gray-400 py-8">No tickets found.</p>}
+          {filtered.length === 0 && <p className="text-center text-gray-300 py-8">No tickets found.</p>}
         </div>
 
         <div className="lg:col-span-2">
@@ -104,7 +104,7 @@ export default function AdminTickets() {
               <div className="flex items-start justify-between mb-4">
                 <div>
                   <h3 className="font-bold">{selectedTicket.subject}</h3>
-                  <p className="text-xs text-gray-500 mt-0.5">
+                  <p className="text-sm text-gray-300 mt-0.5">
                     From {selectedTicket.user_name} · {new Date(selectedTicket.created_at).toLocaleString()}
                   </p>
                 </div>
@@ -135,7 +135,7 @@ export default function AdminTickets() {
               </div>
 
               <div className="border-t border-gray-100 dark:border-gray-800 pt-4">
-                <label className="block text-xs font-medium text-gray-500 mb-2">Reply to ticket</label>
+                <label className="block text-xs font-medium text-gray-300 mb-2">Reply to ticket</label>
                 <textarea
                   value={replyText} onChange={(e) => setReplyText(e.target.value)}
                   placeholder="Type your response..."
@@ -150,7 +150,7 @@ export default function AdminTickets() {
               </div>
             </GlassCard>
           ) : (
-            <div className="flex items-center justify-center h-64 text-gray-400">
+            <div className="flex items-center justify-center h-64 text-gray-300">
               <div className="text-center">
                 <MessageSquare className="w-12 h-12 mx-auto mb-3 opacity-30" />
                 <p>Select a ticket to view details</p>

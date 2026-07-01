@@ -177,33 +177,59 @@ export function Sidebar({ isOpen, onToggle }: SidebarProps) {
         aria-label="Sidebar navigation"
       >
         <div className="flex flex-col h-full">
-          <div className="p-4 flex-1">
-            <div className="flex items-center justify-between mb-6 px-2">
-              {!collapsed && (
+          <div className="p-4 flex-1 flex flex-col">
+            <div className={cn("flex items-center mb-6", collapsed ? "justify-center" : "justify-between px-2")}>
+              {(!collapsed) ? (
                 <div className="flex items-center gap-2">
                   <div className="w-8 h-8 gradient-bg rounded-lg flex items-center justify-center">
                     <GraduationCap className="w-4 h-4 text-white" />
                   </div>
                   <span className="font-semibold text-sm capitalize">{role} Panel</span>
                 </div>
+              ) : (
+                <div className="w-8 h-8 gradient-bg rounded-lg flex items-center justify-center">
+                  <GraduationCap className="w-4 h-4 text-white" />
+                </div>
               )}
-              <div className="flex gap-1">
-                <button
-                  onClick={() => setCollapsed(!collapsed)}
-                  className="p-1.5 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors hidden lg:block"
-                  aria-label={collapsed ? 'Expand sidebar' : 'Collapse sidebar'}
-                >
-                  {collapsed ? <ChevronRight className="w-4 h-4" /> : <ChevronLeft className="w-4 h-4" />}
-                </button>
-                <button
-                  onClick={onToggle}
-                  className="p-1.5 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors lg:hidden"
-                  aria-label="Close sidebar"
-                >
-                  <ChevronLeft className="w-4 h-4" />
-                </button>
-              </div>
+              
+              {!collapsed && (
+                <div className="flex gap-1">
+                  <button
+                    onClick={() => setCollapsed(!collapsed)}
+                    className="p-1.5 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors hidden lg:block"
+                    aria-label={collapsed ? 'Expand sidebar' : 'Collapse sidebar'}
+                  >
+                    {collapsed ? <ChevronRight className="w-4 h-4" /> : <ChevronLeft className="w-4 h-4" />}
+                  </button>
+                  <button
+                    onClick={onToggle}
+                    className="p-1.5 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors lg:hidden"
+                    aria-label="Close sidebar"
+                  >
+                    <ChevronLeft className="w-4 h-4" />
+                  </button>
+                </div>
+              )}
             </div>
+            
+            {collapsed && (
+              <div className="flex justify-center mb-6">
+                 <button
+                    onClick={() => setCollapsed(!collapsed)}
+                    className="p-1.5 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors hidden lg:block"
+                    aria-label={collapsed ? 'Expand sidebar' : 'Collapse sidebar'}
+                  >
+                    {collapsed ? <ChevronRight className="w-4 h-4" /> : <ChevronLeft className="w-4 h-4" />}
+                  </button>
+                  <button
+                    onClick={onToggle}
+                    className="p-1.5 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors lg:hidden"
+                    aria-label="Close sidebar"
+                  >
+                    <ChevronLeft className="w-4 h-4" />
+                  </button>
+              </div>
+            )}
 
             <nav className="space-y-1" role="navigation">
               {links.map((link) => {
@@ -218,12 +244,13 @@ export function Sidebar({ isOpen, onToggle }: SidebarProps) {
                       if (showBadge) setNewCertCount(0);
                     }}
                     className={cn(
-                      'flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 group',
-                      collapsed && showBadge && 'relative',
+                      'flex items-center gap-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 group relative',
+                      collapsed ? 'justify-center px-0' : 'px-3',
                       isActive
                         ? 'bg-primary-500/10 text-primary-600 dark:text-primary-400 border border-primary-500/20'
                         : 'text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800/50 hover:text-gray-900 dark:hover:text-white'
                     )}
+                    title={collapsed ? link.label : undefined}
                     aria-current={isActive ? 'page' : undefined}
                   >
                     <link.icon className={cn('w-4 h-4 flex-shrink-0', isActive && 'text-primary-500')} />
@@ -245,33 +272,39 @@ export function Sidebar({ isOpen, onToggle }: SidebarProps) {
           </div>
 
           {/* User Profile at Bottom */}
-          {!collapsed && (
-            <div className="p-4 border-t border-white/20 dark:border-gray-800/50">
-              <Link
-                to={`/${role}/profile`}
-                className="flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-800/50 transition-all group"
-              >
-                <div className="w-9 h-9 gradient-bg rounded-full flex items-center justify-center text-white text-sm font-semibold flex-shrink-0">
-                  {user?.name?.charAt(0) || 'U'}
-                </div>
-                <div className="flex-1 min-w-0">
-                  <p className="text-sm font-medium truncate">{user?.name || 'User'}</p>
-                  <p className="text-xs text-gray-500 truncate capitalize">{role}</p>
-                </div>
-                <button
-                  onClick={(e) => {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    logout();
-                  }}
-                  className="p-1.5 rounded-lg hover:bg-red-100 dark:hover:bg-red-900/30 text-gray-400 hover:text-red-500 transition-colors"
-                  aria-label="Log out"
-                >
-                  <LogOut className="w-4 h-4" />
-                </button>
-              </Link>
-            </div>
-          )}
+          <div className="p-4 border-t border-white/20 dark:border-gray-800/50">
+            <Link
+              to={`/${role}/profile`}
+              className={cn(
+                "flex items-center gap-3 py-2.5 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-800/50 transition-all group relative",
+                collapsed ? 'justify-center px-0' : 'px-3'
+              )}
+              title={collapsed ? user?.name || 'User' : undefined}
+            >
+              <div className="w-9 h-9 gradient-bg rounded-full flex items-center justify-center text-white text-sm font-semibold flex-shrink-0">
+                {user?.name?.charAt(0) || 'U'}
+              </div>
+              {!collapsed && (
+                <>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-medium truncate">{user?.name || 'User'}</p>
+                    <p className="text-xs text-gray-500 truncate capitalize">{role}</p>
+                  </div>
+                  <button
+                    onClick={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      logout();
+                    }}
+                    className="p-1.5 rounded-lg hover:bg-red-100 dark:hover:bg-red-900/30 text-gray-400 hover:text-red-500 transition-colors"
+                    aria-label="Log out"
+                  >
+                    <LogOut className="w-4 h-4" />
+                  </button>
+                </>
+              )}
+            </Link>
+          </div>
         </div>
         </aside>
     </>

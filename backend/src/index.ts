@@ -4,12 +4,14 @@ dotenv.config();
 import express from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
+import compression from 'compression';
 import rateLimit from 'express-rate-limit';
 import cookieParser from 'cookie-parser';
 import http from 'http';
 import { createSocketServer } from './config/socket';
 
 import { errorHandler } from './middleware/errorHandler';
+import { analyticsTracker } from './middleware/analytics';
 import authRoutes from './routes/auth.routes';
 import courseRoutes from './routes/course.routes';
 import lessonRoutes from './routes/lesson.routes';
@@ -41,6 +43,7 @@ import challengeRoutes from './routes/challenge.routes';
 import examRoutes from './routes/exam.routes';
 import payoutRoutes from './routes/payout.routes';
 import testRoutes from './routes/test.routes';
+import analyticsRoutes from './routes/analytics.routes';
 import { query } from './config/db';
 import passport, { configurePassport } from './config/passport';
 
@@ -50,6 +53,7 @@ const PORT = parseInt(process.env.PORT || '5000', 10);
 
 // Security middleware
 app.use(helmet({ crossOriginResourcePolicy: { policy: 'cross-origin' } }));
+app.use(compression());
 app.use(cors({
   origin: [
     process.env.FRONTEND_URL,
@@ -85,6 +89,9 @@ app.use('/uploads', express.static(path.join(process.cwd(), 'uploads')));
 // Initialize Passport
 configurePassport();
 app.use(passport.initialize());
+
+// Analytics tracking middleware
+app.use(analyticsTracker);
 
 // Health check
 app.get('/health', (_req, res) => {
@@ -148,6 +155,7 @@ app.use('/api/v1/videos', videoRoutes);
 app.use('/api/v1/challenges', challengeRoutes);
 app.use('/api/v1/exams', examRoutes);
 app.use('/api/v1/payouts', payoutRoutes);
+app.use('/api/v1/analytics', analyticsRoutes);
 
 // E2E test helper routes (dev only)
 if (process.env.NODE_ENV === 'development') {

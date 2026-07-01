@@ -82,6 +82,15 @@ export function createSocketServer(server: http.Server) {
       io.to('exam_monitor_room').emit('exam:frame', data);
     });
 
+    // Analytics: admin subscribes to real-time analytics events
+    socket.on('analytics:subscribe', () => {
+      socket.join('analytics_room');
+    });
+
+    socket.on('analytics:unsubscribe', () => {
+      socket.leave('analytics_room');
+    });
+
     socket.on('disconnect', () => {
       console.log('User disconnected:', socket.id);
       for (const [userId, data] of onlineUsers.entries()) {
@@ -110,6 +119,23 @@ export function emitDashboardUpdate() {
 export function emitStudentUpdate(userId: string) {
   if (io) {
     io.to(userId).emit('student:dashboard:update');
+  }
+}
+
+export function emitAnalyticsEvent(event: string, data: Record<string, any>) {
+  if (io) {
+    const payload = { ...data, timestamp: Date.now() };
+    io.to('admin_room').emit(`analytics:${event}`, payload);
+    io.to('analytics_room').emit(`analytics:${event}`, payload);
+  }
+}
+
+export function broadcastOnlineCount() {
+  if (io) {
+    io.emit('online_users', {
+      count: onlineUsers.size,
+      users: Array.from(onlineUsers.entries()).map(([id, data]) => ({ id, name: data.name, role: data.role })),
+    });
   }
 }
 

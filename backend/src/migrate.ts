@@ -563,6 +563,90 @@ async function migrate() {
     `);
     console.log('✓ certificate_templates table created');
 
+    await query(`
+      CREATE TABLE IF NOT EXISTS visitors (
+        id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+        visitor_id VARCHAR(255) UNIQUE NOT NULL,
+        user_id UUID REFERENCES users(id) ON DELETE SET NULL,
+        ip_address VARCHAR(255),
+        country VARCHAR(100),
+        city VARCHAR(100),
+        device_type VARCHAR(50),
+        browser VARCHAR(100),
+        os VARCHAR(100),
+        referral_source TEXT,
+        landing_page TEXT,
+        first_visit TIMESTAMPTZ DEFAULT NOW(),
+        last_visit TIMESTAMPTZ DEFAULT NOW(),
+        visit_count INTEGER DEFAULT 1,
+        session_start TIMESTAMPTZ DEFAULT NOW(),
+        session_end TIMESTAMPTZ,
+        is_active BOOLEAN DEFAULT true,
+        created_at TIMESTAMPTZ DEFAULT NOW()
+      )
+    `);
+    console.log('✓ visitors table created');
+
+    await query(`
+      CREATE TABLE IF NOT EXISTS page_views (
+        id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+        visitor_id VARCHAR(255) NOT NULL REFERENCES visitors(visitor_id) ON DELETE CASCADE,
+        user_id UUID REFERENCES users(id) ON DELETE SET NULL,
+        page_url TEXT NOT NULL,
+        route_name VARCHAR(255),
+        time_spent_sec INTEGER DEFAULT 0,
+        is_exit_page BOOLEAN DEFAULT false,
+        created_at TIMESTAMPTZ DEFAULT NOW()
+      )
+    `);
+    console.log('✓ page_views table created');
+
+    await query(`
+      CREATE TABLE IF NOT EXISTS click_events (
+        id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+        visitor_id VARCHAR(255) NOT NULL REFERENCES visitors(visitor_id) ON DELETE CASCADE,
+        user_id UUID REFERENCES users(id) ON DELETE SET NULL,
+        page_url TEXT NOT NULL,
+        element_selector TEXT,
+        element_text TEXT,
+        element_type VARCHAR(100),
+        created_at TIMESTAMPTZ DEFAULT NOW()
+      )
+    `);
+    console.log('✓ click_events table created');
+
+    await query(`
+      CREATE TABLE IF NOT EXISTS scroll_events (
+        id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+        visitor_id VARCHAR(255) NOT NULL REFERENCES visitors(visitor_id) ON DELETE CASCADE,
+        user_id UUID REFERENCES users(id) ON DELETE SET NULL,
+        page_url TEXT NOT NULL,
+        depth_25 BOOLEAN DEFAULT false,
+        depth_50 BOOLEAN DEFAULT false,
+        depth_75 BOOLEAN DEFAULT false,
+        depth_100 BOOLEAN DEFAULT false,
+        max_depth INTEGER DEFAULT 0,
+        created_at TIMESTAMPTZ DEFAULT NOW()
+      )
+    `);
+    console.log('✓ scroll_events table created');
+
+    await query(`
+      CREATE TABLE IF NOT EXISTS user_journeys (
+        id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+        visitor_id VARCHAR(255) NOT NULL REFERENCES visitors(visitor_id) ON DELETE CASCADE,
+        user_id UUID REFERENCES users(id) ON DELETE SET NULL,
+        pages_visited TEXT[] DEFAULT ARRAY[]::TEXT[],
+        conversion_type VARCHAR(100),
+        converted BOOLEAN DEFAULT false,
+        enrolled_course_id UUID REFERENCES courses(id) ON DELETE SET NULL,
+        dropped_at_page TEXT,
+        journey_duration_sec INTEGER DEFAULT 0,
+        created_at TIMESTAMPTZ DEFAULT NOW()
+      )
+    `);
+    console.log('✓ user_journeys table created');
+
     await query('CREATE INDEX IF NOT EXISTS idx_modules_course ON modules(course_id)');
     await query('CREATE INDEX IF NOT EXISTS idx_support_tickets_user ON support_tickets(user_id)');
     await query('CREATE INDEX IF NOT EXISTS idx_support_tickets_status ON support_tickets(status)');

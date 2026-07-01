@@ -81,7 +81,7 @@ export default function StudentQuizTake() {
         <GlassCard className="p-8 text-center max-w-md" hover={false}>
           <AlertCircle className="w-12 h-12 text-danger-400 mx-auto mb-3" />
           <p className="font-medium mb-1">Unable to load quiz</p>
-          <p className="text-sm text-gray-500 mb-4">{error}</p>
+          <p className="text-sm text-gray-400 mb-4">{error}</p>
           <div className="flex gap-2 justify-center">
             <Button variant="primary" onClick={() => quizId && fetchQuiz(quizId)}>Retry</Button>
             <Button variant="ghost" onClick={() => navigate(-1)}>Go Back</Button>
@@ -100,19 +100,19 @@ export default function StudentQuizTake() {
             {result.passed ? <CheckCircle className="w-10 h-10 text-success-500" /> : <XCircle className="w-10 h-10 text-danger-500" />}
           </div>
           <h2 className="text-2xl font-bold mb-1">{result.passed ? 'Congratulations!' : 'Not this time'}</h2>
-          <p className="text-gray-500 text-sm mb-6">{result.passed ? 'You passed the quiz!' : 'Keep studying and try again.'}</p>
+          <p className="text-gray-400 text-sm mb-6">{result.passed ? 'You passed the quiz!' : 'Keep studying and try again.'}</p>
           <div className="grid grid-cols-1 xs:grid-cols-3 gap-3 mb-6">
             <div className="bg-gray-50 dark:bg-gray-800 rounded-xl p-3">
               <p className="text-2xl font-bold text-primary-500">{result.score}%</p>
-              <p className="text-xs text-gray-500">Your Score</p>
+              <p className="text-sm text-gray-400">Your Score</p>
             </div>
             <div className="bg-gray-50 dark:bg-gray-800 rounded-xl p-3">
               <p className="text-2xl font-bold">{result.correctCount}/{result.totalQuestions}</p>
-              <p className="text-xs text-gray-500">Correct</p>
+              <p className="text-sm text-gray-400">Correct</p>
             </div>
             <div className="bg-gray-50 dark:bg-gray-800 rounded-xl p-3">
               <p className={`text-2xl font-bold ${result.passed ? 'text-success-500' : 'text-danger-500'}`}>{result.passed ? 'Passed' : 'Failed'}</p>
-              <p className="text-xs text-gray-500">Status</p>
+              <p className="text-sm text-gray-400">Status</p>
             </div>
           </div>
           <Button variant="primary" onClick={() => navigate(-1)}>
@@ -135,7 +135,7 @@ export default function StudentQuizTake() {
                       const isSelected = userAns === opt;
                       const isCorrectOpt = opt === q.correct_answer;
                       return (
-                        <div key={oi} className={`text-xs px-3 py-1.5 rounded-lg ${isCorrectOpt ? 'bg-success-500/10 text-success-600 font-medium' : isSelected && !isCorrectOpt ? 'bg-danger-500/10 text-danger-600' : 'bg-gray-100 dark:bg-gray-700 text-gray-500'}`}>
+                        <div key={oi} className={`text-sm px-3 py-1.5 rounded-lg ${isCorrectOpt ? 'bg-success-500/10 text-success-600 font-medium' : isSelected && !isCorrectOpt ? 'bg-danger-500/10 text-danger-600' : 'bg-gray-100 dark:bg-gray-700 text-gray-400'}`}>
                           {String.fromCharCode(65 + oi)}. {opt}
                           {isCorrectOpt && <CheckCircle className="w-3 h-3 inline ml-1 text-success-500" />}
                           {isSelected && !isCorrectOpt && <XCircle className="w-3 h-3 inline ml-1 text-danger-500" />}
@@ -168,10 +168,10 @@ export default function StudentQuizTake() {
         <div className="flex items-center justify-between flex-wrap gap-3">
           <div>
             <h1 className="text-xl font-bold">{currentQuiz?.title}</h1>
-            <p className="text-xs text-gray-500 mt-0.5">{currentQuiz?.description}</p>
+            <p className="text-sm text-gray-400 mt-0.5">{currentQuiz?.description}</p>
           </div>
           {timeLeft !== null && (
-            <div className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium ${timeLeft < 60 ? 'bg-danger-50 text-danger-600 animate-pulse' : 'bg-gray-100 dark:bg-gray-800 text-gray-600'}`}>
+            <div className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium ${timeLeft < 60 ? 'bg-danger-50 text-danger-600 animate-pulse' : 'bg-gray-100 dark:bg-gray-800 text-gray-400'}`}>
               <Clock className="w-4 h-4" />
               {formatTime(timeLeft)}
             </div>
@@ -179,7 +179,7 @@ export default function StudentQuizTake() {
         </div>
         {/* Progress bar */}
         <div className="mt-3">
-          <div className="flex items-center justify-between text-xs text-gray-500 mb-1">
+          <div className="flex items-center justify-between text-sm text-gray-400 mb-1">
             <span>{Object.keys(answers).length} of {questions.length} answered</span>
             <span>{Math.round(progress)}%</span>
           </div>
@@ -193,7 +193,7 @@ export default function StudentQuizTake() {
       {questions.length > 0 && (
         <GlassCard className="p-6" hover={false}>
           <div className="flex items-center justify-between mb-4">
-            <span className="text-xs font-medium text-primary-500 bg-primary-500/10 px-2.5 py-1 rounded-full">
+            <span className="text-sm font-medium text-primary-500 bg-primary-500/10 px-2.5 py-1 rounded-full">
               Question {currentIndex + 1} of {questions.length}
             </span>
             <span className="text-xs text-gray-400">{questions[currentIndex].points} point{questions[currentIndex].points > 1 ? 's' : ''}</span>
@@ -220,7 +220,7 @@ export default function StudentQuizTake() {
       {questions.length === 0 && !isLoading && (
         <GlassCard className="p-8 text-center" hover={false}>
           <FileQuestion className="w-12 h-12 mx-auto mb-3 text-gray-300" />
-          <p className="text-gray-500">This quiz has no questions yet.</p>
+          <p className="text-gray-400">This quiz has no questions yet.</p>
         </GlassCard>
       )}
 
@@ -240,7 +240,7 @@ export default function StudentQuizTake() {
                     ? 'bg-primary-500 text-white'
                     : answers[questions[idx].id]
                     ? 'bg-primary-500/10 text-primary-600'
-                    : 'bg-gray-100 dark:bg-gray-800 text-gray-500 hover:bg-gray-200 dark:hover:bg-gray-700'
+                    : 'bg-gray-100 dark:bg-gray-800 text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-700'
                 }`}
               >
                 {idx + 1}

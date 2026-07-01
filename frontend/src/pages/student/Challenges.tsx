@@ -49,14 +49,14 @@ export default function Challenges() {
     <div>
       <div className="mb-8">
         <h1 className="text-2xl sm:text-3xl font-bold mb-2">Challenges</h1>
-        <p className="text-gray-500">Practice with interactive challenges from your courses.</p>
+        <p className="text-gray-400">Practice with interactive challenges from your courses.</p>
       </div>
 
       <div className="space-y-4">
         {challenges.length === 0 ? (
           <GlassCard className="p-8 text-center">
             <Code className="w-12 h-12 text-gray-600 mx-auto mb-3" />
-            <p className="text-gray-500">No challenges available yet.</p>
+            <p className="text-gray-400">No challenges available yet.</p>
           </GlassCard>
         ) : (
           challenges.map((ch: any) => {
@@ -78,16 +78,16 @@ export default function Challenges() {
                           {sub.passed ? 'Passed' : sub.score !== null ? 'Graded' : 'Submitted'}
                         </Badge>
                       )}
-                      <Badge className="bg-blue-500/10 text-blue-400 text-[10px]">{ch.difficulty}</Badge>
-                      <Badge className="bg-gray-500/10 text-gray-400 text-[10px]">{tc.label}</Badge>
+                      <Badge className="bg-blue-500/10 text-blue-400 text-xs">{ch.difficulty}</Badge>
+                      <Badge className="bg-gray-500/10 text-gray-400 text-xs">{tc.label}</Badge>
                       {sub?.score !== null && sub?.score !== undefined && (
-                        <span className="text-[10px] text-gray-500 flex items-center gap-0.5">
+                        <span className="text-xs text-gray-400 flex items-center gap-0.5">
                           <Zap className="w-3 h-3" /> {sub.score}/100
                         </span>
                       )}
                     </div>
                     <p className="text-gray-400 text-sm">{ch.description}</p>
-                    <div className="flex items-center gap-3 mt-2 text-xs text-gray-500">
+                    <div className="flex items-center gap-3 mt-2 text-sm text-gray-400">
                       {ch.language && <span>{ch.language}</span>}
                       <span>Course: {ch.course_title}</span>
                       <span>Lesson: {ch.lesson_title}</span>

@@ -642,7 +642,7 @@ export default function ExamTake() {
             {[1, 2, 3].map((step) => (
               <div key={step} className="flex items-center gap-1 sm:gap-2 flex-1">
                 <div className={`w-6 h-6 sm:w-8 sm:h-8 rounded-full flex items-center justify-center text-[10px] sm:text-sm font-bold transition-colors ${
-                  wizardStep === step ? 'bg-primary-500 text-white' : wizardStep > step ? 'bg-emerald-500/20 text-emerald-400' : 'bg-gray-800 text-gray-500'
+                  wizardStep === step ? 'bg-primary-500 text-white' : wizardStep > step ? 'bg-emerald-500/20 text-emerald-400' : 'bg-gray-800 text-gray-400'
                 }`}>
                   {wizardStep > step ? <CheckCircle className="w-3 h-3 sm:w-4 sm:h-4" /> : step}
                 </div>
@@ -676,14 +676,14 @@ export default function ExamTake() {
                   {cameraReady ? (
                     <video ref={cameraPreviewRef} className="w-full h-full object-cover" playsInline muted />
                   ) : cameraStarting ? (
-                    <div className="text-center text-gray-600 p-4 sm:p-6">
+                    <div className="text-center text-gray-400 p-4 sm:p-6">
                       <Loader className="w-8 h-8 sm:w-12 sm:h-12 mx-auto mb-2 animate-spin opacity-50" />
                       <p className="text-xs sm:text-sm text-amber-400">Requesting camera access...</p>
                     </div>
                   ) : (
-                    <div className="text-center text-gray-600 p-4 sm:p-6">
+                    <div className="text-center text-gray-400 p-4 sm:p-6">
                       <Camera className="w-8 h-8 sm:w-12 sm:h-12 mx-auto mb-2 sm:mb-3 opacity-50" />
-                      <p className="text-xs sm:text-sm text-gray-400 mb-2 sm:mb-3">Camera is required for proctoring</p>
+                      <p className="text-xs sm:text-sm text-gray-300 mb-2 sm:mb-3">Camera is required for proctoring</p>
                       {cameraError && (
                         <p className="text-[10px] sm:text-xs text-red-400 mb-2 sm:mb-3 break-all max-w-sm mx-auto">{cameraError}</p>
                       )}
@@ -1005,7 +1005,7 @@ export default function ExamTake() {
           {isMobile && (
             <button
               onClick={() => setShowMobileNav(v => !v)}
-              className="p-1.5 rounded-lg hover:bg-gray-800 text-gray-400"
+              className="p-1.5 rounded-lg hover:bg-gray-800 text-gray-300"
               title="Toggle question navigator"
             >
               <Grid className="w-4 h-4" />
@@ -1013,7 +1013,7 @@ export default function ExamTake() {
           )}
           <div className="min-w-0">
             <h1 className="text-white font-semibold text-xs sm:text-sm truncate">{exam.title}</h1>
-            <p className="text-gray-500 text-[10px] sm:text-xs truncate">{exam.course_title}</p>
+            <p className="text-gray-400 text-[10px] sm:text-xs truncate">{exam.course_title}</p>
           </div>
         </div>
         <div className="flex items-center gap-2 sm:gap-4 shrink-0">
@@ -1027,10 +1027,10 @@ export default function ExamTake() {
             <div className="w-20 lg:w-32 bg-gray-800 rounded-full h-2">
               <div className="bg-primary-500 h-2 rounded-full transition-all" style={{ width: `${(answeredCount / questions.length) * 100}%` }} />
             </div>
-            <span className="text-[10px] sm:text-xs text-gray-500">{answeredCount}/{questions.length}</span>
+            <span className="text-[10px] sm:text-xs text-gray-400">{answeredCount}/{questions.length}</span>
           </div>
 
-          <span className="sm:hidden text-[10px] text-gray-500">{answeredCount}/{questions.length}</span>
+          <span className="sm:hidden text-[10px] text-gray-400">{answeredCount}/{questions.length}</span>
 
           {flaggedCount > 0 && (
             <span className="text-[10px] sm:text-xs text-yellow-400 flex items-center gap-1">
@@ -1068,7 +1068,7 @@ export default function ExamTake() {
           {/* Mobile close button */}
           {isMobile && showMobileNav && (
             <div className="flex items-center justify-between mb-2">
-              <span className="text-[10px] text-gray-500">Questions</span>
+              <span className="text-[10px] text-gray-400">Questions</span>
               <button onClick={() => setShowMobileNav(false)} className="text-gray-400 hover:text-white p-1">
                 <span className="text-lg leading-none">&times;</span>
               </button>
@@ -1084,7 +1084,7 @@ export default function ExamTake() {
                     ? 'bg-primary-500 text-white'
                     : answers[q.id]
                       ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30'
-                      : 'bg-gray-800 text-gray-500 hover:bg-gray-700'
+                      : 'bg-gray-800 text-gray-400 hover:bg-gray-700'
                 }`}
               >
                 {i + 1}
@@ -1213,7 +1213,7 @@ export default function ExamTake() {
                   })}
                 </div>
               )}
-              <span className="text-[10px] sm:text-xs text-gray-500 whitespace-nowrap">
+              <span className="text-[10px] sm:text-xs text-gray-400 whitespace-nowrap">
                 <span className="sm:hidden">{currentIndex + 1}/{questions.length}</span>
                 <span className="hidden sm:inline">{currentIndex + 1} / {questions.length}</span>
               </span>

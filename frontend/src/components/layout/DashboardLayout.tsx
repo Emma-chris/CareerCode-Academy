@@ -104,7 +104,7 @@ export function DashboardLayout({ requiredRole }: DashboardLayoutProps) {
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 onFocus={() => searchQuery.trim().length >= 2 && setSearchOpen(true)}
-                className="w-full pl-9 pr-8 py-1.5 sm:py-2 rounded-xl bg-gray-100 dark:bg-gray-800/80 border border-transparent focus:border-primary-500/50 focus:bg-white dark:focus:bg-gray-800 text-sm text-gray-900 dark:text-gray-100 placeholder-gray-400 outline-none transition-all"
+                className="w-full pl-9 pr-8 py-1.5 sm:py-2 rounded-xl bg-gray-100 dark:bg-gray-800/80 border border-transparent focus:border-primary-500/50 focus:bg-white dark:focus:bg-gray-800 text-sm text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-300 outline-none transition-all"
                 aria-label="Search courses, lessons, instructors, certificates"
               />
               {searchQuery && (
@@ -148,7 +148,7 @@ export function DashboardLayout({ requiredRole }: DashboardLayoutProps) {
                         </div>
                         <div className="flex-1 min-w-0">
                           <p className="text-sm font-medium truncate">{result.title}</p>
-                          <p className="text-xs text-gray-500 truncate capitalize">{result.type} &middot; {result.category || ''}</p>
+                          <p className="text-xs text-gray-400 truncate capitalize">{result.type} &middot; {result.category || ''}</p>
                         </div>
                       </Link>
                     ))

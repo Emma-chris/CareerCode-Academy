@@ -68,7 +68,7 @@ export default function StudyPlans() {
       <div className="flex items-center justify-between mb-6">
         <div>
           <h1 className="text-2xl sm:text-3xl font-bold">Study Plans</h1>
-          <p className="text-gray-500 mt-1">Set weekly learning goals and track your progress.</p>
+          <p className="text-gray-400 mt-1">Set weekly learning goals and track your progress.</p>
         </div>
       </div>
 
@@ -81,7 +81,7 @@ export default function StudyPlans() {
             </h2>
             <div className="space-y-4">
               <div>
-                <label className="text-xs font-medium text-gray-500 block mb-1.5">Weekly Goal (hours)</label>
+                <label className="text-sm font-medium text-gray-400 block mb-1.5">Weekly Goal (hours)</label>
                 <div className="flex items-center gap-3">
                   <button
                     onClick={() => setGoalHours(Math.max(1, goalHours - 1))}
@@ -95,7 +95,7 @@ export default function StudyPlans() {
                 </div>
               </div>
               <div>
-                <label className="text-xs font-medium text-gray-500 block mb-1.5">Topics (comma separated)</label>
+                <label className="text-sm font-medium text-gray-400 block mb-1.5">Topics (comma separated)</label>
                 <input
                   type="text"
                   value={goalTopics}
@@ -105,7 +105,7 @@ export default function StudyPlans() {
                 />
               </div>
               <div>
-                <label className="text-xs font-medium text-gray-500 block mb-1.5">Notes</label>
+                <label className="text-sm font-medium text-gray-400 block mb-1.5">Notes</label>
                 <textarea
                   value={notes}
                   onChange={e => setNotes(e.target.value)}
@@ -128,12 +128,12 @@ export default function StudyPlans() {
         {/* Plans List */}
         <div className="lg:col-span-2">
           {loading ? (
-            <div className="text-center py-12 text-gray-500">Loading...</div>
+            <div className="text-center py-12 text-gray-400">Loading...</div>
           ) : plans.length === 0 ? (
             <GlassCard className="p-8 text-center" hover={false}>
               <Target className="w-12 h-12 text-gray-300 mx-auto mb-3" />
               <h3 className="text-lg font-semibold mb-1">No Study Plans Yet</h3>
-              <p className="text-sm text-gray-500">Create your first weekly study plan to start tracking goals.</p>
+              <p className="text-sm text-gray-400">Create your first weekly study plan to start tracking goals.</p>
             </GlassCard>
           ) : (
             <div className="space-y-4">
@@ -150,7 +150,7 @@ export default function StudyPlans() {
                       <div className="flex items-start justify-between mb-3">
                         <div>
                           <h3 className="text-sm font-semibold">{getWeekLabel(plan.week_start, plan.week_end)}</h3>
-                          <p className="text-xs text-gray-500 mt-0.5">
+                          <p className="text-sm text-gray-400 mt-0.5">
                             {new Date(plan.created_at).toLocaleDateString()}
                           </p>
                         </div>
@@ -166,21 +166,21 @@ export default function StudyPlans() {
                         <div className="flex items-center gap-2 p-2 rounded-lg bg-blue-50 dark:bg-blue-900/10">
                           <Clock className="w-4 h-4 text-blue-500" />
                           <div>
-                            <p className="text-xs text-gray-500">Goal</p>
+                            <p className="text-sm text-gray-400">Goal</p>
                             <p className="text-sm font-semibold">{plan.goal_hours}h</p>
                           </div>
                         </div>
                         <div className="flex items-center gap-2 p-2 rounded-lg bg-green-50 dark:bg-green-900/10">
                           <TrendingUp className="w-4 h-4 text-green-500" />
                           <div>
-                            <p className="text-xs text-gray-500">Daily Avg</p>
+                            <p className="text-sm text-gray-400">Daily Avg</p>
                             <p className="text-sm font-semibold">{hoursPerDay}h</p>
                           </div>
                         </div>
                         <div className="flex items-center gap-2 p-2 rounded-lg bg-purple-50 dark:bg-purple-900/10">
                           <BookOpen className="w-4 h-4 text-purple-500" />
                           <div>
-                            <p className="text-xs text-gray-500">Topics</p>
+                            <p className="text-sm text-gray-400">Topics</p>
                             <p className="text-sm font-semibold">{plan.goal_topics.length}</p>
                           </div>
                         </div>
@@ -195,7 +195,7 @@ export default function StudyPlans() {
                       )}
 
                       {plan.notes && (
-                        <p className="text-xs text-gray-500 italic mt-2">{plan.notes}</p>
+                        <p className="text-sm text-gray-400 italic mt-2">{plan.notes}</p>
                       )}
                     </GlassCard>
                   </motion.div>

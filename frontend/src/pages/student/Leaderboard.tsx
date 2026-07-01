@@ -25,7 +25,7 @@ export default function Leaderboard() {
     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
       <div className="mb-8">
         <h1 className="text-2xl sm:text-3xl font-bold">Leaderboard</h1>
-        <p className="text-gray-500 mt-1">See how you rank among your peers.</p>
+        <p className="text-gray-400 mt-1">See how you rank among your peers.</p>
       </div>
 
       {/* Podium */}
@@ -41,11 +41,11 @@ export default function Leaderboard() {
             <div className="w-12 h-12 rounded-full bg-gray-400 flex items-center justify-center text-lg font-bold text-white shadow-lg">
               {(leaderboard[1].name || '?').charAt(0)}
             </div>
-            <span className="text-xs font-medium text-gray-500 truncate max-w-[80px] text-center">{leaderboard[1].name || 'Anonymous'}</span>
+            <span className="text-sm font-medium text-gray-400 truncate max-w-[80px] text-center">{leaderboard[1].name || 'Anonymous'}</span>
             <div className="w-16 h-20 bg-gray-200 dark:bg-gray-800 rounded-t-xl flex items-center justify-center">
               <Medal className="w-5 h-5 text-gray-400" />
             </div>
-            <span className="text-[10px] text-gray-500 font-medium">2nd</span>
+            <span className="text-xs text-gray-400 font-medium">2nd</span>
           </motion.div>
 
           {/* 1st Place */}
@@ -75,11 +75,11 @@ export default function Leaderboard() {
             <div className="w-12 h-12 rounded-full bg-amber-600 flex items-center justify-center text-lg font-bold text-white shadow-lg">
               {(leaderboard[2].name || '?').charAt(0)}
             </div>
-            <span className="text-xs font-medium text-gray-500 truncate max-w-[80px] text-center">{leaderboard[2].name || 'Anonymous'}</span>
+            <span className="text-sm font-medium text-gray-400 truncate max-w-[80px] text-center">{leaderboard[2].name || 'Anonymous'}</span>
             <div className="w-16 h-16 bg-amber-600/10 dark:bg-amber-900/20 rounded-t-xl flex items-center justify-center border border-amber-600/20">
               <Medal className="w-5 h-5 text-amber-600" />
             </div>
-            <span className="text-[10px] text-gray-500 font-medium">3rd</span>
+            <span className="text-xs text-gray-400 font-medium">3rd</span>
           </motion.div>
         </div>
       )}
@@ -112,7 +112,7 @@ export default function Leaderboard() {
                     {entry.rank <= 3 ? (
                       <Crown className={cn('w-5 h-5 mx-auto', rankColors[entry.rank - 1])} />
                     ) : (
-                      <span className="text-sm font-bold text-gray-400">#{entry.rank}</span>
+                      <span className="text-sm font-bold text-gray-300">#{entry.rank}</span>
                     )}
                   </div>
 
@@ -135,7 +135,7 @@ export default function Leaderboard() {
                         <Badge variant="primary" size="sm">You</Badge>
                       )}
                     </div>
-                    <div className="flex items-center gap-2 text-xs text-gray-500">
+                    <div className="flex items-center gap-2 text-sm text-gray-400">
                       <span className="flex items-center gap-0.5"><Zap className="w-3 h-3" /> {entry.xpPoints?.toLocaleString() || 0} XP</span>
                       <span className="flex items-center gap-0.5"><Award className="w-3 h-3" /> {entry.badges ?? 0} badges</span>
                     </div>
@@ -178,11 +178,11 @@ export default function Leaderboard() {
                   <div className="grid grid-cols-2 gap-3 text-center">
                     <div className="p-3 rounded-xl bg-gray-50 dark:bg-gray-800/50">
                       <div className="text-lg font-bold text-primary-500">{me.xpPoints.toLocaleString()}</div>
-                      <div className="text-xs text-gray-500">XP Points</div>
+                      <div className="text-sm text-gray-400">XP Points</div>
                     </div>
                     <div className="p-3 rounded-xl bg-gray-50 dark:bg-gray-800/50">
                       <div className="text-lg font-bold text-amber-500">{me.badges}</div>
-                      <div className="text-xs text-gray-500">Badges</div>
+                      <div className="text-sm text-gray-400">Badges</div>
                     </div>
                   </div>
                 </div>

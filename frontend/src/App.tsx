@@ -7,6 +7,7 @@ import { useAuthStore } from '@/store/authStore';
 import api from '@/lib/axios';
 import { OnboardingProvider } from '@/guides/OnboardingContext';
 import { OnboardingModal } from '@/guides/OnboardingModal';
+import { AnalyticsTracker } from '@/hooks/useAnalyticsTracker';
 
 function SuspenseWrapper({ children }: { children: React.ReactNode }) {
   return (
@@ -161,6 +162,7 @@ function App() {
 
   return (
     <OnboardingProvider>
+      <AnalyticsTracker />
       <Routes>
         <Route element={<MainLayout />}>
           <Route path="/" element={<GuestRoute><SuspenseWrapper><Home /></SuspenseWrapper></GuestRoute>} />

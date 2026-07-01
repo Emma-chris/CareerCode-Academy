@@ -18,6 +18,22 @@ const floatingShapes = [
   { icon: Shield, color: 'text-neon-green', delay: 1.5, x: '80%', y: '75%' },
 ];
 
+const styles = {
+  container: "max-w-[2560px] mx-auto px-4 sm:px-6 lg:px-8 py-20 lg:py-32 3xl:py-48 relative w-full",
+  contentWrapper: "max-w-[1280px] 3xl:max-w-[2240px] mx-auto text-center",
+  badgeWrapper: "mb-6 md:mb-8 3xl:mb-12",
+  badge: "inline-flex items-center gap-2 px-4 py-2 3xl:px-8 3xl:py-4 rounded-full bg-primary-500/10 border border-primary-500/20 text-sm 3xl:text-xl font-medium text-primary-600 dark:text-primary-400",
+  badgeIcon: "w-4 h-4 3xl:w-6 3xl:h-6",
+  heading: "text-4xl sm:text-5xl md:text-6xl lg:text-7xl 3xl:text-[7rem] font-extrabold tracking-tight mb-6 3xl:mb-12 leading-tight",
+  subtitle: "text-lg sm:text-xl 3xl:text-3xl text-gray-600 dark:text-gray-400 max-w-2xl 3xl:max-w-5xl mx-auto mb-10 3xl:mb-16 leading-relaxed",
+  buttonWrapper: "flex flex-col sm:flex-row items-center justify-center gap-4 lg:gap-6 3xl:gap-10",
+  button: "3xl:text-2xl 3xl:px-12 3xl:py-6 3xl:rounded-2xl",
+  buttonIcon: "w-5 h-5 3xl:w-8 3xl:h-8",
+  statsWrapper: "mt-16 lg:mt-24 3xl:mt-40 flex flex-wrap items-center justify-center gap-8 lg:gap-16 3xl:gap-32 text-sm 3xl:text-2xl text-gray-500",
+  statNumber: "text-2xl lg:text-4xl 3xl:text-7xl font-bold text-gray-900 dark:text-white mb-1 3xl:mb-4",
+  floatingIcon: "w-12 h-12 md:w-16 md:h-16 3xl:w-32 3xl:h-32 opacity-20 transition-all duration-300 hover:scale-110",
+};
+
 export function Hero() {
   const [textIndex, setTextIndex] = useState(0);
   const [charIndex, setCharIndex] = useState(0);
@@ -82,27 +98,27 @@ export function Hero() {
             ease: 'easeInOut',
           }}
         >
-          <shape.icon className="w-12 h-12 opacity-20" />
+          <shape.icon className={styles.floatingIcon} />
         </motion.div>
       ))}
 
-      <div className="max-w-screen-4xl mx-auto px-4 sm:px-6 lg:px-8 py-20 relative">
+      <div className={styles.container}>
         <motion.div
           variants={containerVariants}
           initial="hidden"
           animate="visible"
-          className="max-w-4xl mx-auto text-center"
+          className={styles.contentWrapper}
         >
-          <motion.div variants={itemVariants} className="mb-6">
-            <span className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary-500/10 border border-primary-500/20 text-sm font-medium text-primary-600 dark:text-primary-400">
-              <Sparkles className="w-4 h-4" />
+          <motion.div variants={itemVariants} className={styles.badgeWrapper}>
+            <span className={styles.badge}>
+              <Sparkles className={styles.badgeIcon} />
               New: Interactive Coding Challenges Launched
             </span>
           </motion.div>
 
           <motion.h1
             variants={itemVariants}
-            className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-extrabold tracking-tight mb-6"
+            className={styles.heading}
           >
             <span className="text-gray-900 dark:text-white">Learn to Code,</span>
             <br />
@@ -112,7 +128,7 @@ export function Hero() {
 
           <motion.p
             variants={itemVariants}
-            className="text-lg sm:text-xl text-gray-600 dark:text-gray-400 max-w-2xl mx-auto mb-10 leading-relaxed"
+            className={styles.subtitle}
           >
             From zero to job-ready developer. Master in-demand technologies through
             hands-on projects, expert mentorship, and a curriculum designed by
@@ -121,17 +137,17 @@ export function Hero() {
 
           <motion.div
             variants={itemVariants}
-            className="flex flex-col sm:flex-row items-center justify-center gap-4"
+            className={styles.buttonWrapper}
           >
             <Link to="/signup">
-              <NeonButton color="blue" size="lg">
+              <NeonButton color="blue" size="lg" className={styles.button}>
                 Start Learning Free
-                <ArrowRight className="w-5 h-5" />
+                <ArrowRight className={styles.buttonIcon} />
               </NeonButton>
             </Link>
             <Link to="/courses">
-              <NeonButton color="purple" size="lg">
-                <Play className="w-5 h-5" />
+              <NeonButton color="purple" size="lg" className={styles.button}>
+                <Play className={styles.buttonIcon} />
                 Explore Courses
               </NeonButton>
             </Link>
@@ -139,7 +155,7 @@ export function Hero() {
 
           <motion.div
             variants={itemVariants}
-            className="mt-16 flex flex-wrap items-center justify-center gap-8 text-sm text-gray-500"
+            className={styles.statsWrapper}
           >
             {[
               { number: '10K+', label: 'Students' },
@@ -148,7 +164,7 @@ export function Hero() {
               { number: '4.9', label: 'Avg Rating' },
             ].map((stat) => (
               <div key={stat.label} className="text-center">
-                <div className="text-2xl font-bold text-gray-900 dark:text-white">
+                <div className={styles.statNumber}>
                   {stat.number}
                 </div>
                 <div>{stat.label}</div>

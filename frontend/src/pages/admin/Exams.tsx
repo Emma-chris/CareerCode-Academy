@@ -443,7 +443,7 @@ export default function AdminExams() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl sm:text-3xl font-bold">Exams</h1>
-          <p className="text-gray-500 mt-1">Create and manage certification exams linked to courses.</p>
+          <p className="text-gray-400 mt-1">Create and manage certification exams linked to courses.</p>
         </div>
         <Button onClick={() => { resetForm(); setShowForm(true); }}>
           <Plus className="w-4 h-4 mr-1.5" /> Create Exam
@@ -461,7 +461,7 @@ export default function AdminExams() {
             <div className="space-y-4">
               <div className="grid grid-cols-2 gap-4">
                 <div className="col-span-2">
-                  <label className="text-xs font-medium text-gray-500 mb-1 block">Course *</label>
+                  <label className="text-xs font-medium text-gray-400 mb-1 block">Course *</label>
                   <select value={form.courseId} onChange={(e) => setForm({ ...form, courseId: e.target.value })}
                     className="w-full rounded-xl bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-primary-500/30">
                     <option value="">Select a course...</option>
@@ -471,7 +471,7 @@ export default function AdminExams() {
                   </select>
                 </div>
                 <div className="col-span-2">
-                  <label className="text-xs font-medium text-gray-500 mb-1 block">Certificate Template (optional)</label>
+                  <label className="text-xs font-medium text-gray-400 mb-1 block">Certificate Template (optional)</label>
                   <select value={form.certificateTemplateId} onChange={(e) => setForm({ ...form, certificateTemplateId: e.target.value })}
                     className="w-full rounded-xl bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-primary-500/30">
                     <option value="">No certificate requirement</option>
@@ -479,50 +479,50 @@ export default function AdminExams() {
                       <option key={t.id} value={t.id}>{t.name} — {t.course_title}</option>
                     ))}
                   </select>
-                  <p className="text-[10px] text-gray-400 mt-1">When linked, students must complete the course to take this exam.</p>
+                  <p className="text-xs text-gray-300 mt-1">When linked, students must complete the course to take this exam.</p>
                 </div>
                 <div className="col-span-2">
-                  <label className="text-xs font-medium text-gray-500 mb-1 block">Title *</label>
+                  <label className="text-xs font-medium text-gray-400 mb-1 block">Title *</label>
                   <input value={form.title} onChange={(e) => setForm({ ...form, title: e.target.value })}
                     className="w-full rounded-xl bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-primary-500/30" placeholder="Final Certification Exam" />
                 </div>
                 <div className="col-span-2">
-                  <label className="text-xs font-medium text-gray-500 mb-1 block">Description</label>
+                  <label className="text-xs font-medium text-gray-400 mb-1 block">Description</label>
                   <textarea value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} rows={2}
                     className="w-full rounded-xl bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-primary-500/30 resize-none" placeholder="Exam description..." />
                 </div>
                 <div>
-                  <label className="text-xs font-medium text-gray-500 mb-1 block">Duration (minutes)</label>
+                  <label className="text-xs font-medium text-gray-400 mb-1 block">Duration (minutes)</label>
                   <input type="number" value={form.durationMinutes} onChange={(e) => setForm({ ...form, durationMinutes: parseInt(e.target.value) || 60 })}
                     className="w-full rounded-xl bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-primary-500/30" />
                 </div>
                 <div>
-                  <label className="text-xs font-medium text-gray-500 mb-1 block">Passing Score (%)</label>
+                  <label className="text-xs font-medium text-gray-400 mb-1 block">Passing Score (%)</label>
                   <input type="number" value={form.passingScore} onChange={(e) => setForm({ ...form, passingScore: parseInt(e.target.value) || 70 })}
                     className="w-full rounded-xl bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-primary-500/30" />
                 </div>
                 <div>
-                  <label className="text-xs font-medium text-gray-500 mb-1 block">Max Attempts</label>
+                  <label className="text-xs font-medium text-gray-400 mb-1 block">Max Attempts</label>
                   <input type="number" value={form.maxAttempts} onChange={(e) => setForm({ ...form, maxAttempts: parseInt(e.target.value) || 1 })}
                     className="w-full rounded-xl bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-primary-500/30" />
                 </div>
                 <div>
-                  <label className="text-xs font-medium text-gray-500 mb-1 block">Random Questions (0 = all)</label>
+                  <label className="text-xs font-medium text-gray-400 mb-1 block">Random Questions (0 = all)</label>
                   <input type="number" value={form.randomQuestionsCount} onChange={(e) => setForm({ ...form, randomQuestionsCount: parseInt(e.target.value) || 0 })}
                     className="w-full rounded-xl bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-primary-500/30" />
                 </div>
                 <div>
-                  <label className="text-xs font-medium text-gray-500 mb-1 block">Starts At</label>
+                  <label className="text-xs font-medium text-gray-400 mb-1 block">Starts At</label>
                   <input type="datetime-local" value={form.startsAt} onChange={(e) => setForm({ ...form, startsAt: e.target.value })}
                     className="w-full rounded-xl bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-primary-500/30" />
                 </div>
                 <div>
-                  <label className="text-xs font-medium text-gray-500 mb-1 block">Ends At</label>
+                  <label className="text-xs font-medium text-gray-400 mb-1 block">Ends At</label>
                   <input type="datetime-local" value={form.endsAt} onChange={(e) => setForm({ ...form, endsAt: e.target.value })}
                     className="w-full rounded-xl bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-primary-500/30" />
                 </div>
                 <div className="col-span-2">
-                  <label className="text-xs font-medium text-gray-500 mb-1 block">Instructions</label>
+                  <label className="text-xs font-medium text-gray-400 mb-1 block">Instructions</label>
                   <textarea value={form.instructions} onChange={(e) => setForm({ ...form, instructions: e.target.value })} rows={3}
                     className="w-full rounded-xl bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-primary-500/30 resize-none" placeholder="Instructions shown to students before starting the exam..." />
                 </div>
@@ -550,10 +550,10 @@ export default function AdminExams() {
                 </label>
                 {form.negativeMarking && (
                   <div className="flex items-center gap-2">
-                    <span className="text-xs text-gray-500">Deduct</span>
+                    <span className="text-xs text-gray-400">Deduct</span>
                     <input type="number" value={form.negativePercentage} onChange={(e) => setForm({ ...form, negativePercentage: parseInt(e.target.value) || 0 })}
                       className="w-16 rounded-xl bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 px-2 py-1 text-sm outline-none focus:ring-2 focus:ring-primary-500/30 text-center" />
-                    <span className="text-xs text-gray-500">% per wrong answer</span>
+                    <span className="text-xs text-gray-400">% per wrong answer</span>
                   </div>
                 )}
               </div>
@@ -583,7 +583,7 @@ export default function AdminExams() {
                 <button onClick={() => { setSelectedAttempt(null); setAttemptAnswers([]); }} className="text-sm text-primary-400 hover:underline mb-3">&larr; Back to attempts list</button>
                 <div className="mb-4">
                   <p className="font-medium">{selectedAttempt.user_name} ({selectedAttempt.user_email})</p>
-                  <p className="text-xs text-gray-500">Score: {selectedAttempt.score}% | {selectedAttempt.passed ? 'Passed' : 'Failed'} | {selectedAttempt.status}</p>
+                  <p className="text-xs text-gray-400">Score: {selectedAttempt.score}% | {selectedAttempt.passed ? 'Passed' : 'Failed'} | {selectedAttempt.status}</p>
                 </div>
 
                 <div className="space-y-3 mb-4">
@@ -594,13 +594,13 @@ export default function AdminExams() {
                       <div key={ans.id} className={`p-3 rounded-xl ${ans.is_correct ? 'bg-emerald-500/5 border border-emerald-500/10' : 'bg-red-500/5 border border-red-500/10'}`}>
                         <div className="flex items-center gap-2 mb-1">
                           <span className="text-xs font-medium text-primary-400">Q{i + 1}</span>
-                          <Badge className="text-[10px]">{ans.question_type}</Badge>
-                          <span className="text-[10px] text-gray-500">{ans.points}pt</span>
+                          <Badge className="text-xs">{ans.question_type}</Badge>
+                          <span className="text-xs text-gray-400">{ans.points}pt</span>
                         </div>
                         <p className="text-sm mb-1">{ans.question}</p>
                         <p className="text-xs">Answer: <span className={ans.is_correct ? 'text-emerald-400' : 'text-red-400'}>{ans.answer || '(none)'}</span></p>
                         {!ans.is_correct && <p className="text-xs text-emerald-400">Correct: {ans.correct_answer}</p>}
-                        <p className="text-xs text-gray-500">Points earned: {ans.points_earned}/{ans.points}</p>
+                        <p className="text-xs text-gray-400">Points earned: {ans.points_earned}/{ans.points}</p>
                       </div>
                     ))
                   )}
@@ -609,10 +609,10 @@ export default function AdminExams() {
                 <div className="border-t border-gray-700 pt-4">
                   <h4 className="text-sm font-medium mb-2">Manual Grading</h4>
                   <div className="flex items-center gap-2">
-                    <span className="text-xs text-gray-500">Override score (0-100):</span>
+                    <span className="text-xs text-gray-400">Override score (0-100):</span>
                     <input type="number" value={gradingScore} onChange={(e) => setGradingScore(e.target.value)}
                       className="w-20 rounded-xl bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 px-3 py-1.5 text-sm outline-none focus:ring-2 focus:ring-primary-500/30 text-center" />
-                    <span className="text-xs text-gray-500">%</span>
+                    <span className="text-xs text-gray-400">%</span>
                     <Button size="sm" onClick={handleGrade} disabled={savingGrade}>
                       {savingGrade ? <Loader2 className="w-3.5 h-3.5 animate-spin mr-1" /> : null}
                       Save Grade
@@ -625,14 +625,14 @@ export default function AdminExams() {
                 {loadingAttempts ? (
                   <div className="text-center py-8"><Loader2 className="w-6 h-6 animate-spin mx-auto" /></div>
                 ) : attempts.length === 0 ? (
-                  <p className="text-gray-500 text-center py-8">No attempts yet.</p>
+                  <p className="text-gray-400 text-center py-8">No attempts yet.</p>
                 ) : (
                   <div className="space-y-2">
                     {attempts.map((a) => (
                       <div key={a.id} className="flex items-center justify-between p-3 rounded-xl bg-gray-800/50 cursor-pointer hover:bg-gray-800 transition-colors" onClick={() => loadAttemptDetail(a)}>
                         <div>
                           <p className="text-sm font-medium">{a.user_name}</p>
-                          <p className="text-xs text-gray-500">{a.user_email}</p>
+                          <p className="text-xs text-gray-400">{a.user_email}</p>
                         </div>
                         <div className="flex items-center gap-3">
                           <Badge variant={a.passed ? 'success' : 'danger'}>{a.passed ? 'Passed' : 'Failed'}</Badge>
@@ -666,11 +666,11 @@ export default function AdminExams() {
                     <div className="flex items-start justify-between mb-2">
                       <div className="flex-1 min-w-0">
                         <h3 className="font-semibold text-sm truncate">{exam.title}</h3>
-                        <p className="text-xs text-gray-500 truncate">{exam.course_title}</p>
+                          <p className="text-xs text-gray-400 truncate">{exam.course_title}</p>
                       </div>
                       <Badge variant={exam.is_published ? 'success' : 'default'}>{exam.is_published ? 'Published' : 'Draft'}</Badge>
                     </div>
-                    <div className="flex items-center gap-3 text-xs text-gray-400 mb-2 flex-wrap">
+                    <div className="flex items-center gap-3 text-xs text-gray-300 mb-2 flex-wrap">
                       <span>{exam.duration_minutes}min</span>
                       <span>Pass: {exam.passing_score}%</span>
                       <span>{exam.max_attempts} attempt(s)</span>
@@ -678,7 +678,7 @@ export default function AdminExams() {
                       {exam.negative_marking && <span className="text-red-400">-{exam.negative_percentage}%</span>}
                     </div>
                     {exam.starts_at && (
-                      <p className="text-[10px] text-gray-600 mb-2">
+                      <p className="text-xs text-gray-400 mb-2">
                         Schedule: {new Date(exam.starts_at).toLocaleString()}{exam.ends_at ? ` — ${new Date(exam.ends_at).toLocaleString()}` : ''}
                       </p>
                     )}
@@ -708,7 +708,7 @@ export default function AdminExams() {
               <div className="flex items-center justify-between">
                 <div>
                   <h2 className="font-semibold text-sm">{selectedExam.title}</h2>
-                  <p className="text-xs text-gray-500">{questions.length} question(s)</p>
+                  <p className="text-xs text-gray-400">{questions.length} question(s)</p>
                 </div>
                 <Button size="sm" onClick={() => { resetQuestionForm(); setShowQuestionForm(true); }}>
                   <Plus className="w-3.5 h-3.5 mr-1" /> Add Question
@@ -723,12 +723,12 @@ export default function AdminExams() {
                   </div>
                   <div className="space-y-3">
                     <div>
-                      <label className="text-xs font-medium text-gray-500 mb-1 block">Question *</label>
+                      <label className="text-xs font-medium text-gray-400 mb-1 block">Question *</label>
                       <textarea value={questionForm.question} onChange={(e) => setQuestionForm({ ...questionForm, question: e.target.value })} rows={2}
                         className="w-full rounded-xl bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-primary-500/30 resize-none" placeholder="What is 2 + 2?" />
                     </div>
                     <div>
-                      <label className="text-xs font-medium text-gray-500 mb-1 block">Type</label>
+                      <label className="text-xs font-medium text-gray-400 mb-1 block">Type</label>
                       <select value={questionForm.questionType} onChange={(e) => {
                         const t = e.target.value as 'mcq' | 'true_false' | 'essay';
                         setQuestionForm({
@@ -746,10 +746,10 @@ export default function AdminExams() {
 
                     {questionForm.questionType === 'mcq' && (
                       <div>
-                        <label className="text-xs font-medium text-gray-500 mb-1 block">Options</label>
+                        <label className="text-xs font-medium text-gray-400 mb-1 block">Options</label>
                         {questionForm.options.map((opt, i) => (
                           <div key={i} className="flex items-center gap-2 mb-1.5">
-                            <span className="text-xs text-gray-400 w-5">{i + 1}.</span>
+                            <span className="text-xs text-gray-300 w-5">{i + 1}.</span>
                             <input value={opt} onChange={(e) => updateOption(i, e.target.value)}
                               className="flex-1 rounded-xl bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 px-3 py-1.5 text-sm outline-none focus:ring-2 focus:ring-primary-500/30" placeholder={`Option ${i + 1}`} />
                             {questionForm.options.length > 2 && (
@@ -762,7 +762,7 @@ export default function AdminExams() {
                     )}
 
                     <div>
-                      <label className="text-xs font-medium text-gray-500 mb-1 block">Correct Answer *</label>
+                      <label className="text-xs font-medium text-gray-400 mb-1 block">Correct Answer *</label>
                       {questionForm.questionType === 'true_false' ? (
                         <select value={questionForm.correctAnswer} onChange={(e) => setQuestionForm({ ...questionForm, correctAnswer: e.target.value })}
                           className="w-full rounded-xl bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-primary-500/30">
@@ -785,7 +785,7 @@ export default function AdminExams() {
                     </div>
 
                     <div>
-                      <label className="text-xs font-medium text-gray-500 mb-1 block">Points</label>
+                      <label className="text-xs font-medium text-gray-400 mb-1 block">Points</label>
                       <input type="number" value={questionForm.points} onChange={(e) => setQuestionForm({ ...questionForm, points: parseInt(e.target.value) || 1 })}
                         className="w-full rounded-xl bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-primary-500/30" />
                     </div>
@@ -804,7 +804,7 @@ export default function AdminExams() {
                 {loadingQuestions ? (
                   <div className="text-center py-8 text-gray-400"><Loader2 className="w-6 h-6 animate-spin mx-auto" /></div>
                 ) : questions.length === 0 ? (
-                  <p className="text-gray-500 text-sm text-center py-8">No questions yet. Add your first question.</p>
+                  <p className="text-gray-400 text-sm text-center py-8">No questions yet. Add your first question.</p>
                 ) : (
                   questions.map((q, i) => (
                     <GlassCard key={q.id} className="p-3">
@@ -812,11 +812,11 @@ export default function AdminExams() {
                         <div className="flex-1 min-w-0">
                           <div className="flex items-center gap-2 mb-1">
                             <span className="text-xs font-medium text-primary-400">Q{i + 1}</span>
-                            <Badge className="text-[10px]">{q.question_type}</Badge>
-                            <span className="text-[10px] text-gray-500">{q.points}pt(s)</span>
+                            <Badge className="text-xs">{q.question_type}</Badge>
+                            <span className="text-xs text-gray-400">{q.points}pt(s)</span>
                           </div>
                           <p className="text-sm">{q.question}</p>
-                          <p className="text-xs text-gray-500 mt-1">Answer: <span className="text-emerald-400">{q.correct_answer}</span></p>
+                          <p className="text-xs text-gray-400 mt-1">Answer: <span className="text-emerald-400">{q.correct_answer}</span></p>
                         </div>
                         <div className="flex flex-col gap-1 shrink-0">
                           <div className="flex gap-0.5">
@@ -835,7 +835,7 @@ export default function AdminExams() {
               </div>
             </>
           ) : (
-            <div className="text-center py-16 text-gray-400">
+            <div className="text-center py-16 text-gray-300">
               <ClipboardList className="w-12 h-12 mx-auto mb-3 opacity-50" />
               <p className="text-sm">Select an exam to manage questions</p>
             </div>

@@ -294,7 +294,7 @@ export function ChatView({
                     <button
                       key={tab.filter}
                       onClick={() => setRoleFilter(tab.filter)}
-                      className={`flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-[11px] font-medium transition-colors ${isActive ? 'bg-primary-500 text-white' : 'bg-gray-100 dark:bg-gray-800 text-gray-500 hover:text-gray-700 dark:hover:text-gray-300'}`}
+                      className={`flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-[11px] font-medium transition-colors ${isActive ? 'bg-primary-500 text-white' : 'bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200'}`}
                     >
                       <Icon className="w-3 h-3" />
                       {tab.label}
@@ -316,7 +316,7 @@ export function ChatView({
 
           <div className="flex-1 overflow-y-auto">
             {filtered.length === 0 && !isLoading && (
-              <div className="p-6 text-center text-gray-500 text-sm">
+              <div className="p-6 text-center text-gray-400 dark:text-gray-300 text-sm">
                 {search || roleFilter ? 'No matching conversations' : 'No conversations yet'}
               </div>
             )}
@@ -349,7 +349,7 @@ export function ChatView({
                       )}
                     </div>
                     <div className="flex items-center gap-2 mt-0.5">
-                      <div className="text-xs text-gray-500 truncate flex-1">
+                      <div className="text-xs text-gray-400 truncate flex-1">
                         {conv.last_message ? highlightText(conv.last_message, search) : <span className="italic opacity-60">No messages yet</span>}
                       </div>
                       {(conv.unread_count || 0) > 0 && (
@@ -643,7 +643,7 @@ export function ChatView({
                   </div>
                   <div className="flex-1 min-w-0">
                     <div className="text-sm font-medium truncate">{u.name}</div>
-                    <div className="text-xs text-gray-500 truncate">{u.email}</div>
+                    <div className="text-xs text-gray-400 truncate">{u.email}</div>
                   </div>
                   <span className={`text-[10px] font-medium px-2 py-0.5 rounded-full capitalize ${
                     u.role === 'admin' ? 'bg-purple-100 text-purple-700 dark:bg-purple-900/20 dark:text-purple-300' :

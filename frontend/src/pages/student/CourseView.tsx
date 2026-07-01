@@ -386,7 +386,7 @@ export default function CourseView() {
     return (
       <div className="min-h-screen bg-gray-950 flex items-center justify-center">
         <GlassCard className="max-w-md text-center p-8">
-          <Lock className="w-16 h-16 text-gray-600 mx-auto mb-4" />
+          <Lock className="w-16 h-16 text-gray-400 mx-auto mb-4" />
           <h2 className="text-2xl font-bold text-white mb-2">Access Required</h2>
           <p className="text-gray-400 mb-6">You need to enroll in this course to access the content.</p>
           <Link to={`/courses/${slug}`}>
@@ -408,7 +408,7 @@ export default function CourseView() {
           </Link>
           <div className="min-w-0">
             <h1 className="text-white font-semibold text-sm truncate">{course.title}</h1>
-            <p className="text-gray-500 text-xs truncate">{currentLesson?.title || 'Select a lesson'}</p>
+            <p className="text-gray-400 text-xs truncate">{currentLesson?.title || 'Select a lesson'}</p>
           </div>
         </div>
         <div className="flex items-center gap-2 shrink-0">
@@ -416,7 +416,7 @@ export default function CourseView() {
           <button
             onClick={() => setAutoPlayNext(!autoPlayNext)}
             className={`flex items-center gap-1 text-[10px] font-medium px-2 py-1 rounded-lg transition-colors ${
-              autoPlayNext ? 'bg-emerald-500/20 text-emerald-400' : 'bg-gray-800 text-gray-500'
+              autoPlayNext ? 'bg-emerald-500/20 text-emerald-400' : 'bg-gray-800 text-gray-400'
             }`}
             title={autoPlayNext ? 'Autoplay next lesson is on' : 'Autoplay next lesson is off'}
           >
@@ -475,12 +475,12 @@ export default function CourseView() {
                     className="w-full flex items-center gap-2 px-3 py-2 hover:bg-gray-800/50 transition-colors"
                   >
                     {isExpanded ? (
-                      <ChevronDown className="w-3 h-3 text-gray-500 shrink-0" />
+                      <ChevronDown className="w-3 h-3 text-gray-400 shrink-0" />
                     ) : (
-                      <ChevronUp className="w-3 h-3 text-gray-500 shrink-0" />
+                      <ChevronUp className="w-3 h-3 text-gray-400 shrink-0" />
                     )}
                     <span className="text-xs text-gray-400 font-medium truncate flex-1 text-left">{mod.title}</span>
-                    <span className="text-[10px] text-gray-600">{modCompleted}/{modTotal}</span>
+                    <span className="text-[10px] text-gray-400">{modCompleted}/{modTotal}</span>
                   </button>
 
                   {isExpanded && modLessons.map((lesson: any, li: number) => {
@@ -520,7 +520,7 @@ export default function CourseView() {
                           {isLCompleted ? (
                             <CheckCircle className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
                           ) : (
-                            <PlayCircle className={`w-3.5 h-3.5 shrink-0 ${lesson.isFree ? 'text-blue-400' : 'text-gray-600'}`} />
+                            <PlayCircle className={`w-3.5 h-3.5 shrink-0 ${lesson.isFree ? 'text-blue-400' : 'text-gray-400'}`} />
                           )}
                           <div className="flex-1 min-w-0 text-left">
                             <p className={`text-xs truncate ${isCurrent ? 'text-white' : 'text-gray-400'}`}>
@@ -541,7 +541,7 @@ export default function CourseView() {
                           {isBookmarked ? (
                             <BookmarkCheck className="w-3 h-3 text-yellow-400" />
                           ) : (
-                            <Bookmark className="w-3 h-3 text-gray-600" />
+                            <Bookmark className="w-3 h-3 text-gray-400" />
                           )}
                         </button>
                       </div>
@@ -589,7 +589,7 @@ export default function CourseView() {
                   className={`flex items-center gap-1.5 px-4 py-2.5 text-xs font-medium border-b-2 transition-colors ${
                     activeTab === tab.key
                       ? 'text-blue-400 border-blue-500'
-                      : 'text-gray-500 border-transparent hover:text-gray-300'
+                      : 'text-gray-400 border-transparent hover:text-gray-300'
                   }`}
                 >
                   <tab.icon className="w-3.5 h-3.5" />
@@ -671,7 +671,7 @@ export default function CourseView() {
                   {lessonQuiz ? (
                     <LessonQuiz quiz={lessonQuiz} lessonId={currentLesson?.id} />
                   ) : (
-                    <p className="text-gray-500 text-sm">No quiz available for this lesson.</p>
+                    <p className="text-gray-400 text-sm">No quiz available for this lesson.</p>
                   )}
                 </div>
               )}
@@ -723,7 +723,7 @@ export default function CourseView() {
                   {/* Uploaded File Resources */}
                   {resources.length > 0 && (
                     <div>
-                      <h4 className="text-sm font-medium text-gray-400 mb-2 flex items-center gap-2">
+                      <h4 className="text-sm font-medium text-gray-300 mb-2 flex items-center gap-2">
                         <Download className="w-4 h-4" />
                         Downloadable Resources
                       </h4>
@@ -740,7 +740,7 @@ export default function CourseView() {
                             <div className="min-w-0">
                               <p className="text-sm text-white truncate">{res.title}</p>
                               {res.file_type && (
-                                <p className="text-xs text-gray-500">{res.file_type}</p>
+                                <p className="text-xs text-gray-400">{res.file_type}</p>
                               )}
                             </div>
                           </a>
@@ -751,7 +751,7 @@ export default function CourseView() {
 
                   {/* Empty State */}
                   {!currentLesson?.description && resources.length === 0 && (
-                    <p className="text-gray-500 text-sm">No resources available for this lesson.</p>
+                    <p className="text-gray-400 text-sm">No resources available for this lesson.</p>
                   )}
                 </div>
               )}
@@ -759,7 +759,7 @@ export default function CourseView() {
               {activeTab === 'challenge' && (
                 <div className="space-y-4">
                   {challenges.length === 0 ? (
-                    <p className="text-gray-500 text-sm">No coding challenges for this lesson.</p>
+                    <p className="text-gray-400 text-sm">No coding challenges for this lesson.</p>
                   ) : (
                     challenges.map((ch: any) => (
                       <ChallengeCard key={ch.id} challenge={ch} />
@@ -775,13 +775,13 @@ export default function CourseView() {
                     Course Announcements
                   </h3>
                   {announcements.length === 0 ? (
-                    <p className="text-gray-500 text-sm">No announcements for this course yet.</p>
+                    <p className="text-gray-400 text-sm">No announcements for this course yet.</p>
                   ) : (
                     announcements.map((ann: any) => (
                       <div key={ann.id} className="p-4 rounded-xl bg-gray-800/50 border-l-2 border-blue-500">
                         <div className="flex items-center justify-between mb-1">
                           <h4 className="text-white text-sm font-medium">{ann.title}</h4>
-                          <span className="text-gray-500 text-xs">{new Date(ann.created_at).toLocaleDateString()}</span>
+                          <span className="text-gray-400 text-xs">{new Date(ann.created_at).toLocaleDateString()}</span>
                         </div>
                         <p className="text-xs text-blue-400 mb-2">{ann.instructor_name}</p>
                         <p className="text-gray-400 text-sm whitespace-pre-wrap">{ann.content}</p>
@@ -824,19 +824,19 @@ export default function CourseView() {
                       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
                         <GlassCard className="p-3 text-center">
                           <p className="text-2xl font-bold text-white">{analytics.lessons.completionRate}%</p>
-                          <p className="text-xs text-gray-500 mt-1">Completion</p>
+                          <p className="text-xs text-gray-400 mt-1">Completion</p>
                         </GlassCard>
                         <GlassCard className="p-3 text-center">
                           <p className="text-2xl font-bold text-white">{analytics.lessons.completed}/{analytics.lessons.total}</p>
-                          <p className="text-xs text-gray-500 mt-1">Lessons</p>
+                          <p className="text-xs text-gray-400 mt-1">Lessons</p>
                         </GlassCard>
                         <GlassCard className="p-3 text-center">
                           <p className="text-2xl font-bold text-white">{analytics.timeSpent.totalHours}h</p>
-                          <p className="text-xs text-gray-500 mt-1">Time Spent</p>
+                          <p className="text-xs text-gray-400 mt-1">Time Spent</p>
                         </GlassCard>
                         <GlassCard className="p-3 text-center">
                           <p className="text-2xl font-bold text-white">{analytics.quizzes.averageScore}%</p>
-                          <p className="text-xs text-gray-500 mt-1">Quiz Avg</p>
+                          <p className="text-xs text-gray-400 mt-1">Quiz Avg</p>
                         </GlassCard>
                       </div>
 
@@ -852,12 +852,12 @@ export default function CourseView() {
                             const height = Math.max((day.lessons / maxLessons) * 100, 4);
                             return (
                               <div key={day.date} className="flex-1 flex flex-col items-center gap-1">
-                                <span className="text-[10px] text-gray-500">{day.lessons}</span>
+                                <span className="text-[10px] text-gray-400">{day.lessons}</span>
                                 <div
                                   className="w-full rounded-sm bg-blue-500/40 transition-all"
                                   style={{ height: `${height}%`, minHeight: '4px' }}
                                 />
-                                <span className="text-[10px] text-gray-600">{day.label}</span>
+                                <span className="text-[10px] text-gray-400">{day.label}</span>
                               </div>
                             );
                           })}
@@ -910,7 +910,7 @@ export default function CourseView() {
                           setLoadingAnalytics(false);
                         }
                       }}
-                      className="w-full py-8 border-2 border-dashed border-gray-800 rounded-xl text-gray-500 text-sm hover:border-gray-700 hover:text-gray-400 transition-colors"
+                      className="w-full py-8 border-2 border-dashed border-gray-800 rounded-xl text-gray-400 text-sm hover:border-gray-700 hover:text-gray-400 transition-colors"
                     >
                       Load Analytics
                     </button>
@@ -932,7 +932,7 @@ export default function CourseView() {
             </Button>
 
             <div className="flex items-center gap-2">
-              <span className="text-xs text-gray-500">
+              <span className="text-xs text-gray-400">
                 {currentLessonIndex + 1} / {totalLessons}
               </span>
               <Button
@@ -989,7 +989,7 @@ export default function CourseView() {
               <p className="text-gray-400 mb-2">
                 You completed all lessons in <span className="text-emerald-400 font-semibold">{course?.title}</span>
               </p>
-              <p className="text-sm text-gray-500 mb-6">
+              <p className="text-sm text-gray-400 mb-6">
                 Great dedication! Keep up the amazing work.
               </p>
               <div className="flex gap-3 justify-center">
@@ -1041,7 +1041,7 @@ function ChallengeCard({ challenge }: { challenge: any }) {
           </div>
           <div>
             <h4 className="text-white text-sm font-medium">{challenge.title}</h4>
-            <p className="text-gray-500 text-xs mt-0.5">{challenge.description}</p>
+            <p className="text-gray-400 text-xs mt-0.5">{challenge.description}</p>
           </div>
         </div>
         <div className="flex items-center gap-2 shrink-0">
@@ -1055,7 +1055,7 @@ function ChallengeCard({ challenge }: { challenge: any }) {
         </div>
       </div>
 
-      <div className="text-xs text-gray-400 mb-3 whitespace-pre-wrap">{challenge.instructions}</div>
+      <div className="text-xs text-gray-300 mb-3 whitespace-pre-wrap">{challenge.instructions}</div>
 
       {latestSubmission?.feedback && (
         <div className="text-xs text-gray-400 mb-3 p-2 rounded-lg bg-gray-800/50">
@@ -1100,14 +1100,14 @@ function LessonQuiz({ quiz, lessonId: _lessonId }: { quiz: any; lessonId: string
   };
 
   if (!quiz.questions?.length) {
-    return <p className="text-gray-500 text-sm">No questions in this quiz yet.</p>;
+    return <p className="text-gray-400 text-sm">No questions in this quiz yet.</p>;
   }
 
   return (
     <div className="space-y-4">
       <h3 className="text-white text-sm font-medium">{quiz.title || 'Lesson Quiz'}</h3>
       {quiz.description && (
-        <p className="text-gray-400 text-xs">{quiz.description}</p>
+        <p className="text-gray-300 text-xs">{quiz.description}</p>
       )}
 
       {quiz.questions.map((q: any, qi: number) => {

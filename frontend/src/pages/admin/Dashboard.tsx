@@ -1,10 +1,10 @@
-import { useEffect, useRef, useCallback } from 'react';
+import { useEffect, useRef, useCallback, useState } from 'react';
 import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import {
   Users, GraduationCap, BookOpen, DollarSign, Award, TrendingUp,
   UserPlus, FileText, Activity, Zap, Wifi, ArrowUpRight, ArrowDownRight,
-  Bell, MessageSquare, Download, AlertCircle,
+  Bell, MessageSquare, Download, AlertCircle, Eye, Globe, Clock, UserCheck,
 } from 'lucide-react';
 import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
@@ -13,9 +13,12 @@ import {
 import { GlassCard } from '@/components/ui/GlassCard';
 import { Badge } from '@/components/ui/Badge';
 import { Button } from '@/components/ui/Button';
+import { Loader } from '@/components/ui/Loader';
 import { StatsSkeleton, ChartSkeleton } from '@/components/student/SkeletonLoader';
 import { useAdminStore } from '@/store/adminStore';
+import { useAnalyticsStore } from '@/store/analyticsStore';
 import { useSocket } from '@/hooks/useSocket';
+import { useAnalyticsSocket } from '@/hooks/useAnalyticsSocket';
 import SEO from '@/components/seo/SEO';
 
 function formatRelativeTime(ms: number): string {
@@ -32,8 +35,8 @@ function EmptyState({ message }: { message: string }) {
   return (
     <div className="h-64 flex items-center justify-center">
       <div className="text-center">
-        <BarChart3Icon className="w-10 h-10 text-gray-300 dark:text-gray-600 mx-auto mb-2" />
-        <p className="text-sm text-gray-500">{message}</p>
+        <BarChart3Icon className="w-10 h-10 text-gray-300 dark:text-gray-400 mx-auto mb-2" />
+        <p className="text-sm text-gray-400">{message}</p>
       </div>
     </div>
   );
@@ -92,8 +95,15 @@ export default function AdminDashboard() {
     isLoading, error, fetchDashboardData,
   } = useAdminStore();
   const { socket, onlineCount, onlineUsers } = useSocket();
+  useAnalyticsSocket();
+  const {
+    overview: analyticsOverview, realtime, conversionFunnel,
+    loading: analyticsLoading, fetchOverview, fetchRealtime, fetchConversionFunnel,
+  } = useAnalyticsStore();
+  const [showOnlineUsers, setShowOnlineUsers] = useState(false);
   const timeRangeRef = useRef('6m');
   const autoRef = useRef<ReturnType<typeof setInterval>>();
+  const onlineRef = useRef<HTMLDivElement>(null);
 
   const loadData = useCallback((range?: string) => {
     fetchDashboardData(range || timeRangeRef.current);
@@ -101,6 +111,29 @@ export default function AdminDashboard() {
 
   useEffect(() => {
     loadData();
+  }, []);
+
+  useEffect(() => {
+    fetchOverview('24h');
+    fetchRealtime();
+    fetchConversionFunnel('24h');
+  }, []);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      fetchRealtime();
+    }, 30000);
+    return () => clearInterval(interval);
+  }, []);
+
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (onlineRef.current && !onlineRef.current.contains(e.target as Node)) {
+        setShowOnlineUsers(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
   useEffect(() => {
@@ -148,7 +181,7 @@ export default function AdminDashboard() {
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
           <h1 className="text-2xl sm:text-3xl font-bold">Admin Dashboard</h1>
-          <p className="text-gray-500 mt-1">Platform overview and key metrics.</p>
+          <p className="text-gray-400 mt-1">Platform overview and key metrics.</p>
         </div>
         <div className="flex items-center gap-2">
           <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-success-500/10 text-success-600 text-xs font-medium">
@@ -172,7 +205,7 @@ export default function AdminDashboard() {
             <svg className={`w-4 h-4 ${isLoading ? 'animate-spin' : ''}`} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="23 4 23 10 17 10" /><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10" /></svg>
           </Button>
           {lastFetchedAt && (
-            <span className="text-xs text-gray-500 whitespace-nowrap">
+            <span className="text-xs text-gray-400 whitespace-nowrap">
               Updated {formatRelativeTime(lastFetchedAt)}
             </span>
           )}
@@ -205,10 +238,10 @@ export default function AdminDashboard() {
       ) : (
         <motion.div variants={container} initial="hidden" animate="show" className="space-y-6">
           {/* Stats Cards */}
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 3xl:grid-cols-8 5xl:grid-cols-10 gap-2 sm:gap-3">
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 3xl:grid-cols-8 5xl:grid-cols-10 gap-3 sm:gap-4">
             {/* Live Online Users */}
-            <motion.div variants={item}>
-              <GlassCard className="p-4 group cursor-default" hover>
+            <motion.div variants={item} ref={onlineRef} className="relative">
+              <GlassCard className="p-4 group cursor-pointer" hover onClick={() => setShowOnlineUsers(v => !v)}>
                 <div className="flex items-center gap-3">
                   <div className="w-10 h-10 rounded-xl bg-success-500/10 flex items-center justify-center transition-transform group-hover:scale-110">
                     <Wifi className="w-5 h-5 text-success-500" />
@@ -221,7 +254,7 @@ export default function AdminDashboard() {
                         <span className="relative inline-flex rounded-full h-2 w-2 bg-success-500" />
                       </span>
                     </div>
-                    <div className="text-xs text-gray-500 truncate">Online Now</div>
+                    <div className="text-xs text-gray-300 truncate">Online Now</div>
                     {onlineUsers.length > 0 && (
                       <div className="flex -space-x-1.5 mt-1">
                         {onlineUsers.slice(0, 5).map((u: any) => (
@@ -239,6 +272,24 @@ export default function AdminDashboard() {
                   </div>
                 </div>
               </GlassCard>
+              {showOnlineUsers && onlineUsers.length > 0 && (
+                <div className="absolute z-50 top-full left-0 mt-2 w-72 bg-white dark:bg-gray-800 rounded-xl shadow-xl border border-gray-200 dark:border-gray-700 p-3 max-h-64 overflow-y-auto">
+                  <p className="text-xs font-semibold text-gray-500 mb-2 uppercase tracking-wider">Online Users ({onlineCount})</p>
+                  <div className="space-y-2">
+                    {onlineUsers.map((u: any) => (
+                      <div key={u.id} className="flex items-center gap-2 text-sm">
+                        <div className="w-7 h-7 rounded-full bg-primary-500/10 flex items-center justify-center text-[10px] font-bold text-primary-600 flex-shrink-0">
+                          {(u.name || '?').charAt(0).toUpperCase()}
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <p className="text-sm font-medium truncate">{u.name || 'Anonymous'}</p>
+                          <p className="text-xs text-gray-400 capitalize">{u.role || 'user'}</p>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
             </motion.div>
 
             {statCards.map((stat, i) => {
@@ -258,13 +309,13 @@ export default function AdminDashboard() {
                           <div className="text-lg font-bold flex items-center gap-2">
                             {formatValue(stat.key, value)}
                             {trend !== undefined && trend !== 0 && (
-                              <span className={`inline-flex items-center gap-0.5 text-[10px] font-semibold ${trend > 0 ? 'text-success-500' : 'text-danger-500'}`}>
+                              <span className={`inline-flex items-center gap-0.5 text-xs font-semibold ${trend > 0 ? 'text-success-500' : 'text-danger-500'}`}>
                                 {trend > 0 ? <ArrowUpRight className="w-3 h-3" /> : <ArrowDownRight className="w-3 h-3" />}
                                 {Math.abs(trend)}%
                               </span>
                             )}
                           </div>
-                          <div className="text-xs text-gray-500 truncate">{stat.label}</div>
+                          <div className="text-xs text-gray-400 truncate">{stat.label}</div>
                         </div>
                       </div>
                     </GlassCard>
@@ -285,7 +336,7 @@ export default function AdminDashboard() {
                       <div className="text-lg font-bold flex items-center gap-2">
                         {payoutSummary ? `${payoutSummary.pendingCount} · $${payoutSummary.pendingAmount.toLocaleString()}` : '0'}
                       </div>
-                      <div className="text-xs text-gray-500 truncate">Pending Payouts</div>
+                      <div className="text-xs text-gray-400 truncate">Pending Payouts</div>
                     </div>
                   </div>
                 </GlassCard>
@@ -311,6 +362,51 @@ export default function AdminDashboard() {
                     </Link>
                   );
                 })}
+              </div>
+            </GlassCard>
+          </motion.div>
+
+          {/* Today at a Glance */}
+          <motion.div variants={item}>
+            <GlassCard className="p-5" hover={false}>
+              <h3 className="text-sm font-semibold mb-4 flex items-center gap-2">
+                <Activity className="w-4 h-4 text-primary-500" />
+                Today at a Glance
+                {analyticsLoading && <Loader className="w-3 h-3 animate-spin text-gray-400" />}
+              </h3>
+              <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 sm:gap-4">
+                <div className="p-3 rounded-xl bg-gray-50 dark:bg-gray-800/50 text-center">
+                  <Globe className="w-4 h-4 text-blue-500 mx-auto mb-1" />
+                  <div className="text-lg font-bold text-blue-500">{realtime?.activeVisitors ?? analyticsOverview?.activeVisitors ?? '-'}</div>
+                  <div className="text-xs text-gray-400">Active Now</div>
+                </div>
+                <div className="p-3 rounded-xl bg-gray-50 dark:bg-gray-800/50 text-center">
+                  <Users className="w-4 h-4 text-indigo-500 mx-auto mb-1" />
+                  <div className="text-lg font-bold text-indigo-500">{analyticsOverview?.uniqueVisitors ?? '-'}</div>
+                  <div className="text-xs text-gray-400">Visitors Today</div>
+                </div>
+                <div className="p-3 rounded-xl bg-gray-50 dark:bg-gray-800/50 text-center">
+                  <Eye className="w-4 h-4 text-cyan-500 mx-auto mb-1" />
+                  <div className="text-lg font-bold text-cyan-500">{analyticsOverview?.totalPageViews ?? '-'}</div>
+                  <div className="text-xs text-gray-400">Page Views</div>
+                </div>
+                <div className="p-3 rounded-xl bg-gray-50 dark:bg-gray-800/50 text-center">
+                  <UserCheck className="w-4 h-4 text-success-500 mx-auto mb-1" />
+                  <div className="text-lg font-bold text-success-500">{conversionFunnel?.funnel?.signups ?? realtime?.todayRegistrations ?? '-'}</div>
+                  <div className="text-xs text-gray-400">Signups</div>
+                </div>
+                <div className="p-3 rounded-xl bg-gray-50 dark:bg-gray-800/50 text-center">
+                  <UserPlus className="w-4 h-4 text-purple-500 mx-auto mb-1" />
+                  <div className="text-lg font-bold text-purple-500">{conversionFunnel?.funnel?.enrollments ?? realtime?.todayEnrollments ?? '-'}</div>
+                  <div className="text-xs text-gray-400">Enrollments</div>
+                </div>
+                <div className="p-3 rounded-xl bg-gray-50 dark:bg-gray-800/50 text-center">
+                  <Clock className="w-4 h-4 text-amber-500 mx-auto mb-1" />
+                  <div className="text-lg font-bold text-amber-500">
+                    {analyticsOverview?.avgSessionDuration ? `${Math.round(analyticsOverview.avgSessionDuration / 60)}m` : '-'}
+                  </div>
+                  <div className="text-xs text-gray-400">Avg Session</div>
+                </div>
               </div>
             </GlassCard>
           </motion.div>
@@ -454,7 +550,7 @@ export default function AdminDashboard() {
                           <div className="flex-1 min-w-0">
                             <div className="flex items-center justify-between">
                               <p className="text-sm font-medium truncate">{course.title}</p>
-                              <span className="text-xs text-gray-500 ml-2">{course.enrollments}</span>
+                              <span className="text-xs text-gray-400 ml-2">{course.enrollments}</span>
                             </div>
                             <div className="w-full h-1.5 bg-gray-100 dark:bg-gray-800 rounded-full mt-1">
                               <div
@@ -484,23 +580,23 @@ export default function AdminDashboard() {
                   <div className="text-lg font-bold text-primary-500">
                     {stats ? Math.round((stats.publishedCourses / Math.max(stats.totalCourses, 1)) * 100) : 0}%
                   </div>
-                  <div className="text-xs text-gray-500">Published Rate</div>
+                  <div className="text-xs text-gray-400">Published Rate</div>
                 </div>
                 <div className="p-3 rounded-xl bg-gray-50 dark:bg-gray-800/50 text-center">
                   <div className="text-lg font-bold text-success-500">
                     {stats ? Math.round((stats.totalEnrollments / Math.max(stats.totalStudents, 1)) * 100) : 0}%
                   </div>
-                  <div className="text-xs text-gray-500">Enrollment Rate</div>
+                  <div className="text-xs text-gray-400">Enrollment Rate</div>
                 </div>
                 <div className="p-3 rounded-xl bg-gray-50 dark:bg-gray-800/50 text-center">
                   <div className="text-lg font-bold text-purple-500">
                     {stats ? Math.round((stats.certificatesIssued / Math.max(stats.totalEnrollments, 1)) * 100) : 0}%
                   </div>
-                  <div className="text-xs text-gray-500">Completion Rate</div>
+                  <div className="text-xs text-gray-400">Completion Rate</div>
                 </div>
                 <div className="p-3 rounded-xl bg-gray-50 dark:bg-gray-800/50 text-center">
                   <div className="text-lg font-bold text-amber-500">{stats?.totalInstructors || 0}</div>
-                  <div className="text-xs text-gray-500">Instructors</div>
+                  <div className="text-xs text-gray-400">Instructors</div>
                 </div>
               </div>
             </GlassCard>
@@ -515,10 +611,10 @@ export default function AdminDashboard() {
               </h3>
               <div className="grid sm:grid-cols-2 4xl:grid-cols-3 gap-3">
                 <div>
-                  <p className="text-xs font-medium text-gray-500 mb-2 uppercase tracking-wider">New Users</p>
+                  <p className="text-xs font-medium text-gray-400 mb-2 uppercase tracking-wider">New Users</p>
                   <div className="space-y-2">
-                    {recentUsers.length === 0 ? (
-                      <p className="text-sm text-gray-400 text-center py-3">No activity</p>
+                      {recentUsers.length === 0 ? (
+                      <p className="text-sm text-gray-300 text-center py-3">No activity</p>
                     ) : (
                       recentUsers.slice(0, 5).map((user: any, i: number) => (
                         <div key={i} className="flex items-center gap-3 text-sm">
@@ -527,19 +623,19 @@ export default function AdminDashboard() {
                           </div>
                           <div className="flex-1 min-w-0">
                             <p className="text-sm font-medium truncate">{user.name}</p>
-                            <p className="text-xs text-gray-500 capitalize">{user.role} joined</p>
+                            <p className="text-xs text-gray-400 capitalize">{user.role} joined</p>
                           </div>
-                          <span className="text-[10px] text-gray-400">{new Date(user.created_at).toLocaleDateString()}</span>
+                          <span className="text-xs text-gray-400">{new Date(user.created_at).toLocaleDateString()}</span>
                         </div>
                       ))
                     )}
                   </div>
                 </div>
                 <div>
-                  <p className="text-xs font-medium text-gray-500 mb-2 uppercase tracking-wider">Audit Trail</p>
+                  <p className="text-xs font-medium text-gray-400 mb-2 uppercase tracking-wider">Audit Trail</p>
                   <div className="space-y-2">
-                    {recentActivities.length === 0 ? (
-                      <p className="text-sm text-gray-400 text-center py-3">No recent activity</p>
+                      {recentActivities.length === 0 ? (
+                      <p className="text-sm text-gray-300 text-center py-3">No recent activity</p>
                     ) : (
                       recentActivities.slice(0, 5).map((act: any, i: number) => (
                         <div key={i} className="flex items-center gap-3 text-sm">
@@ -548,9 +644,9 @@ export default function AdminDashboard() {
                           </div>
                           <div className="flex-1 min-w-0">
                             <p className="text-xs font-medium truncate">{act.admin_name || 'System'}</p>
-                            <p className="text-[10px] text-gray-400 truncate">{act.action} - {act.resource_type || ''}</p>
+                            <p className="text-xs text-gray-400 truncate">{act.action} - {act.resource_type || ''}</p>
                           </div>
-                          <span className="text-[10px] text-gray-400">
+                          <span className="text-xs text-gray-400">
                             {act.created_at ? new Date(act.created_at).toLocaleDateString() : ''}
                           </span>
                         </div>

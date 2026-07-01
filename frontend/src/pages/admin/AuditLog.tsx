@@ -39,7 +39,7 @@ export default function AdminAuditLog() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl sm:text-3xl font-bold">Audit Log</h1>
-          <p className="text-gray-500 mt-1">Track all administrative actions.</p>
+          <p className="text-gray-400 mt-1">Track all administrative actions.</p>
         </div>
         <Button variant="ghost" size="sm" onClick={() => fetchAuditLogs()} icon={<RefreshCw className="w-4 h-4" />} />
       </div>
@@ -66,12 +66,12 @@ export default function AdminAuditLog() {
           <table className="w-full text-sm">
             <thead>
               <tr className="border-b border-gray-100 dark:border-gray-800">
-                <th className="p-3 text-left text-xs font-semibold text-gray-500 uppercase">Admin</th>
-                <th className="p-3 text-left text-xs font-semibold text-gray-500 uppercase">Action</th>
-                <th className="p-3 text-left text-xs font-semibold text-gray-500 uppercase">Resource</th>
-                <th className="p-3 text-left text-xs font-semibold text-gray-500 uppercase hidden md:table-cell">Details</th>
-                <th className="p-3 text-left text-xs font-semibold text-gray-500 uppercase hidden lg:table-cell">IP</th>
-                <th className="p-3 text-left text-xs font-semibold text-gray-500 uppercase">Date</th>
+                <th className="p-3 text-left text-xs font-semibold text-gray-400 uppercase">Admin</th>
+                <th className="p-3 text-left text-xs font-semibold text-gray-400 uppercase">Action</th>
+                <th className="p-3 text-left text-xs font-semibold text-gray-400 uppercase">Resource</th>
+                <th className="p-3 text-left text-xs font-semibold text-gray-400 uppercase hidden md:table-cell">Details</th>
+                <th className="p-3 text-left text-xs font-semibold text-gray-400 uppercase hidden lg:table-cell">IP</th>
+                <th className="p-3 text-left text-xs font-semibold text-gray-400 uppercase">Date</th>
               </tr>
             </thead>
             <tbody>
@@ -79,7 +79,7 @@ export default function AdminAuditLog() {
                 <tr key={log._id} className="border-b border-gray-50 dark:border-gray-800/50 hover:bg-gray-50 dark:hover:bg-gray-800/30">
                   <td className="p-3">
                     <div className="flex items-center gap-2">
-                      <div className="w-7 h-7 rounded-full bg-primary-500/10 flex items-center justify-center text-[10px] font-bold text-primary-500">
+                      <div className="w-7 h-7 rounded-full bg-primary-500/10 flex items-center justify-center text-xs font-bold text-primary-500">
                         {log.admin_name?.charAt(0) || '?'}
                       </div>
                       <span className="font-medium">{log.admin_name}</span>
@@ -92,13 +92,13 @@ export default function AdminAuditLog() {
                   </td>
                   <td className="p-3">
                     <div className="flex flex-col">
-                      <span className="capitalize text-xs text-gray-500">{log.resource_type}</span>
-                      <span className="text-[10px] text-gray-400 font-mono">{log.resource_id?.slice(-8)}</span>
+                      <span className="capitalize text-sm text-gray-400">{log.resource_type}</span>
+                      <span className="text-xs text-gray-300 font-mono">{log.resource_id?.slice(-8)}</span>
                     </div>
                   </td>
-                  <td className="p-3 text-gray-500 text-xs max-w-[250px] truncate hidden md:table-cell">{log.details || '—'}</td>
-                  <td className="p-3 text-gray-400 text-[10px] font-mono hidden lg:table-cell">{log.ip_address || '—'}</td>
-                  <td className="p-3 text-gray-500 text-xs whitespace-nowrap">{new Date(log.created_at).toLocaleString()}</td>
+                  <td className="p-3 text-gray-400 text-sm max-w-[250px] truncate hidden md:table-cell">{log.details || '—'}</td>
+                  <td className="p-3 text-gray-300 text-xs font-mono hidden lg:table-cell">{log.ip_address || '—'}</td>
+                  <td className="p-3 text-gray-400 text-xs whitespace-nowrap">{new Date(log.created_at).toLocaleString()}</td>
                 </tr>
               ))}
               {filtered.length === 0 && (

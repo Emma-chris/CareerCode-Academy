@@ -357,7 +357,7 @@ export default function AdminCourses() {
           {TABS.map((t) => (
             <button
               key={t} onClick={() => setTab(t)}
-              className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all capitalize whitespace-nowrap ${tab === t ? 'bg-white dark:bg-gray-700 text-primary-600 dark:text-primary-400 shadow-sm' : 'text-gray-500 hover:text-gray-700 dark:hover:text-gray-300'}`}
+              className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all capitalize whitespace-nowrap ${tab === t ? 'bg-white dark:bg-gray-700 text-primary-600 dark:text-primary-400 shadow-sm' : 'text-gray-400 hover:text-gray-700 dark:hover:text-gray-300'}`}
             >
               {t.replace('_', ' ')}
             </button>
@@ -405,9 +405,9 @@ export default function AdminCourses() {
                   )}
                 </div>
                 <h3 className="font-semibold text-sm leading-snug mb-1 line-clamp-2">{course.title}</h3>
-                <p className="text-xs text-gray-500 mb-1">{course.instructor?.name} · {course.category}</p>
-                <p className="text-xs text-gray-400 mb-3 line-clamp-2">{course.description}</p>
-                <div className="flex items-center gap-2 text-xs text-gray-500 mb-3">
+                <p className="text-xs text-gray-400 mb-1">{course.instructor?.name} · {course.category}</p>
+                <p className="text-xs text-gray-400 dark:text-gray-300 mb-3 line-clamp-2">{course.description}</p>
+                <div className="flex items-center gap-2 text-xs text-gray-400 mb-3">
                   <span>{course.enrollmentCount || 0} enrolled</span>
                   <span>·</span>
                   <span>${course.price || 0}</span>
@@ -502,7 +502,7 @@ export default function AdminCourses() {
                   <X className="w-5 h-5" />
                 </button>
               </div>
-              <p className="text-sm text-gray-500 mb-4">
+              <p className="text-sm text-gray-400 mb-4">
                 {reviewModal.action === 'approve'
                   ? 'Publishing this course will make it visible to all students. Add any review notes below.'
                   : 'Rejecting will move the course back to draft. Provide feedback to the instructor.'}
@@ -649,7 +649,7 @@ export default function AdminCourses() {
                           className="w-full text-left px-3 py-2 text-sm hover:bg-gray-100 dark:hover:bg-gray-800 border-b last:border-0"
                         >
                           <span className="font-medium">{u.name}</span>
-                          <span className="text-gray-400 ml-2">{u.email}</span>
+                          <span className="text-gray-400 dark:text-gray-300 ml-2">{u.email}</span>
                         </button>
                       ))}
                     </div>
@@ -700,7 +700,7 @@ export default function AdminCourses() {
                     <Code className="w-5 h-5 text-purple-500" />
                     Challenges
                   </h2>
-                  <p className="text-sm text-gray-500 mt-0.5">{challengeCourseTitle}</p>
+                  <p className="text-sm text-gray-400 mt-0.5">{challengeCourseTitle}</p>
                 </div>
                 <button onClick={() => { setChallengeModal(false); setChallengeFormOpen(false); }} className="p-1 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800">
                   <X className="w-5 h-5" />
@@ -760,7 +760,7 @@ export default function AdminCourses() {
               {/* Lessons list */}
               <div className="space-y-3">
                 {challengeLessons.length === 0 && (
-                  <p className="text-center text-gray-500 py-8">No lessons found for this course. Add lessons in the instructor editor first.</p>
+                  <p className="text-center text-gray-400 py-8">No lessons found for this course. Add lessons in the instructor editor first.</p>
                 )}
                 {challengeLessons.map((lesson) => {
                   const chs = challengeLessonChallenges[lesson.id] || [];
@@ -768,7 +768,7 @@ export default function AdminCourses() {
                     <GlassCard key={lesson.id} className="p-4">
                       <div className="flex items-start justify-between mb-2">
                         <div>
-                          <span className="text-xs text-gray-500">{lesson.module_title}</span>
+                          <span className="text-xs text-gray-400">{lesson.module_title}</span>
                           <h4 className="text-sm font-medium">{lesson.title}</h4>
                         </div>
                         {!challengeFormOpen && (
@@ -785,7 +785,7 @@ export default function AdminCourses() {
                                 <Code className="w-3 h-3 text-purple-500" />
                                 <span className="font-medium">{ch.title}</span>
                                 <Badge className="bg-blue-500/10 text-blue-400 text-[10px]">{ch.difficulty}</Badge>
-                                <span className="text-gray-500">{ch.language}</span>
+                                <span className="text-gray-400">{ch.language}</span>
                               </div>
                               <div className="flex items-center gap-1">
                                 <Button size="sm" variant="ghost" onClick={() => openChallengeForm(lesson.id, ch)}>

@@ -107,7 +107,7 @@ export default function AdminCertificates() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl sm:text-3xl font-bold">Certificates</h1>
-          <p className="text-gray-500 mt-1">Manage issued certificates.</p>
+          <p className="text-gray-300 mt-1">Manage issued certificates.</p>
         </div>
         <Button onClick={() => setShowIssue(true)}>
           <Plus size={16} className="mr-1" /> Issue Certificate
@@ -133,7 +133,7 @@ export default function AdminCertificates() {
 
       <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
         {filtered.length === 0 && (
-          <div className="md:col-span-3 text-center py-16 text-gray-400">No certificates found.</div>
+          <div className="md:col-span-3 text-center py-16 text-gray-300">No certificates found.</div>
         )}
         {filtered.map((cert) => (
           <motion.div key={cert._id} layout initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
@@ -145,7 +145,7 @@ export default function AdminCertificates() {
                   </div>
                   <div>
                     <p className="font-semibold text-sm">{cert.user?.name}</p>
-                    <p className="text-xs text-gray-500">{cert.certificateId}</p>
+                    <p className="text-xs text-gray-400">{cert.certificateId}</p>
                   </div>
                 </div>
                 <Badge variant={cert.is_revoked ? 'danger' : 'success'}>
@@ -153,7 +153,7 @@ export default function AdminCertificates() {
                 </Badge>
               </div>
               <p className="text-sm font-medium mb-1">{cert.course?.title || 'Course'}</p>
-              <p className="text-xs text-gray-500 mb-3">
+              <p className="text-xs text-gray-400 mb-3">
                 Issued: {new Date(cert.issued_at).toLocaleDateString()}
                 {cert.expires_at && ` · Exp: ${new Date(cert.expires_at).toLocaleDateString()}`}
               </p>

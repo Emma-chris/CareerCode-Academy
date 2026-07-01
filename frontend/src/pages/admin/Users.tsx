@@ -192,7 +192,7 @@ export default function AdminUsers() {
         ].map(s => (
           <div key={s.label} className={`rounded-xl ${s.bg} p-3 text-center`}>
             <p className={`text-lg font-bold ${s.color}`}>{s.count}</p>
-            <p className="text-[10px] text-gray-500 truncate">{s.label}</p>
+            <p className="text-xs text-gray-400 truncate">{s.label}</p>
           </div>
         ))}
       </div>
@@ -220,7 +220,7 @@ export default function AdminUsers() {
           {ROLES.map(r => (
             <button
               key={r} onClick={() => { setRoleFilter(r); setPage(1); }}
-              className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${roleFilter === r ? 'bg-white dark:bg-gray-700 text-primary-600 dark:text-primary-400 shadow-sm' : 'text-gray-500 hover:text-gray-700 dark:hover:text-gray-300'}`}
+              className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${roleFilter === r ? 'bg-white dark:bg-gray-700 text-primary-600 dark:text-primary-400 shadow-sm' : 'text-gray-400 hover:text-gray-700 dark:hover:text-gray-300'}`}
             >
               {r === 'all' ? 'All' : r.replace('_', ' ')}
             </button>
@@ -231,7 +231,7 @@ export default function AdminUsers() {
           {STATUS_OPTIONS.map(s => (
             <button
               key={s} onClick={() => { setStatusFilter(s); setPage(1); }}
-              className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${statusFilter === s ? 'bg-white dark:bg-gray-700 text-primary-600 dark:text-primary-400 shadow-sm' : 'text-gray-500 hover:text-gray-700 dark:hover:text-gray-300'}`}
+              className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${statusFilter === s ? 'bg-white dark:bg-gray-700 text-primary-600 dark:text-primary-400 shadow-sm' : 'text-gray-400 hover:text-gray-700 dark:hover:text-gray-300'}`}
             >
               {s === 'all' ? 'All' : s.charAt(0).toUpperCase() + s.slice(1)}
             </button>
@@ -319,7 +319,7 @@ export default function AdminUsers() {
                       </div>
                       <div>
                         <p className="font-medium">{user.name}</p>
-                        <p className="text-xs text-gray-400 md:hidden">{user.email}</p>
+                        <p className="text-sm text-gray-300">{user.email}</p>
                       </div>
                     </div>
                   </td>
@@ -381,7 +381,7 @@ export default function AdminUsers() {
                 <div className="flex items-start justify-between gap-2">
                   <div>
                     <p className="font-medium text-sm">{user.name}</p>
-                    <p className="text-xs text-gray-400 truncate">{user.email}</p>
+                    <p className="text-xs text-gray-400 leading-relaxed truncate">{user.email}</p>
                   </div>
                   <div className="flex items-center gap-1.5 flex-shrink-0">
                     {roleBadge(user.role)}
@@ -461,7 +461,7 @@ export default function AdminUsers() {
                   </div>
                   <div>
                     <h3 className="text-xl font-bold">{userDetail.name}</h3>
-                    <p className="text-sm text-gray-500">{userDetail.email}</p>
+                    <p className="text-sm text-gray-400">{userDetail.email}</p>
                     <div className="flex items-center gap-2 mt-1">
                       {roleBadge(userDetail.role)}
                       <Badge variant={userDetail.is_suspended ? 'danger' : 'success'}>
@@ -475,7 +475,7 @@ export default function AdminUsers() {
                 {/* Bio */}
                 {userDetail.bio && (
                   <div className="mb-6 p-3 rounded-xl bg-gray-50 dark:bg-gray-800/50">
-                    <p className="text-sm text-gray-600 dark:text-gray-400">{userDetail.bio}</p>
+                    <p className="text-sm text-gray-400 dark:text-gray-300 leading-relaxed">{userDetail.bio}</p>
                   </div>
                 )}
 

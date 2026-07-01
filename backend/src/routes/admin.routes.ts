@@ -17,9 +17,9 @@ import { sendInstructorApprovalEmail, sendInstructorUpgradeEmail, slugify } from
 import { z } from 'zod';
 import { validate } from '../middleware/validate';
 import { logAudit } from '../middleware/audit';
-import { io, emitDashboardUpdate } from '../config/socket';
 import { uploadSingle } from '../middleware/upload';
 import { syncLearningPathForCourse } from '../models/learningPath';
+import * as AnalyticsService from '../services/analytics.service';
 
 const adminCreateCourseSchema = z.object({
   title: z.string().min(3).max(200),
@@ -1536,6 +1536,107 @@ router.get('/calendar', async (req: AuthRequest, res: Response, next: NextFuncti
     ].sort((a: any, b: any) => new Date(a.date).getTime() - new Date(b.date).getTime());
 
     res.json({ success: true, data: events });
+  } catch (error) { next(error); }
+});
+
+// ============================================================
+// ANALYTICS ENDPOINTS
+// ============================================================
+
+// GET /admin/analytics/overview?range=7d
+router.get('/analytics/overview', async (req, res, next) => {
+  try {
+    const range = (req.query.range as string) || '7d';
+    const data = await AnalyticsService.getOverview(range);
+    res.json({ success: true, data });
+  } catch (error) { next(error); }
+});
+
+// GET /admin/analytics/visitors?range=7d
+router.get('/analytics/visitors', async (req, res, next) => {
+  try {
+    const range = (req.query.range as string) || '7d';
+    const data = await AnalyticsService.getVisitorTrend(range);
+    res.json({ success: true, data });
+  } catch (error) { next(error); }
+});
+
+// GET /admin/analytics/pages?range=7d
+router.get('/analytics/pages', async (req, res, next) => {
+  try {
+    const range = (req.query.range as string) || '7d';
+    const data = await AnalyticsService.getPageAnalytics(range);
+    res.json({ success: true, data });
+  } catch (error) { next(error); }
+});
+
+// GET /admin/analytics/devices?range=7d
+router.get('/analytics/devices', async (req, res, next) => {
+  try {
+    const range = (req.query.range as string) || '7d';
+    const data = await AnalyticsService.getDeviceAnalytics(range);
+    res.json({ success: true, data });
+  } catch (error) { next(error); }
+});
+
+// GET /admin/analytics/sources?range=7d
+router.get('/analytics/sources', async (req, res, next) => {
+  try {
+    const range = (req.query.range as string) || '7d';
+    const data = await AnalyticsService.getSourceAnalytics(range);
+    res.json({ success: true, data });
+  } catch (error) { next(error); }
+});
+
+// GET /admin/analytics/conversions?range=7d
+router.get('/analytics/conversions', async (req, res, next) => {
+  try {
+    const range = (req.query.range as string) || '7d';
+    const data = await AnalyticsService.getConversionFunnel(range);
+    res.json({ success: true, data });
+  } catch (error) { next(error); }
+});
+
+// GET /admin/analytics/journeys?range=7d
+router.get('/analytics/journeys', async (req, res, next) => {
+  try {
+    const range = (req.query.range as string) || '7d';
+    const data = await AnalyticsService.getJourneyAnalytics(range);
+    res.json({ success: true, data });
+  } catch (error) { next(error); }
+});
+
+// GET /admin/analytics/courses?range=7d
+router.get('/analytics/courses', async (req, res, next) => {
+  try {
+    const range = (req.query.range as string) || '7d';
+    const data = await AnalyticsService.getCourseAnalytics(range);
+    res.json({ success: true, data });
+  } catch (error) { next(error); }
+});
+
+// GET /admin/analytics/clicks?range=7d
+router.get('/analytics/clicks', async (req, res, next) => {
+  try {
+    const range = (req.query.range as string) || '7d';
+    const data = await AnalyticsService.getClickAnalytics(range);
+    res.json({ success: true, data });
+  } catch (error) { next(error); }
+});
+
+// GET /admin/analytics/realtime
+router.get('/analytics/realtime', async (req, res, next) => {
+  try {
+    const data = await AnalyticsService.getRealtimeStats();
+    res.json({ success: true, data });
+  } catch (error) { next(error); }
+});
+
+// GET /admin/analytics/summary
+router.get('/analytics/summary', async (req, res, next) => {
+  try {
+    const data = await AnalyticsService.getDashboardSummary();
+    res.json({ success: true, data });
   } catch (error) { next(error); }
 });
 
