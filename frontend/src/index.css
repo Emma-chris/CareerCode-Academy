@@ -111,13 +111,13 @@
   }
 
   .shimmer {
-    background: linear-gradient(90deg, transparent, rgba(99, 102, 241, 0.08), transparent);
+    background: linear-gradient(90deg, transparent, rgba(99, 102, 241, 0.06), rgba(139, 92, 246, 0.08), rgba(6, 182, 212, 0.06), transparent);
     background-size: 200% 100%;
     animation: shimmer 2s ease-in-out infinite;
   }
 
   .dark .shimmer {
-    background: linear-gradient(90deg, transparent, rgba(99, 102, 241, 0.15), transparent);
+    background: linear-gradient(90deg, transparent, rgba(99, 102, 241, 0.12), rgba(139, 92, 246, 0.15), rgba(6, 182, 212, 0.12), transparent);
     background-size: 200% 100%;
     animation: shimmer 2s ease-in-out infinite;
   }

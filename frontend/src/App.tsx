@@ -2,34 +2,27 @@ import React, { useEffect, useState, Suspense, lazy } from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
 import { MainLayout } from '@/components/layout/MainLayout';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
-import { Loader } from '@/components/ui/Loader';
+import { Loader, PageLoader } from '@/components/ui/Loader';
 import { useAuthStore } from '@/store/authStore';
 import api from '@/lib/axios';
 import { OnboardingProvider } from '@/guides/OnboardingContext';
 import { OnboardingModal } from '@/guides/OnboardingModal';
 import { AnalyticsTracker } from '@/hooks/useAnalyticsTracker';
 import { ScrollToTop, ErrorBoundary } from '@/components/ui';
+import { SkeletonLine, SkeletonBlock } from '@/components/ui/Skeleton';
 
 function PageSkeleton() {
   return (
     <div className="min-h-[60vh] flex items-center justify-center p-8">
-      <div className="w-full max-w-4xl space-y-6">
-        <div className="relative overflow-hidden h-10 w-64 rounded-xl bg-gray-200 dark:bg-gray-700">
-          <div className="absolute inset-0 shimmer" />
-        </div>
-        <div className="relative overflow-hidden h-5 w-96 rounded-lg bg-gray-200 dark:bg-gray-700">
-          <div className="absolute inset-0 shimmer" />
-        </div>
+      <div className="w-full max-w-4xl space-y-6 animate-fade-in">
+        <SkeletonLine width="w-64" className="h-10 rounded-xl" />
+        <SkeletonLine width="w-96" className="h-5 rounded-lg" />
         <div className="grid grid-cols-3 gap-4">
           {[1, 2, 3].map((i) => (
-            <div key={i} className="relative overflow-hidden h-48 rounded-2xl bg-gray-200 dark:bg-gray-700">
-              <div className="absolute inset-0 shimmer" />
-            </div>
+            <SkeletonBlock key={i} className="h-48 rounded-2xl" />
           ))}
         </div>
-        <div className="relative overflow-hidden h-32 rounded-2xl bg-gray-200 dark:bg-gray-700">
-          <div className="absolute inset-0 shimmer" />
-        </div>
+        <SkeletonBlock className="h-32 rounded-2xl" />
       </div>
     </div>
   );

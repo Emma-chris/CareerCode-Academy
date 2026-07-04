@@ -12,7 +12,7 @@ export function Skeleton({ variant = 'text', width, height, className }: Skeleto
   return (
     <div
       className={cn(
-        'relative overflow-hidden bg-gray-200 dark:bg-gray-700',
+        'relative overflow-hidden bg-gray-200 dark:bg-gray-700 animate-fade-in',
         variant === 'circular' && 'rounded-full',
         variant === 'rounded' && 'rounded-xl',
         variant === 'rectangular' && 'rounded-none',

@@ -3,6 +3,7 @@ import { motion } from 'framer-motion';
 import { Target, Plus, Trash2, Clock, BookOpen, CheckCircle, TrendingUp } from 'lucide-react';
 import { GlassCard } from '@/components/ui/GlassCard';
 import { Badge } from '@/components/ui/Badge';
+import { Loader } from '@/components/ui/Loader';
 import api from '@/lib/axios';
 
 interface StudyPlan {
@@ -128,7 +129,7 @@ export default function StudyPlans() {
         {/* Plans List */}
         <div className="lg:col-span-2">
           {loading ? (
-            <div className="text-center py-12 text-gray-400">Loading...</div>
+            <Loader size="lg" variant="dots" text="Loading plans" />
           ) : plans.length === 0 ? (
             <GlassCard className="p-8 text-center" hover={false}>
               <Target className="w-12 h-12 text-gray-300 mx-auto mb-3" />
