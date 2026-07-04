@@ -21,6 +21,7 @@ import {
   Map,
   Target,
   User,
+  Film,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useAuthStore } from '@/store/authStore';
@@ -43,6 +44,7 @@ const roleSidebarLinks: Record<string, { label: string; path: string; icon: any 
     { label: 'Certificates', path: '/student/certificates', icon: Award },
     { label: 'Community', path: '/community', icon: Users },
     { label: 'Leaderboard', path: '/student/leaderboard', icon: Trophy },
+    { label: 'Mentorship', path: '/student/mentoring', icon: Users },
     { label: 'Calendar', path: '/student/calendar', icon: Calendar },
     { label: 'Roadmap', path: '/student/roadmap', icon: Map },
     { label: 'Study Plans', path: '/student/study-plans', icon: Target },
@@ -66,6 +68,7 @@ const roleSidebarLinks: Record<string, { label: string; path: string; icon: any 
     { label: 'Live Classes', path: '/instructor/live-classes', icon: Calendar },
     { label: 'Messages', path: '/instructor/messages', icon: Users },
     { label: 'Schedule', path: '/instructor/schedule', icon: Calendar },
+    { label: 'Mentorship', path: '/instructor/mentoring', icon: Users },
     { label: 'Payouts', path: '/instructor/payouts', icon: LayoutDashboard },
     { label: 'Profile', path: '/instructor/profile', icon: User },
   ],
@@ -74,6 +77,7 @@ const roleSidebarLinks: Record<string, { label: string; path: string; icon: any 
     { label: 'Users', path: '/admin/users', icon: Users },
     { label: 'Courses', path: '/admin/courses', icon: GraduationCap },
     { label: 'Categories', path: '/admin/categories', icon: Hash },
+    { label: 'Videos', path: '/admin/videos', icon: Film },
     { label: 'Course Proposals', path: '/admin/course-proposals', icon: BookOpen },
     { label: 'Applications', path: '/admin/applications', icon: ClipboardList },
     { label: 'Payments', path: '/admin/payments', icon: LayoutDashboard },
@@ -95,6 +99,7 @@ const roleSidebarLinks: Record<string, { label: string; path: string; icon: any 
     { label: 'Users', path: '/admin/users', icon: Users },
     { label: 'Courses', path: '/admin/courses', icon: BookOpen },
     { label: 'Categories', path: '/admin/categories', icon: GitBranch },
+    { label: 'Videos', path: '/admin/videos', icon: Film },
     { label: 'Course Proposals', path: '/admin/course-proposals', icon: BookOpen },
     { label: 'Applications', path: '/admin/applications', icon: ClipboardList },
     { label: 'Payments', path: '/admin/payments', icon: LayoutDashboard },

@@ -7,6 +7,14 @@ export interface AuthRequest extends Request {
   user?: TokenPayload;
 }
 
+declare global {
+  namespace Express {
+    interface User extends TokenPayload {
+      [key: string]: any;
+    }
+  }
+}
+
 export function authenticate(req: AuthRequest, _res: Response, next: NextFunction): void {
   try {
     let token: string | undefined;

@@ -39,11 +39,15 @@ import ticketRoutes from './routes/ticket.routes';
 import learningPathRoutes from './routes/learningPath.routes';
 import pageRoutes from './routes/page.routes';
 import videoRoutes from './routes/video.routes';
+import showcaseVideoRoutes from './routes/showcase-video.routes';
 import challengeRoutes from './routes/challenge.routes';
 import examRoutes from './routes/exam.routes';
 import payoutRoutes from './routes/payout.routes';
 import testRoutes from './routes/test.routes';
 import analyticsRoutes from './routes/analytics.routes';
+import schoolRoutes from './routes/school.routes';
+import careerRoutes from './routes/career.routes';
+import discussionRoutes from './routes/discussion.routes';
 import { query } from './config/db';
 import passport, { configurePassport } from './config/passport';
 
@@ -156,6 +160,10 @@ app.use('/api/v1/challenges', challengeRoutes);
 app.use('/api/v1/exams', examRoutes);
 app.use('/api/v1/payouts', payoutRoutes);
 app.use('/api/v1/analytics', analyticsRoutes);
+app.use('/api/v1/schools', schoolRoutes);
+app.use('/api/v1/career', careerRoutes);
+app.use('/api/v1/discussions', discussionRoutes);
+app.use('/api/v1/showcase-videos', showcaseVideoRoutes);
 
 // E2E test helper routes (dev only)
 if (process.env.NODE_ENV === 'development') {

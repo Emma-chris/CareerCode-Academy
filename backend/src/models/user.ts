@@ -22,6 +22,8 @@ export interface User {
   verification_token_expires: Date | null;
   reset_token: string | null;
   reset_token_expiry: Date | null;
+  setup_token: string | null;
+  setup_token_expires: Date | null;
   created_at: Date;
   updated_at: Date;
 }
@@ -52,6 +54,8 @@ export interface UpdateUserInput {
   verification_token_expires?: Date | null;
   reset_token?: string | null;
   reset_token_expiry?: Date | null;
+  setup_token?: string | null;
+  setup_token_expires?: Date | null;
   password?: string;
   role?: 'student' | 'instructor' | 'admin' | 'super_admin';
 }
@@ -109,6 +113,14 @@ export async function getUserByVerificationTokenIgnoreExpiry(token: string): Pro
 export async function getUserByResetToken(token: string): Promise<User | null> {
   const { rows } = await query<User>(
     'SELECT * FROM users WHERE reset_token = $1 AND reset_token_expiry > NOW()',
+    [token]
+  );
+  return rows[0] || null;
+}
+
+export async function getUserBySetupToken(token: string): Promise<User | null> {
+  const { rows } = await query<User>(
+    'SELECT * FROM users WHERE setup_token = $1 AND setup_token_expires > NOW()',
     [token]
   );
   return rows[0] || null;

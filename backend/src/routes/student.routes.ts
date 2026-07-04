@@ -3,12 +3,15 @@ import { authenticate, AuthRequest } from '../middleware/auth';
 import { query } from '../config/db';
 import { io } from '../config/socket';
 import { createNotification } from '../models/notification';
+import messageRoutes from './message.routes';
 
 const router = Router();
 const analyticsCache = new Map<string, { data: any; expiresAt: number }>();
 const CACHE_TTL = 5 * 60 * 1000; // 5 minutes
 
 router.use(authenticate);
+
+router.use('/messages', messageRoutes);
 
 function getCachedOrFetch(key: string, fetcher: () => Promise<any>): Promise<any> {
   const cached = analyticsCache.get(key);

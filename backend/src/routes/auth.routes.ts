@@ -29,7 +29,7 @@ const registerSchema = z.object({
   name: z.string().min(1, 'Name is required').max(100),
   email: z.string().email('Invalid email address'),
   password: z.string().min(4, 'Password must be at least 4 characters').max(100),
-  role: z.enum(['student', 'instructor']).optional().default('student'),
+  role: z.enum(['student']).optional().default('student'),
 });
 
 const loginSchema = z.object({
@@ -215,6 +215,44 @@ router.post(
       res.json({
         success: true,
         message: 'Password reset successful.',
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
+);
+
+// POST /set-password - first-time password setup (instructor approval flow)
+const setPasswordSchema = z.object({
+  token: z.string().min(1, 'Token is required'),
+  password: z.string().min(6, 'Password must be at least 6 characters').max(100),
+});
+
+router.post(
+  '/set-password',
+  validate(setPasswordSchema),
+  async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const { token, password } = req.body;
+
+      const user = await UserModel.getUserBySetupToken(token);
+      if (!user) {
+        throw new UnauthorizedError('Invalid or expired setup token');
+      }
+
+      const hashedPassword = await bcrypt.hash(password, 12);
+      await UserModel.updateUser(user.id, {
+        password: hashedPassword,
+        setup_token: null,
+        setup_token_expires: null,
+        is_verified: true,
+      });
+
+      await sendWelcomeEmail(user.email, user.name);
+
+      res.json({
+        success: true,
+        message: 'Password set successfully. You can now log in.',
       });
     } catch (error) {
       next(error);

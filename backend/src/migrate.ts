@@ -57,6 +57,18 @@ async function migrate() {
     console.log('✓ refresh_tokens table created');
 
     await query(`
+      CREATE TABLE IF NOT EXISTS messages (
+        id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+        sender_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+        receiver_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+        content TEXT NOT NULL,
+        is_read BOOLEAN DEFAULT false,
+        created_at TIMESTAMPTZ DEFAULT NOW()
+      )
+    `);
+    console.log('✓ messages table created');
+
+    await query(`
       CREATE TABLE IF NOT EXISTS courses (
         id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
         title VARCHAR(200) NOT NULL,
@@ -248,6 +260,35 @@ async function migrate() {
       )
     `);
     console.log('✓ forum_messages table created');
+
+    await query(`
+      CREATE TABLE IF NOT EXISTS discussions (
+        id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+        user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+        title VARCHAR(200) NOT NULL,
+        content TEXT NOT NULL,
+        category VARCHAR(100) NOT NULL DEFAULT 'General',
+        tags JSONB DEFAULT '[]',
+        views INTEGER DEFAULT 0,
+        likes_count INTEGER DEFAULT 0,
+        pinned BOOLEAN DEFAULT false,
+        created_at TIMESTAMPTZ DEFAULT NOW(),
+        updated_at TIMESTAMPTZ DEFAULT NOW()
+      )
+    `);
+    console.log('✓ discussions table created');
+
+    await query(`
+      CREATE TABLE IF NOT EXISTS discussion_replies (
+        id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+        discussion_id UUID NOT NULL REFERENCES discussions(id) ON DELETE CASCADE,
+        user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+        content TEXT NOT NULL,
+        likes_count INTEGER DEFAULT 0,
+        created_at TIMESTAMPTZ DEFAULT NOW()
+      )
+    `);
+    console.log('✓ discussion_replies table created');
 
     await query(`
       CREATE TABLE IF NOT EXISTS instructor_applications (
@@ -446,6 +487,8 @@ async function migrate() {
 
     await query('ALTER TABLE courses ADD COLUMN IF NOT EXISTS discount_percentage DECIMAL(5,2) NOT NULL DEFAULT 0');
     console.log('✓ discount_percentage column added to courses');
+
+
 
     // Create indexes
     await query('CREATE INDEX IF NOT EXISTS idx_refresh_tokens_user ON refresh_tokens(user_id)');
@@ -647,12 +690,198 @@ async function migrate() {
     `);
     console.log('✓ user_journeys table created');
 
+    await query(`
+      CREATE TABLE IF NOT EXISTS schools (
+        id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+        name VARCHAR(200) NOT NULL,
+        slug VARCHAR(200) UNIQUE NOT NULL,
+        description TEXT,
+        icon VARCHAR(100),
+        color VARCHAR(100),
+        sort_order INTEGER DEFAULT 0,
+        created_at TIMESTAMPTZ DEFAULT NOW(),
+        updated_at TIMESTAMPTZ DEFAULT NOW()
+      )
+    `);
+    console.log('✓ schools table created');
+
+    await query(`
+      CREATE TABLE IF NOT EXISTS programs (
+        id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+        school_id UUID NOT NULL REFERENCES schools(id) ON DELETE CASCADE,
+        name VARCHAR(200) NOT NULL,
+        slug VARCHAR(200) UNIQUE NOT NULL,
+        description TEXT,
+        career_outcomes TEXT[] DEFAULT ARRAY[]::TEXT[],
+        duration VARCHAR(100),
+        icon VARCHAR(100),
+        color VARCHAR(100),
+        main_course_id UUID REFERENCES courses(id) ON DELETE SET NULL,
+        sort_order INTEGER DEFAULT 0,
+        created_at TIMESTAMPTZ DEFAULT NOW(),
+        updated_at TIMESTAMPTZ DEFAULT NOW()
+      )
+    `);
+    console.log('✓ programs table created');
+
+    await query(`
+      CREATE TABLE IF NOT EXISTS program_courses (
+        id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+        program_id UUID NOT NULL REFERENCES programs(id) ON DELETE CASCADE,
+        course_id UUID NOT NULL REFERENCES courses(id) ON DELETE CASCADE,
+        order_index INTEGER DEFAULT 0,
+        UNIQUE(program_id, course_id)
+      )
+    `);
+    console.log('✓ program_courses table created');
+
+    await query(`
+      ALTER TABLE programs
+        ADD COLUMN IF NOT EXISTS main_course_id UUID REFERENCES courses(id) ON DELETE SET NULL
+    `);
+    console.log('✓ programs.main_course_id column added');
+
+    await query(`
+      CREATE TABLE IF NOT EXISTS discussions (
+        id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+        user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+        title VARCHAR(255) NOT NULL,
+        content TEXT NOT NULL,
+        category VARCHAR(100) DEFAULT 'General',
+        tags JSONB DEFAULT '[]'::jsonb,
+        views INTEGER DEFAULT 0,
+        likes_count INTEGER DEFAULT 0,
+        pinned BOOLEAN DEFAULT false,
+        created_at TIMESTAMPTZ DEFAULT NOW(),
+        updated_at TIMESTAMPTZ DEFAULT NOW()
+      )
+    `);
+    console.log('✓ discussions table created');
+
+    await query(`
+      CREATE TABLE IF NOT EXISTS discussion_replies (
+        id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+        discussion_id UUID NOT NULL REFERENCES discussions(id) ON DELETE CASCADE,
+        user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+        content TEXT NOT NULL,
+        likes_count INTEGER DEFAULT 0,
+        created_at TIMESTAMPTZ DEFAULT NOW()
+      )
+    `);
+    console.log('✓ discussion_replies table created');
+
+    await query(`
+      CREATE TABLE IF NOT EXISTS jobs (
+        id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+        title VARCHAR(255) NOT NULL,
+        company VARCHAR(255) NOT NULL,
+        description TEXT NOT NULL,
+        location VARCHAR(255),
+        type VARCHAR(100) NOT NULL,
+        salary_range VARCHAR(100),
+        application_url TEXT,
+        logo_url TEXT,
+        posted_by UUID REFERENCES users(id) ON DELETE SET NULL,
+        is_active BOOLEAN DEFAULT true,
+        expires_at TIMESTAMPTZ,
+        created_at TIMESTAMPTZ DEFAULT NOW(),
+        updated_at TIMESTAMPTZ DEFAULT NOW()
+      )
+    `);
+    console.log('✓ jobs table created');
+
+    await query(`
+      CREATE TABLE IF NOT EXISTS internships (
+        id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+        title VARCHAR(255) NOT NULL,
+        company VARCHAR(255) NOT NULL,
+        description TEXT NOT NULL,
+        location VARCHAR(255),
+        type VARCHAR(100) NOT NULL,
+        duration VARCHAR(100),
+        requirements TEXT,
+        stipend VARCHAR(100),
+        application_url TEXT,
+        logo_url TEXT,
+        posted_by UUID REFERENCES users(id) ON DELETE SET NULL,
+        is_active BOOLEAN DEFAULT true,
+        expires_at TIMESTAMPTZ,
+        created_at TIMESTAMPTZ DEFAULT NOW(),
+        updated_at TIMESTAMPTZ DEFAULT NOW()
+      )
+    `);
+    console.log('✓ internships table created');
+
+    await query(`
+      CREATE TABLE IF NOT EXISTS alumni (
+        id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+        user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+        graduation_year INTEGER,
+        current_company VARCHAR(255),
+        current_position VARCHAR(255),
+        linkedin_url TEXT,
+        portfolio_url TEXT,
+        testimonial TEXT,
+        is_featured BOOLEAN DEFAULT false,
+        created_at TIMESTAMPTZ DEFAULT NOW(),
+        updated_at TIMESTAMPTZ DEFAULT NOW()
+      )
+    `);
+    console.log('✓ alumni table created');
+
+    await query('ALTER TABLE courses ADD COLUMN IF NOT EXISTS program_id UUID REFERENCES programs(id) ON DELETE SET NULL');
+    await query('ALTER TABLE courses ADD COLUMN IF NOT EXISTS learning_outcomes TEXT[] DEFAULT ARRAY[]::TEXT[]');
+    await query('ALTER TABLE courses ADD COLUMN IF NOT EXISTS featured BOOLEAN DEFAULT false');
+    await query('ALTER TABLE courses ADD COLUMN IF NOT EXISTS status VARCHAR(50) DEFAULT \'draft\'');
+    await query('ALTER TABLE courses ADD COLUMN IF NOT EXISTS review_notes TEXT');
+    await query('ALTER TABLE courses ADD COLUMN IF NOT EXISTS reviewed_by UUID REFERENCES users(id) ON DELETE SET NULL');
+    await query('ALTER TABLE courses ADD COLUMN IF NOT EXISTS reviewed_at TIMESTAMPTZ');
+    console.log('✓ additional columns added to courses');
+
     await query('CREATE INDEX IF NOT EXISTS idx_modules_course ON modules(course_id)');
     await query('CREATE INDEX IF NOT EXISTS idx_support_tickets_user ON support_tickets(user_id)');
     await query('CREATE INDEX IF NOT EXISTS idx_support_tickets_status ON support_tickets(status)');
     await query('CREATE INDEX IF NOT EXISTS idx_ticket_replies_ticket ON ticket_replies(ticket_id)');
     await query('CREATE INDEX IF NOT EXISTS idx_audit_logs_admin ON audit_logs(admin_id)');
-    console.log('✓ all indexes created');
+    await query('CREATE INDEX IF NOT EXISTS idx_discussions_category ON discussions(category)');
+    await query('CREATE INDEX IF NOT EXISTS idx_discussions_user ON discussions(user_id)');
+    await query('CREATE INDEX IF NOT EXISTS idx_discussion_replies_discussion ON discussion_replies(discussion_id)');
+    await query(`
+      CREATE TABLE IF NOT EXISTS showcase_videos (
+        id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+        entity_type VARCHAR(20) NOT NULL CHECK (entity_type IN ('school', 'program', 'course')),
+        entity_id UUID NOT NULL,
+        title VARCHAR(255) NOT NULL,
+        description TEXT,
+        video_url TEXT NOT NULL,
+        thumbnail_url TEXT,
+        duration INTEGER DEFAULT 0,
+        provider VARCHAR(20) DEFAULT 'html5' CHECK (provider IN ('html5', 'youtube', 'vimeo')),
+        views INTEGER DEFAULT 0,
+        is_active BOOLEAN DEFAULT true,
+        created_at TIMESTAMPTZ DEFAULT NOW(),
+        updated_at TIMESTAMPTZ DEFAULT NOW()
+      )
+    `);
+    console.log('✓ showcase_videos table created');
+
+    await query(`
+      CREATE TABLE IF NOT EXISTS video_analytics (
+        id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+        video_id UUID NOT NULL REFERENCES showcase_videos(id) ON DELETE CASCADE,
+        user_id UUID REFERENCES users(id) ON DELETE SET NULL,
+        watch_duration INTEGER DEFAULT 0,
+        completed BOOLEAN DEFAULT false,
+        ip_address VARCHAR(45),
+        created_at TIMESTAMPTZ DEFAULT NOW()
+      )
+    `);
+    console.log('✓ video_analytics table created');
+
+    await query('CREATE INDEX IF NOT EXISTS idx_showcase_videos_entity ON showcase_videos(entity_type, entity_id)');
+    await query('CREATE INDEX IF NOT EXISTS idx_video_analytics_video ON video_analytics(video_id)');
+    await query('CREATE INDEX IF NOT EXISTS idx_video_analytics_user ON video_analytics(user_id)');
+    console.log('✓ showcase video indexes created');
 
     console.log('Migration completed successfully!');
     await syncAllLearningPaths();

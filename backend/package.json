@@ -10,6 +10,7 @@
     "seed": "tsx --require dotenv/config src/seed-courses.ts",
     "seed:admin": "tsx --require dotenv/config src/seed-admin.ts",
     "seed:exam": "tsx --require dotenv/config src/seed-exam-questions.ts",
+    "seed:schools": "tsx --require dotenv/config src/seed-schools.ts",
     "seed:cert": "tsx --require dotenv/config src/seed-certificate-assets.ts",
     "seed:yt": "tsx --require dotenv/config src/seed-youtube-videos.ts",
     "seed:yt:urls": "tsx --require dotenv/config src/seed-youtube-videos.ts --urls-only",
@@ -47,6 +48,7 @@
   },
   "devDependencies": {
     "@types/bcryptjs": "^2.4.6",
+    "@types/compression": "^1.8.1",
     "@types/cookie-parser": "^1.4.10",
     "@types/cors": "^2.8.17",
     "@types/express": "^4.17.21",

@@ -1,11 +1,12 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import { Hero } from '@/components/home/Hero';
+import { TrustSection } from '@/components/home/TrustSection';
 import { FeaturedCourses } from '@/components/home/FeaturedCourses';
 import { StatsCounter } from '@/components/home/StatsCounter';
 import { Testimonials } from '@/components/home/Testimonials';
 import { FAQ } from '@/components/home/FAQ';
-import { Newsletter } from '@/components/home/Newsletter';
+import { CTASection } from '@/components/home/CTASection';
 import SEO from '@/components/seo/SEO';
 
 export default function Home() {
@@ -17,11 +18,12 @@ export default function Home() {
     >
       <SEO title="Home" />
       <Hero />
+      <TrustSection />
       <FeaturedCourses />
       <StatsCounter />
       <Testimonials />
       <FAQ />
-      <Newsletter />
+      <CTASection />
     </motion.div>
   );
 }

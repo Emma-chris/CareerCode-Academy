@@ -5,7 +5,7 @@ import {
   BookOpen, ChevronRight, ChevronLeft, Play, Calendar,
   Clock, AlertCircle, RefreshCw, Target, TrendingUp,
   Lightbulb, BookMarked, BarChart3, Sparkles, ListChecks,
-  MessageSquare, Trophy,
+  MessageSquare, Trophy, Flame, Award, Zap, Star, CheckCircle2,
 } from 'lucide-react';
 import { GlassCard } from '@/components/ui/GlassCard';
 import { Badge } from '@/components/ui/Badge';
@@ -22,17 +22,92 @@ import { AIStudyAssistant } from '@/components/student/AIStudyAssistant';
 import { HeroSkeleton, StatsSkeleton, CardSkeleton, ChartSkeleton } from '@/components/student/SkeletonLoader';
 import SEO from '@/components/seo/SEO';
 
-function ProgressRing({ progress, size = 56, strokeWidth = 4 }: { progress: number; size?: number; strokeWidth?: number }) {
+function ProgressRing({ progress, size = 56, strokeWidth = 4, color = 'text-primary-500' }: { progress: number; size?: number; strokeWidth?: number; color?: string }) {
+  const safeProgress = Number.isNaN(progress) ? 0 : progress;
   const radius = (size - strokeWidth) / 2;
   const circumference = 2 * Math.PI * radius;
-  const offset = circumference - (progress / 100) * circumference;
+  const offset = circumference - (safeProgress / 100) * circumference;
 
   return (
     <svg width={size} height={size} className="transform -rotate-90 flex-shrink-0" aria-hidden="true">
       <circle cx={size / 2} cy={size / 2} r={radius} fill="none" stroke="currentColor" strokeWidth={strokeWidth} className="text-gray-200 dark:text-gray-700" />
-      <circle cx={size / 2} cy={size / 2} r={radius} fill="none" stroke="currentColor" strokeWidth={strokeWidth} strokeDasharray={circumference} strokeDashoffset={offset} strokeLinecap="round" className="text-primary-500 transition-all duration-700" />
+      <circle cx={size / 2} cy={size / 2} r={radius} fill="none" stroke="currentColor" strokeWidth={strokeWidth} strokeDasharray={circumference} strokeDashoffset={offset} strokeLinecap="round" className={`${color} transition-all duration-700`} />
     </svg>
   );
+}
+
+function WeeklyProgress({ weeklyHours, weeklyGoal }: { weeklyHours: number; weeklyGoal: number }) {
+  const pct = weeklyGoal > 0 ? Math.min((weeklyHours / weeklyGoal) * 100, 100) : 0;
+  return (
+    <GlassCard className="p-5 flex items-center gap-5" hover>
+      <div className="relative flex-shrink-0">
+        <ProgressRing progress={pct} size={72} strokeWidth={6} color="text-accent-500" />
+        <span className="absolute inset-0 flex items-center justify-center text-sm font-bold text-accent-500">
+          {Math.round(pct)}%
+        </span>
+      </div>
+      <div className="flex-1 min-w-0">
+        <p className="text-sm font-semibold">Weekly Progress</p>
+        <p className="text-xs text-gray-500 mt-0.5">{weeklyHours}h of {weeklyGoal}h goal</p>
+        <div className="w-full h-1.5 bg-gray-100 dark:bg-gray-800 rounded-full mt-2 overflow-hidden">
+          <motion.div
+            initial={{ width: 0 }}
+            animate={{ width: `${pct}%` }}
+            transition={{ duration: 1, ease: 'easeOut' }}
+            className="h-full rounded-full bg-gradient-to-r from-primary-500 to-accent-500"
+          />
+        </div>
+        {weeklyHours >= weeklyGoal && (
+          <div className="flex items-center gap-1 mt-1.5 text-xs text-success-500 font-medium">
+            <CheckCircle2 className="w-3 h-3" />
+            Goal reached!
+          </div>
+        )}
+      </div>
+    </GlassCard>
+  );
+}
+
+function StreakTracker({ streak, bestStreak }: { streak: number; bestStreak: number }) {
+  const days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+  const today = new Date().getDay();
+  const weekDays = days.map((d, i) => ({
+    day: d,
+    active: i < streak % 7,
+    isToday: (i + 1) % 7 === today,
+  }));
+
+  return (
+    <GlassCard className="p-5" hover>
+      <div className="flex items-center gap-3 mb-4">
+        <div className="w-10 h-10 rounded-xl bg-orange-500/10 flex items-center justify-center">
+          <Flame className="w-5 h-5 text-orange-500" />
+        </div>
+        <div>
+          <p className="text-lg font-bold text-orange-500">{streak} days</p>
+          <p className="text-xs text-gray-500">Current streak · Best: {bestStreak}d</p>
+        </div>
+      </div>
+      <div className="flex items-center gap-1.5">
+        {weekDays.map((d) => (
+          <div key={d.day} className="flex-1 flex flex-col items-center gap-1">
+            <div className={cn(
+              'w-full h-8 rounded-lg flex items-center justify-center text-xs font-medium transition-all',
+              d.isToday ? 'ring-2 ring-primary-500/50 ring-offset-1 ring-offset-gray-900' : '',
+              d.active ? 'bg-gradient-to-b from-orange-500 to-orange-600 text-white shadow-lg shadow-orange-500/30' : 'bg-gray-100 dark:bg-gray-800 text-gray-400'
+            )}>
+              {d.active ? <Flame className="w-3 h-3" /> : null}
+            </div>
+            <span className={cn('text-[10px]', d.isToday ? 'text-primary-500 font-medium' : 'text-gray-500')}>{d.day.slice(0, 2)}</span>
+          </div>
+        ))}
+      </div>
+    </GlassCard>
+  );
+}
+
+function cn(...classes: (string | boolean | undefined | null)[]) {
+  return classes.filter(Boolean).join(' ');
 }
 
 export default function StudentDashboard() {
@@ -104,35 +179,42 @@ export default function StudentDashboard() {
   return (
     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-8">
       <SEO title="Dashboard" />
-      {/* Hero Welcome Section */}
       <HeroSection />
 
       {/* Stats Cards */}
       <StatsCards stats={stats} />
 
-      {/* Quick Actions */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 3xl:grid-cols-6 gap-2 sm:gap-3">
-        {[
-          { label: 'Browse Courses', icon: BookMarked, color: 'text-blue-500', bg: 'bg-blue-500/10', onClick: () => navigate('/courses') },
-          { label: 'Take a Quiz', icon: ListChecks, color: 'text-purple-500', bg: 'bg-purple-500/10', onClick: () => navigate('/student/courses') },
-          { label: 'Leaderboard', icon: Trophy, color: 'text-amber-500', bg: 'bg-amber-500/10', onClick: () => navigate('/student/leaderboard') },
-          { label: 'Messages', icon: MessageSquare, color: 'text-emerald-500', bg: 'bg-emerald-500/10', onClick: () => navigate('/student/messages') },
-        ].map((action) => (
-          <motion.button
-            key={action.label}
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            whileHover={{ scale: 1.02 }}
-            whileTap={{ scale: 0.98 }}
-            onClick={action.onClick}
-                className="flex items-center gap-2 sm:gap-3 p-2 sm:p-3 rounded-xl border border-gray-100 dark:border-gray-800 hover:border-primary-200 dark:hover:border-primary-800 transition-all bg-white/50 dark:bg-gray-900/50"
-              >
-                <div className={`w-8 h-8 sm:w-9 sm:h-9 rounded-lg ${action.bg} flex items-center justify-center flex-shrink-0`}>
-                  <action.icon className={`w-3.5 h-3.5 sm:w-4 sm:h-4 ${action.color}`} />
-                </div>
-                <span className="text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-300 truncate">{action.label}</span>
-          </motion.button>
-        ))}
+      {/* Streak Tracker + Weekly Progress + Quick Actions Row */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+        <div className="sm:col-span-1">
+          <StreakTracker streak={stats?.currentStreak || 0} bestStreak={stats?.bestStreak || 0} />
+        </div>
+        <div className="sm:col-span-1">
+          <WeeklyProgress weeklyHours={weeklyHours} weeklyGoal={weeklyGoal} />
+        </div>
+        <div className="sm:col-span-2 grid grid-cols-2 gap-3">
+          {[
+            { label: 'Browse Courses', icon: BookMarked, color: 'text-blue-500', bg: 'bg-blue-500/10', onClick: () => navigate('/courses') },
+            { label: 'Take a Quiz', icon: ListChecks, color: 'text-purple-500', bg: 'bg-purple-500/10', onClick: () => navigate('/student/courses') },
+            { label: 'Leaderboard', icon: Trophy, color: 'text-amber-500', bg: 'bg-amber-500/10', onClick: () => navigate('/student/leaderboard') },
+            { label: 'Messages', icon: MessageSquare, color: 'text-emerald-500', bg: 'bg-emerald-500/10', onClick: () => navigate('/student/messages') },
+          ].map((action) => (
+            <motion.button
+              key={action.label}
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
+              onClick={action.onClick}
+              className="flex items-center gap-2 sm:gap-3 p-3 sm:p-4 rounded-xl border border-gray-100 dark:border-gray-800 hover:border-primary-200 dark:hover:border-primary-800 transition-all bg-white/50 dark:bg-gray-900/50"
+            >
+              <div className={`w-9 h-9 rounded-lg ${action.bg} flex items-center justify-center flex-shrink-0`}>
+                <action.icon className={`w-4 h-4 ${action.color}`} />
+              </div>
+              <span className="text-sm font-medium text-gray-700 dark:text-gray-300 truncate">{action.label}</span>
+            </motion.button>
+          ))}
+        </div>
       </div>
 
       {/* Continue Learning */}
@@ -168,14 +250,14 @@ export default function StudentDashboard() {
                 key={course.id}
                 initial={{ opacity: 0, x: 20 }}
                 animate={{ opacity: 1, x: 0 }}
-                className="flex-shrink-0 w-[260px] xs:w-[280px] snap-start"
+                className="flex-shrink-0 w-[280px] snap-start"
                 role="listitem"
               >
                 <Link to={`/student/courses/${course.slug}`} className="block group">
                   <GlassCard className="p-5 h-full" hover>
                     <div className="flex items-start gap-4">
                       <div className="relative flex-shrink-0">
-                        <ProgressRing progress={course.progress} size={64} strokeWidth={5} />
+                        <ProgressRing progress={course.progress} size={64} strokeWidth={5} color="text-primary-500" />
                         <span className="absolute inset-0 flex items-center justify-center text-xs font-bold text-primary-500">
                           {course.progress}%
                         </span>
@@ -192,7 +274,7 @@ export default function StudentDashboard() {
                       </div>
                     </div>
                     <div className="mt-4 w-full">
-                      <div className="flex items-center justify-center gap-2 py-2 rounded-lg bg-primary-500/10 text-primary-600 dark:text-primary-400 text-sm font-medium group-hover:bg-primary-500/20 transition-colors">
+                      <div className="flex items-center justify-center gap-2 py-2.5 rounded-lg bg-primary-500/10 text-primary-600 dark:text-primary-400 text-sm font-medium group-hover:bg-primary-500/20 transition-colors">
                         <Play className="w-4 h-4" />
                         Resume
                       </div>
@@ -215,7 +297,6 @@ export default function StudentDashboard() {
       <AchievementCenter />
 
       <div className="grid lg:grid-cols-3 xl:grid-cols-4 3xl:grid-cols-5 5xl:grid-cols-6 gap-4 sm:gap-6">
-        {/* Left Column */}
         <div className="lg:col-span-2 xl:col-span-3 3xl:col-span-4 5xl:col-span-5 space-y-4 sm:space-y-6">
           {/* My Learning */}
           <GlassCard className="p-6" hover={false}>
@@ -252,8 +333,8 @@ export default function StudentDashboard() {
                     className="flex items-center gap-4 p-4 rounded-xl border border-gray-100 dark:border-gray-800 hover:border-primary-200 dark:hover:border-primary-800 hover:bg-primary-500/5 transition-all group"
                   >
                     <div className="relative flex-shrink-0">
-                      <ProgressRing progress={course.progress} size={48} strokeWidth={4} />
-                      <span className="absolute inset-0 flex items-center justify-center text-[10px] font-bold text-primary-500">
+                      <ProgressRing progress={course.progress} size={48} strokeWidth={4} color={course.progress === 100 ? 'text-success-500' : 'text-primary-500'} />
+                      <span className="absolute inset-0 flex items-center justify-center text-[10px] font-bold" style={{ color: course.progress === 100 ? '#10B981' : '#6366f1' }}>
                         {course.progress}%
                       </span>
                     </div>
@@ -331,6 +412,47 @@ export default function StudentDashboard() {
 
         {/* Right Sidebar */}
         <div className="space-y-6">
+          {/* Weekly Progress Overview */}
+          <GlassCard className="p-6" hover={false}>
+            <h2 className="text-lg font-semibold mb-4">
+              <Target className="w-4 h-4 inline mr-2 -mt-0.5 text-gray-400" />
+              Learning Stats
+            </h2>
+            <div className="space-y-4">
+              <div>
+                <div className="flex justify-between text-sm mb-1">
+                  <span className="text-gray-500">Overall Progress</span>
+                  <span className="font-medium tabular-nums">{stats?.averageProgress || 0}%</span>
+                </div>
+                <div className="w-full h-2 bg-gray-100 dark:bg-gray-800 rounded-full overflow-hidden">
+                  <div
+                    className="h-full rounded-full bg-gradient-to-r from-primary-500 to-accent-500 transition-all duration-700"
+                    style={{ width: `${stats?.averageProgress || 0}%` }}
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-3 text-center">
+                <div className="p-3 rounded-xl bg-blue-500/5 border border-blue-500/10">
+                  <div className="text-lg font-bold text-blue-500 tabular-nums">{stats?.enrolledCourses || 0}</div>
+                  <div className="text-xs text-gray-500">Enrolled</div>
+                </div>
+                <div className="p-3 rounded-xl bg-success-500/5 border border-success-500/10">
+                  <div className="text-lg font-bold text-success-500 tabular-nums">{completedCount}</div>
+                  <div className="text-xs text-gray-500">Completed</div>
+                </div>
+                <div className="p-3 rounded-xl bg-purple-500/5 border border-purple-500/10">
+                  <div className="text-lg font-bold text-purple-500 tabular-nums">{stats?.completedLessons || 0}</div>
+                  <div className="text-xs text-gray-500">Lessons</div>
+                </div>
+                <div className="p-3 rounded-xl bg-amber-500/5 border border-amber-500/10">
+                  <div className="text-lg font-bold text-amber-500 tabular-nums">{stats?.certificates || 0}</div>
+                  <div className="text-xs text-gray-500">Certificates</div>
+                </div>
+              </div>
+            </div>
+          </GlassCard>
+
           {/* Upcoming Deadlines */}
           <GlassCard className="p-6" hover={false}>
             <div className="flex items-center justify-between mb-4">
@@ -382,71 +504,6 @@ export default function StudentDashboard() {
                   );
                 })
               )}
-            </div>
-          </GlassCard>
-
-          {/* Learning Stats */}
-          <GlassCard className="p-6" hover={false}>
-            <h2 className="text-lg font-semibold mb-4">
-              <Target className="w-4 h-4 inline mr-2 -mt-0.5 text-gray-400" />
-              Learning Stats
-            </h2>
-            <div className="space-y-4">
-              <div>
-                <div className="flex justify-between text-sm mb-1">
-                  <span className="text-gray-500">Overall Progress</span>
-                  <span className="font-medium">{stats?.averageProgress || 0}%</span>
-                </div>
-                <div className="w-full h-2 bg-gray-100 dark:bg-gray-800 rounded-full overflow-hidden">
-                  <div
-                    className="h-full rounded-full bg-gradient-to-r from-primary-500 to-accent-500 transition-all duration-700"
-                    style={{ width: `${stats?.averageProgress || 0}%` }}
-                  />
-                </div>
-              </div>
-
-              {/* Weekly Goal */}
-              <div className="p-4 rounded-xl bg-gradient-to-br from-primary-500/5 to-accent-500/5 border border-primary-500/10">
-                <div className="flex items-center justify-between mb-2">
-                  <span className="text-sm font-medium flex items-center gap-1.5">
-                    <TrendingUp className="w-3.5 h-3.5 text-primary-500" />
-                    Weekly Goal
-                  </span>
-                  <span className="text-xs text-gray-500">{weeklyHours}h / {weeklyGoal}h</span>
-                </div>
-                <div className="w-full h-2.5 bg-gray-100 dark:bg-gray-800 rounded-full overflow-hidden">
-                  <motion.div
-                    initial={{ width: 0 }}
-                    animate={{ width: `${Math.min((weeklyHours / weeklyGoal) * 100, 100)}%` }}
-                    transition={{ duration: 1, ease: 'easeOut' }}
-                    className="h-full rounded-full bg-gradient-to-r from-primary-500 to-accent-500"
-                  />
-                </div>
-                <p className="text-xs text-gray-400 mt-1.5">
-                  {weeklyHours >= weeklyGoal
-                    ? 'Great job, you hit your weekly goal!'
-                    : `${weeklyGoal - weeklyHours}h more to reach your goal`}
-                </p>
-              </div>
-
-              <div className="grid grid-cols-2 gap-3 text-center">
-                <div className="p-3 rounded-xl bg-gray-50 dark:bg-gray-800/50">
-                  <div className="text-lg font-bold text-primary-500">{stats?.enrolledCourses || 0}</div>
-                  <div className="text-xs text-gray-500">Enrolled</div>
-                </div>
-                <div className="p-3 rounded-xl bg-gray-50 dark:bg-gray-800/50">
-                  <div className="text-lg font-bold text-success-500">{completedCount}</div>
-                  <div className="text-xs text-gray-500">Completed</div>
-                </div>
-                <div className="p-3 rounded-xl bg-gray-50 dark:bg-gray-800/50">
-                  <div className="text-lg font-bold text-purple-500">{stats?.completedLessons || 0}</div>
-                  <div className="text-xs text-gray-500">Lessons</div>
-                </div>
-                <div className="p-3 rounded-xl bg-gray-50 dark:bg-gray-800/50">
-                  <div className="text-lg font-bold text-amber-500">{stats?.certificates || 0}</div>
-                  <div className="text-xs text-gray-500">Certificates</div>
-                </div>
-              </div>
             </div>
           </GlassCard>
         </div>

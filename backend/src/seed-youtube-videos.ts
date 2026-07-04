@@ -1,4 +1,5 @@
 import { query as db } from './config/db';
+import { uploadFile } from './config/storage';
 import { exec } from 'child_process';
 import fs from 'fs';
 import path from 'path';

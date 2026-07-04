@@ -10,6 +10,7 @@ export interface StudentStats {
   completedLessons: number;
   totalLearningHours: number;
   currentStreak: number;
+  bestStreak: number;
   xpPoints: number;
   level: number;
   rank: number;
@@ -233,6 +234,7 @@ export const useStudentStore = create<StudentState>((set, get) => ({
           averageProgress: data.stats.averageProgress || 0,
           totalLearningHours: data.stats.totalLearningHours || 0,
           currentStreak: data.stats.currentStreak || 0,
+          bestStreak: data.stats.bestStreak || 0,
           xpPoints: data.stats.xpPoints || 0,
           level: data.stats.level || 1,
           rank: data.stats.rank || 0,

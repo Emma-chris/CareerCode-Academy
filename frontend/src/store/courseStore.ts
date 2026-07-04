@@ -48,6 +48,21 @@ export interface Course {
   enrollmentCount?: number;
   student_count?: number;
   avg_rating?: number;
+  
+  // Program/School fields
+  program_id?: string;
+  program_name?: string;
+  program_slug?: string;
+  program_icon?: string;
+  school_name?: string;
+  school_slug?: string;
+}
+
+interface PaginationInfo {
+  page: number;
+  limit: number;
+  total: number;
+  pages: number;
 }
 
 interface CourseState {
@@ -55,8 +70,9 @@ interface CourseState {
   currentCourse: Course | null;
   isLoading: boolean;
   error: string | null;
+  pagination: PaginationInfo;
   
-  fetchCourses: (filters?: { category?: string; level?: string }) => Promise<void>;
+  fetchCourses: (filters?: { category?: string; level?: string; page?: number; limit?: number; sort?: string }) => Promise<void>;
   fetchCourseBySlug: (slug: string) => Promise<void>;
   enrollCourse: (courseId: string) => Promise<void>;
   unenrollCourse: (courseId: string) => Promise<void>;
@@ -68,6 +84,7 @@ export const useCourseStore = create<CourseState>((set) => ({
   currentCourse: null,
   isLoading: false,
   error: null,
+  pagination: { page: 1, limit: 50, total: 0, pages: 0 },
 
   fetchCourses: async (filters = {}) => {
     set({ isLoading: true, error: null });
@@ -79,9 +96,16 @@ export const useCourseStore = create<CourseState>((set) => ({
       if (filters.level && filters.level !== 'All Levels') {
         params.append('level', filters.level.toLowerCase());
       }
+      if (filters.page) params.append('page', String(filters.page));
+      if (filters.limit) params.append('limit', String(filters.limit));
+      if (filters.sort) params.append('sort', filters.sort);
       
       const { data } = await api.get(`/courses?${params.toString()}`);
-      set({ courses: data.data || [], isLoading: false });
+      set({ 
+        courses: data.data || [], 
+        isLoading: false,
+        pagination: data.pagination || { page: 1, limit: 50, total: 0, pages: 0 },
+      });
     } catch (error: any) {
       set({ 
         isLoading: false, 

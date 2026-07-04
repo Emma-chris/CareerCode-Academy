@@ -4,7 +4,7 @@ import { cn } from '@/lib/utils';
 interface BadgeProps {
   children: React.ReactNode;
   variant?: 'default' | 'primary' | 'success' | 'warning' | 'danger' | 'neon';
-  size?: 'sm' | 'md';
+  size?: 'sm' | 'md' | 'lg';
   className?: string;
 }
 
@@ -20,6 +20,7 @@ const variants = {
 const sizes = {
   sm: 'px-2 py-0.5 text-xs',
   md: 'px-3 py-1 text-sm',
+  lg: 'px-4 py-1.5 text-sm',
 };
 
 export function Badge({ children, variant = 'default', size = 'sm', className }: BadgeProps) {

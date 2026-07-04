@@ -1,8 +1,9 @@
-import { useState } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Zap, Brain, Flame, Award, GraduationCap, HeartHandshake, Lock, X, Info, TrendingUp } from 'lucide-react';
+import { Zap, Brain, Flame, Award, GraduationCap, HeartHandshake, Lock, X, Info, TrendingUp, Sparkles, CheckCircle2 } from 'lucide-react';
 import { GlassCard } from '@/components/ui/GlassCard';
 import { Button } from '@/components/ui/Button';
+import { Badge } from '@/components/ui/Badge';
 import { useStudentStore } from '@/store/studentStore';
 
 const iconMap: Record<string, any> = {
@@ -14,7 +15,12 @@ function XpBreakdown({ xp }: { xp: number }) {
   const coursesXp = Math.round(xp * 0.35);
   const certsXp = Math.round(xp * 0.25);
   return (
-    <div className="p-3 rounded-xl bg-gray-50 dark:bg-gray-800/50 space-y-2 text-xs">
+    <motion.div
+      initial={{ opacity: 0, height: 0 }}
+      animate={{ opacity: 1, height: 'auto' }}
+      exit={{ opacity: 0, height: 0 }}
+      className="p-3 rounded-xl bg-gray-50 dark:bg-gray-800/50 space-y-2 text-xs overflow-hidden"
+    >
       <p className="font-medium text-gray-700 dark:text-gray-300 flex items-center gap-1">
         <TrendingUp className="w-3 h-3" /> XP Breakdown
       </p>
@@ -31,11 +37,11 @@ function XpBreakdown({ xp }: { xp: number }) {
                 <div className={`h-full rounded-full ${item.color}`} style={{ width: `${xp ? (item.value / xp) * 100 : 0}%` }} />
               </div>
             </div>
-            <span className="font-medium text-gray-600 dark:text-gray-400 w-10 text-right">{item.value}</span>
+            <span className="font-medium text-gray-600 dark:text-gray-400 w-10 text-right tabular-nums">{item.value}</span>
           </div>
         ))}
       </div>
-    </div>
+    </motion.div>
   );
 }
 
@@ -43,6 +49,7 @@ export function AchievementCenter() {
   const { badges, stats } = useStudentStore();
   const [selectedBadge, setSelectedBadge] = useState<any>(null);
   const [showXpBreakdown, setShowXpBreakdown] = useState(false);
+  const [celebratedBadges, setCelebratedBadges] = useState<Set<string>>(new Set());
 
   if (badges.length === 0) return null;
 
@@ -56,14 +63,20 @@ export function AchievementCenter() {
 
   return (
     <section>
-      <h2 className="text-lg font-semibold mb-4">Achievements</h2>
+      <div className="flex items-center justify-between mb-4">
+        <h2 className="text-lg font-semibold">Achievements</h2>
+        <Badge variant="primary" size="sm">{earnedCount} / {badges.length} earned</Badge>
+      </div>
       <GlassCard className="p-5" hover={false}>
         {/* XP Progression Bar */}
         <div className="mb-5">
           <div className="flex items-center justify-between text-sm mb-2">
-            <span className="font-medium">Level {currentLevel}</span>
+            <span className="font-medium flex items-center gap-1.5">
+              <Award className="w-4 h-4 text-amber-500" />
+              Level {currentLevel}
+            </span>
             <div className="flex items-center gap-2">
-              <span className="text-gray-500 text-xs">{totalXp} / {currentLevel * xpPerLevel} XP</span>
+              <span className="text-gray-500 text-xs tabular-nums">{totalXp} / {currentLevel * xpPerLevel} XP</span>
               <button
                 onClick={() => setShowXpBreakdown(!showXpBreakdown)}
                 className="p-1 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
@@ -83,11 +96,13 @@ export function AchievementCenter() {
           </div>
           <div className="flex items-center justify-between mt-1">
             <span className="text-[10px] text-gray-400">{earnedCount} badges earned</span>
-            <span className="text-[10px] text-gray-400">{xpToNextLevel - xpProgress} XP to next level</span>
+            <span className="text-[10px] text-gray-400 tabular-nums">{xpToNextLevel - xpProgress} XP to next level</span>
           </div>
         </div>
 
-        {showXpBreakdown && <XpBreakdown xp={totalXp} />}
+        <AnimatePresence>
+          {showXpBreakdown && <XpBreakdown xp={totalXp} />}
+        </AnimatePresence>
 
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-3">
           {badges.map((badge, i) => {
@@ -110,6 +125,15 @@ export function AchievementCenter() {
                     <Lock className="w-5 h-5 text-gray-400" />
                   </div>
                 )}
+                {badge.earned && (
+                  <motion.div
+                    initial={{ scale: 0 }}
+                    animate={{ scale: 1 }}
+                    className="absolute -top-1 -right-1 z-10"
+                  >
+                    <Sparkles className="w-3.5 h-3.5 text-yellow-500" />
+                  </motion.div>
+                )}
                 <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${
                   badge.earned ? 'bg-primary-500/20' : 'bg-gray-300 dark:bg-gray-700'
                 }`}>
@@ -120,7 +144,12 @@ export function AchievementCenter() {
                 </span>
                 {!badge.earned && badge.progress !== undefined && (
                   <div className="w-full h-1 bg-gray-300 dark:bg-gray-700 rounded-full overflow-hidden mt-1">
-                    <div className="h-full bg-gray-400 dark:bg-gray-500 rounded-full" style={{ width: `${badge.progress}%` }} />
+                    <motion.div
+                      initial={{ width: 0 }}
+                      animate={{ width: `${badge.progress}%` }}
+                      transition={{ duration: 1 }}
+                      className="h-full bg-gray-400 dark:bg-gray-500 rounded-full"
+                    />
                   </div>
                 )}
               </motion.button>
@@ -168,18 +197,24 @@ export function AchievementCenter() {
                 })()}
                 <p className="text-sm text-gray-500 text-center">{selectedBadge.description}</p>
                 {selectedBadge.earned && selectedBadge.earned_at && (
-                  <p className="text-xs text-gray-400">
+                  <div className="flex items-center gap-1.5 text-xs text-success-500">
+                    <CheckCircle2 className="w-3.5 h-3.5" />
                     Earned on {new Date(selectedBadge.earned_at).toLocaleDateString()}
-                  </p>
+                  </div>
                 )}
                 {!selectedBadge.earned && selectedBadge.progress !== undefined && (
                   <div className="w-full space-y-1">
                     <div className="flex justify-between text-xs text-gray-500">
                       <span>Progress</span>
-                      <span>{selectedBadge.progress}%</span>
+                      <span className="tabular-nums">{selectedBadge.progress}%</span>
                     </div>
                     <div className="w-full h-2 bg-gray-200 dark:bg-gray-700 rounded-full">
-                      <div className="h-full bg-primary-500 rounded-full" style={{ width: `${selectedBadge.progress}%` }} />
+                      <motion.div
+                        initial={{ width: 0 }}
+                        animate={{ width: `${selectedBadge.progress}%` }}
+                        transition={{ duration: 1 }}
+                        className="h-full bg-primary-500 rounded-full"
+                      />
                     </div>
                   </div>
                 )}

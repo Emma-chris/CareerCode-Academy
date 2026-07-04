@@ -1,14 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { ArrowRight, Play, Code2, Sparkles, Shield, Zap } from 'lucide-react';
+import { ArrowRight, Play, Code2, Sparkles, Shield, Zap, Award, Users, BookOpen, Building2, Star, ChevronRight } from 'lucide-react';
 import { NeonButton } from '@/components/ui/NeonButton';
+import { Badge } from '@/components/ui/Badge';
 
 const typingTexts = [
-  'Build Real-World Projects',
+  'Land Your Dream Job',
+  'Build Production Apps',
+  'Earn Industry Certification',
   'Master Modern Frameworks',
-  'Launch Your Dev Career',
-  'Learn From Industry Experts',
 ];
 
 const floatingShapes = [
@@ -16,6 +17,10 @@ const floatingShapes = [
   { icon: Zap, color: 'text-neon-purple', delay: 0.5, x: '85%', y: '15%' },
   { icon: Sparkles, color: 'text-neon-pink', delay: 1, x: '15%', y: '70%' },
   { icon: Shield, color: 'text-neon-green', delay: 1.5, x: '80%', y: '75%' },
+];
+
+const employerLogos = [
+  'Google', 'Microsoft', 'Amazon', 'Stripe', 'Netflix', 'Spotify', 'Atlassian', 'GitLab', 'Vercel', 'Figma',
 ];
 
 const styles = {
@@ -33,6 +38,30 @@ const styles = {
   statNumber: "text-2xl lg:text-4xl 3xl:text-7xl font-bold text-gray-900 dark:text-white mb-1 3xl:mb-4",
   floatingIcon: "w-12 h-12 md:w-16 md:h-16 3xl:w-32 3xl:h-32 opacity-20 transition-all duration-300 hover:scale-110",
 };
+
+function Marquee() {
+  return (
+    <div className="relative overflow-hidden w-full mt-12 lg:mt-16">
+      <div className="absolute inset-y-0 left-0 w-20 bg-gradient-to-r from-white dark:from-gray-950 to-transparent z-10" />
+      <div className="absolute inset-y-0 right-0 w-20 bg-gradient-to-l from-white dark:from-gray-950 to-transparent z-10" />
+      <motion.div
+        className="flex gap-16 items-center"
+        animate={{ x: ['0%', '-50%'] }}
+        transition={{ duration: 30, repeat: Infinity, ease: 'linear' }}
+      >
+        {[...employerLogos, ...employerLogos].map((name, i) => (
+          <div
+            key={i}
+            className="flex items-center gap-2 px-4 py-2 rounded-xl bg-gray-100/50 dark:bg-gray-800/30 border border-gray-200 dark:border-gray-700/50 whitespace-nowrap"
+          >
+            <Building2 className="w-4 h-4 text-gray-400" />
+            <span className="text-sm font-medium text-gray-500 dark:text-gray-400">{name}</span>
+          </div>
+        ))}
+      </motion.div>
+    </div>
+  );
+}
 
 export function Hero() {
   const [textIndex, setTextIndex] = useState(0);
@@ -81,6 +110,7 @@ export function Hero() {
       <div className="absolute inset-0 gradient-bg-subtle" />
       <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_rgba(99,102,241,0.1),transparent_50%)]" />
       <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_bottom_left,_rgba(34,197,94,0.08),transparent_50%)]" />
+      <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxnIGZpbGw9IiNmZmYiIGZpbGwtb3BhY2l0eT0iMC4wMyI+PHBhdGggZD0iTTM2IDM0djItSDI0di0yaDEyek0zNiAyNHYySDI0di0yaDEyeiIvPjwvZz48L2c+PC9zdmc+')]" />
 
       {floatingShapes.map((shape) => (
         <motion.div
@@ -112,7 +142,7 @@ export function Hero() {
           <motion.div variants={itemVariants} className={styles.badgeWrapper}>
             <span className={styles.badge}>
               <Sparkles className={styles.badgeIcon} />
-              New: Interactive Coding Challenges Launched
+              Industry-Recognized Curriculum · 95% Placement Rate
             </span>
           </motion.div>
 
@@ -140,7 +170,7 @@ export function Hero() {
             className={styles.buttonWrapper}
           >
             <Link to="/signup">
-              <NeonButton color="blue" size="lg" className={styles.button}>
+              <NeonButton color="blue" size="lg" className={styles.button + " animate-glow"}>
                 Start Learning Free
                 <ArrowRight className={styles.buttonIcon} />
               </NeonButton>
@@ -148,7 +178,7 @@ export function Hero() {
             <Link to="/courses">
               <NeonButton color="purple" size="lg" className={styles.button}>
                 <Play className={styles.buttonIcon} />
-                Explore Courses
+                Explore Programs
               </NeonButton>
             </Link>
           </motion.div>
@@ -158,9 +188,10 @@ export function Hero() {
             className={styles.statsWrapper}
           >
             {[
-              { number: '10K+', label: 'Students' },
-              { number: '200+', label: 'Courses' },
-              { number: '95%', label: 'Job Placement' },
+              { number: '15K+', label: 'Students' },
+              { number: '250+', label: 'Courses' },
+              { number: '95%', label: 'Placement Rate' },
+              { number: '50+', label: 'Instructors' },
               { number: '4.9', label: 'Avg Rating' },
             ].map((stat) => (
               <div key={stat.label} className="text-center">
@@ -170,6 +201,27 @@ export function Hero() {
                 <div>{stat.label}</div>
               </div>
             ))}
+          </motion.div>
+
+          <motion.div variants={itemVariants}>
+            <div className="mt-8 flex items-center justify-center gap-3">
+              <Badge variant="success" size="sm" className="px-3 py-1">
+                <Award className="w-3 h-3" />
+                Industry Approved
+              </Badge>
+              <Badge variant="primary" size="sm" className="px-3 py-1">
+                <Users className="w-3 h-3" />
+                500+ Hiring Partners
+              </Badge>
+              <Badge variant="default" size="sm" className="px-3 py-1">
+                <Star className="w-3 h-3 text-yellow-500" />
+                Certificate Included
+              </Badge>
+            </div>
+          </motion.div>
+
+          <motion.div variants={itemVariants}>
+            <Marquee />
           </motion.div>
         </motion.div>
       </div>

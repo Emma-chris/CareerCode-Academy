@@ -213,7 +213,7 @@ router.post('/:id/submit', authenticate, async (req: AuthRequest, res: Response,
       submission = await ChallengeModel.submitChallenge({
         challenge_id: challengeId, user_id: userId,
         file_url: fileUrl || undefined, text_answer: textAnswer || undefined,
-        passed: false, score: null,
+        passed: false, score: undefined,
       });
     }
 

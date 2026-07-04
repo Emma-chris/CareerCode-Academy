@@ -6,11 +6,14 @@ import { createNotification } from '../models/notification';
 import { sendMail } from '../config/mailer';
 import { getEnrollmentsByCourse } from '../models/enrollment';
 import { getUserById, updateUser, UpdateUserInput } from '../models/user';
+import messageRoutes from './message.routes';
 
 const router = Router();
 
 // All instructor routes require instructor role
 router.use(authenticate, authorize('instructor', 'admin', 'super_admin'));
+
+router.use('/messages', messageRoutes);
 
 // ----------------------------------------------------------------------
 // DASHBOARD STATS

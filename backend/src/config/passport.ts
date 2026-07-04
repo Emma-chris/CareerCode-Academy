@@ -52,7 +52,7 @@ export function configurePassport() {
           const refreshTokenExpiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
           await TokenModel.createRefreshToken(user.id, refreshToken, refreshTokenExpiresAt);
 
-          return done(null, { user, token, refreshToken });
+          return done(null, { userId: user.id, role: user.role as any, user, token, refreshToken });
         } catch (err) {
           return done(err as Error, undefined);
         }

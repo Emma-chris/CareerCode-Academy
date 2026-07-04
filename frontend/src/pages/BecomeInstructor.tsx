@@ -107,9 +107,13 @@ export default function BecomeInstructor() {
             </div>
           </div>
           <div className="flex-1 w-full max-w-md">
-            {/* Placeholder for an illustration or image */}
-            <div className="aspect-square rounded-2xl gradient-bg opacity-80 shadow-2xl flex items-center justify-center">
-              <Users className="w-32 h-32 text-white/50" />
+            <div className="aspect-square rounded-2xl shadow-2xl overflow-hidden relative border border-white/20 dark:border-gray-800/50">
+              <div className="absolute inset-0 bg-primary-600/10 mix-blend-overlay z-10"></div>
+              <img 
+                src="/instructor-hero.png" 
+                alt="Tech instructor teaching a coding class" 
+                className="w-full h-full object-cover" 
+              />
             </div>
           </div>
         </div>

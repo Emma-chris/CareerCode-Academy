@@ -112,7 +112,14 @@ export async function updateCourseStatus(id: string, status: string, reviewNotes
 
 export async function getCourseById(id: string): Promise<Course | null> {
   const { rows } = await query<Course>(
-    'SELECT c.*, u.name as instructor_name, u.avatar as instructor_avatar FROM courses c JOIN users u ON c.instructor_id = u.id WHERE c.id = $1',
+    `SELECT c.*, u.name as instructor_name, u.avatar as instructor_avatar,
+            pr.name as program_name, pr.slug as program_slug, pr.icon as program_icon,
+            s.name as school_name, s.slug as school_slug
+     FROM courses c
+     JOIN users u ON c.instructor_id = u.id
+     LEFT JOIN programs pr ON pr.id = c.program_id
+     LEFT JOIN schools s ON s.id = pr.school_id
+     WHERE c.id = $1`,
     [id]
   );
   return rows[0] || null;
@@ -120,7 +127,14 @@ export async function getCourseById(id: string): Promise<Course | null> {
 
 export async function getCourseBySlug(slug: string): Promise<Course | null> {
   const { rows } = await query<Course>(
-    'SELECT c.*, u.name as instructor_name, u.avatar as instructor_avatar FROM courses c JOIN users u ON c.instructor_id = u.id WHERE c.slug = $1',
+    `SELECT c.*, u.name as instructor_name, u.avatar as instructor_avatar,
+            pr.name as program_name, pr.slug as program_slug, pr.icon as program_icon,
+            s.name as school_name, s.slug as school_slug
+     FROM courses c
+     JOIN users u ON c.instructor_id = u.id
+     LEFT JOIN programs pr ON pr.id = c.program_id
+     LEFT JOIN schools s ON s.id = pr.school_id
+     WHERE c.slug = $1`,
     [slug]
   );
   return rows[0] || null;

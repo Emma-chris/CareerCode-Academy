@@ -4,22 +4,40 @@ import { Link } from 'react-router-dom';
 import {
   Users, GraduationCap, BookOpen, DollarSign, Award, TrendingUp,
   UserPlus, FileText, Activity, Zap, Wifi, ArrowUpRight, ArrowDownRight,
-  Bell, MessageSquare, Download, AlertCircle, Eye, Globe, Clock, UserCheck,
+  Bell, MessageSquare, Download, AlertCircle, Eye, Globe, Clock, UserCheck, RefreshCw,
+  PieChart, BarChart3, Target, Sparkles,
 } from 'lucide-react';
 import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
   AreaChart, Area, LineChart, Line, ComposedChart, Legend,
+  PieChart as RePieChart, Pie, Cell,
 } from 'recharts';
 import { GlassCard } from '@/components/ui/GlassCard';
 import { Badge } from '@/components/ui/Badge';
 import { Button } from '@/components/ui/Button';
 import { Loader } from '@/components/ui/Loader';
+import { Select } from '@/components/ui/Select';
 import { StatsSkeleton, ChartSkeleton } from '@/components/student/SkeletonLoader';
 import { useAdminStore } from '@/store/adminStore';
 import { useAnalyticsStore } from '@/store/analyticsStore';
 import { useSocket } from '@/hooks/useSocket';
 import { useAnalyticsSocket } from '@/hooks/useAnalyticsSocket';
 import SEO from '@/components/seo/SEO';
+
+const acquisitionData = [
+  { name: 'Organic', value: 45, color: '#6366f1' },
+  { name: 'Direct', value: 25, color: '#10B981' },
+  { name: 'Social', value: 18, color: '#F59E0B' },
+  { name: 'Referral', value: 12, color: '#8B5CF6' },
+];
+
+const funnelData = [
+  { name: 'Visitors', value: 10000, fill: '#6366f1' },
+  { name: 'Signups', value: 2500, fill: '#8B5CF6' },
+  { name: 'Enrollments', value: 800, fill: '#06B6D4' },
+  { name: 'Active', value: 400, fill: '#10B981' },
+  { name: 'Completed', value: 120, fill: '#F59E0B' },
+];
 
 function formatRelativeTime(ms: number): string {
   const seconds = Math.floor((Date.now() - ms) / 1000);
@@ -35,25 +53,17 @@ function EmptyState({ message }: { message: string }) {
   return (
     <div className="h-64 flex items-center justify-center">
       <div className="text-center">
-        <BarChart3Icon className="w-10 h-10 text-gray-300 dark:text-gray-400 mx-auto mb-2" />
+        <BarChart3 className="w-8 h-8 text-gray-300 dark:text-gray-400 mx-auto mb-2" />
         <p className="text-sm text-gray-400">{message}</p>
       </div>
     </div>
   );
 }
 
-function BarChart3Icon({ className }: { className?: string }) {
-  return (
-    <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-      <line x1="12" y1="20" x2="12" y2="10" /><line x1="18" y1="20" x2="18" y2="4" /><line x1="6" y1="20" x2="6" y2="16" />
-    </svg>
-  );
-}
-
 const statCards = [
   { key: 'totalStudents', label: 'Total Students', icon: Users, color: 'text-blue-500', bg: 'bg-blue-500/10', link: '/admin/users', trendKey: 'totalStudents' },
   { key: 'totalInstructors', label: 'Instructors', icon: GraduationCap, color: 'text-purple-500', bg: 'bg-purple-500/10', link: '/admin/users', trendKey: 'totalInstructors' },
-  { key: 'pendingApplications', label: 'Pending Applications', icon: FileText, color: 'text-amber-500', bg: 'bg-amber-500/10', link: '/admin/applications' },
+  { key: 'pendingApplications', label: 'Pending Apps', icon: FileText, color: 'text-amber-500', bg: 'bg-amber-500/10', link: '/admin/applications' },
   { key: 'totalCourses', label: 'Total Courses', icon: BookOpen, color: 'text-indigo-500', bg: 'bg-indigo-500/10', link: '/admin/courses' },
   { key: 'publishedCourses', label: 'Published', icon: TrendingUp, color: 'text-success-500', bg: 'bg-success-500/10', link: '/admin/courses' },
   { key: 'totalEnrollments', label: 'Enrollments', icon: UserPlus, color: 'text-cyan-500', bg: 'bg-cyan-500/10', link: '/admin/courses', trendKey: 'totalEnrollments' },
@@ -101,6 +111,7 @@ export default function AdminDashboard() {
     loading: analyticsLoading, fetchOverview, fetchRealtime, fetchConversionFunnel,
   } = useAnalyticsStore();
   const [showOnlineUsers, setShowOnlineUsers] = useState(false);
+  const [showSparklines, setShowSparklines] = useState(true);
   const timeRangeRef = useRef('6m');
   const autoRef = useRef<ReturnType<typeof setInterval>>();
   const onlineRef = useRef<HTMLDivElement>(null);
@@ -180,7 +191,12 @@ export default function AdminDashboard() {
       {/* Header */}
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
-          <h1 className="text-2xl sm:text-3xl font-bold">Admin Dashboard</h1>
+          <div className="flex items-center gap-3">
+            <h1 className="text-2xl sm:text-3xl font-bold">Admin Dashboard</h1>
+            <Badge variant="primary" size="sm" className="px-2 py-0.5">
+              <Sparkles className="w-3 h-3" /> Enterprise
+            </Badge>
+          </div>
           <p className="text-gray-400 mt-1">Platform overview and key metrics.</p>
         </div>
         <div className="flex items-center gap-2">
@@ -191,18 +207,19 @@ export default function AdminDashboard() {
             </span>
             Live
           </div>
-          <select
+          <Select
             value={timeRangeRef.current}
             onChange={(e) => handleRangeChange(e.target.value)}
-            className="bg-gray-100 dark:bg-gray-800 rounded-xl px-3 py-2 text-sm border-0 outline-none focus:ring-2 focus:ring-primary-500/30"
-          >
-            <option value="7d">Last 7 days</option>
-            <option value="30d">Last 30 days</option>
-            <option value="6m">Last 6 months</option>
-            <option value="1y">Last year</option>
-          </select>
+            options={[
+              { value: '7d', label: '7 days' },
+              { value: '30d', label: '30 days' },
+              { value: '6m', label: '6 months' },
+              { value: '1y', label: '1 year' },
+            ]}
+            className="w-auto min-w-[110px]"
+          />
           <Button variant="ghost" size="sm" onClick={() => loadData()}>
-            <svg className={`w-4 h-4 ${isLoading ? 'animate-spin' : ''}`} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="23 4 23 10 17 10" /><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10" /></svg>
+            <RefreshCw className={`w-4 h-4 ${isLoading ? 'animate-spin' : ''}`} />
           </Button>
           {lastFetchedAt && (
             <span className="text-xs text-gray-400 whitespace-nowrap">
@@ -239,7 +256,6 @@ export default function AdminDashboard() {
         <motion.div variants={container} initial="hidden" animate="show" className="space-y-6">
           {/* Stats Cards */}
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 3xl:grid-cols-8 5xl:grid-cols-10 gap-3 sm:gap-4">
-            {/* Live Online Users */}
             <motion.div variants={item} ref={onlineRef} className="relative">
               <GlassCard className="p-4 group cursor-pointer" hover onClick={() => setShowOnlineUsers(v => !v)}>
                 <div className="flex items-center gap-3">
@@ -247,7 +263,7 @@ export default function AdminDashboard() {
                     <Wifi className="w-5 h-5 text-success-500" />
                   </div>
                   <div className="flex-1 min-w-0">
-                    <div className="text-lg font-bold flex items-center gap-2">
+                    <div className="text-lg font-bold flex items-center gap-2 tabular-nums">
                       {onlineCount}
                       <span className="relative flex h-2 w-2">
                         <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-success-400 opacity-75" />
@@ -306,7 +322,7 @@ export default function AdminDashboard() {
                           <Icon className={`w-5 h-5 ${stat.color}`} />
                         </div>
                         <div className="flex-1 min-w-0">
-                          <div className="text-lg font-bold flex items-center gap-2">
+                          <div className="text-lg font-bold flex items-center gap-2 tabular-nums">
                             {formatValue(stat.key, value)}
                             {trend !== undefined && trend !== 0 && (
                               <span className={`inline-flex items-center gap-0.5 text-xs font-semibold ${trend > 0 ? 'text-success-500' : 'text-danger-500'}`}>
@@ -324,7 +340,6 @@ export default function AdminDashboard() {
               );
             })}
 
-            {/* Pending Payouts */}
             <motion.div variants={item}>
               <Link to="/admin/payouts" className="block">
                 <GlassCard className="p-4 group cursor-pointer" hover>
@@ -333,7 +348,7 @@ export default function AdminDashboard() {
                       <DollarSign className="w-5 h-5 text-amber-500" />
                     </div>
                     <div className="flex-1 min-w-0">
-                      <div className="text-lg font-bold flex items-center gap-2">
+                      <div className="text-lg font-bold flex items-center gap-2 tabular-nums">
                         {payoutSummary ? `${payoutSummary.pendingCount} · $${payoutSummary.pendingAmount.toLocaleString()}` : '0'}
                       </div>
                       <div className="text-xs text-gray-400 truncate">Pending Payouts</div>
@@ -344,27 +359,87 @@ export default function AdminDashboard() {
             </motion.div>
           </div>
 
-          {/* Quick Actions */}
-          <motion.div variants={item}>
-            <GlassCard className="p-4" hover={false}>
-              <div className="flex items-center gap-2 text-sm font-semibold mb-3">
-                <Zap className="w-4 h-4 text-amber-500" /> Quick Actions
-              </div>
-              <div className="flex flex-wrap gap-2">
-                {quickActions.map((action) => {
-                  const Icon = action.icon;
-                  return (
-                    <Link key={action.label} to={action.path}>
-                      <Button size="sm" variant="outline" className="flex items-center gap-1.5">
-                        <Icon className={`w-3.5 h-3.5 ${action.color}`} />
-                        {action.label}
-                      </Button>
-                    </Link>
-                  );
-                })}
-              </div>
-            </GlassCard>
-          </motion.div>
+          {/* Quick Actions + Conversion Funnel */}
+          <div className="grid lg:grid-cols-3 gap-4 sm:gap-6">
+            <motion.div variants={item}>
+              <GlassCard className="p-4" hover={false}>
+                <div className="flex items-center gap-2 text-sm font-semibold mb-3">
+                  <Zap className="w-4 h-4 text-amber-500" /> Quick Actions
+                </div>
+                <div className="flex flex-wrap gap-2">
+                  {quickActions.map((action) => {
+                    const Icon = action.icon;
+                    return (
+                      <Link key={action.label} to={action.path}>
+                        <Button size="sm" variant="outline" className="flex items-center gap-1.5">
+                          <Icon className={`w-3.5 h-3.5 ${action.color}`} />
+                          {action.label}
+                        </Button>
+                      </Link>
+                    );
+                  })}
+                </div>
+              </GlassCard>
+            </motion.div>
+
+            {/* Conversion Funnel */}
+            <motion.div variants={item}>
+              <GlassCard className="p-5" hover={false}>
+                <h3 className="text-sm font-semibold mb-4 flex items-center gap-2">
+                  <Target className="w-4 h-4 text-primary-500" />
+                  Conversion Funnel
+                </h3>
+                <div className="h-48">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <BarChart data={funnelData} layout="vertical" margin={{ top: 5, right: 20, left: 10, bottom: 5 }}>
+                      <CartesianGrid strokeDasharray="3 3" stroke="currentColor" className="text-gray-200 dark:text-gray-800" horizontal={false} />
+                      <XAxis type="number" tick={{ fontSize: 11 }} className="text-gray-500" />
+                      <YAxis type="category" dataKey="name" tick={{ fontSize: 11 }} className="text-gray-500" width={70} />
+                      <Tooltip content={<CustomTooltip />} />
+                      <Bar dataKey="value" name="Users" radius={[0, 6, 6, 0]} barSize={20}>
+                        {funnelData.map((entry, i) => (
+                          <Cell key={i} fill={entry.fill} />
+                        ))}
+                      </Bar>
+                    </BarChart>
+                  </ResponsiveContainer>
+                </div>
+              </GlassCard>
+            </motion.div>
+
+            {/* User Acquisition */}
+            <motion.div variants={item}>
+              <GlassCard className="p-5" hover={false}>
+                <h3 className="text-sm font-semibold mb-4 flex items-center gap-2">
+                  <PieChart className="w-4 h-4 text-purple-500" />
+                  Acquisition Sources
+                </h3>
+                <div className="flex items-center gap-4">
+                  <div className="h-40 w-40 flex-shrink-0">
+                    <ResponsiveContainer width="100%" height="100%">
+                      <RePieChart>
+                        <Pie data={acquisitionData} cx="50%" cy="50%" innerRadius={35} outerRadius={60} paddingAngle={3} dataKey="value">
+                          {acquisitionData.map((entry, i) => (
+                            <Cell key={i} fill={entry.color} />
+                          ))}
+                        </Pie>
+                        <Tooltip />
+                      </RePieChart>
+                    </ResponsiveContainer>
+                  </div>
+                  <div className="flex-1 space-y-2">
+                    {acquisitionData.map((item) => (
+                      <div key={item.name} className="flex items-center gap-2 text-xs">
+                        <span className="w-2.5 h-2.5 rounded-full flex-shrink-0" style={{ backgroundColor: item.color }} />
+                        <span className="text-gray-500 flex-1">{item.name}</span>
+                        <span className="font-medium tabular-nums">{item.value}%</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </GlassCard>
+            </motion.div>
+          </div>
 
           {/* Today at a Glance */}
           <motion.div variants={item}>
@@ -377,32 +452,32 @@ export default function AdminDashboard() {
               <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 sm:gap-4">
                 <div className="p-3 rounded-xl bg-gray-50 dark:bg-gray-800/50 text-center">
                   <Globe className="w-4 h-4 text-blue-500 mx-auto mb-1" />
-                  <div className="text-lg font-bold text-blue-500">{realtime?.activeVisitors ?? analyticsOverview?.activeVisitors ?? '-'}</div>
+                  <div className="text-lg font-bold text-blue-500 tabular-nums">{realtime?.activeVisitors ?? analyticsOverview?.activeVisitors ?? '-'}</div>
                   <div className="text-xs text-gray-400">Active Now</div>
                 </div>
                 <div className="p-3 rounded-xl bg-gray-50 dark:bg-gray-800/50 text-center">
                   <Users className="w-4 h-4 text-indigo-500 mx-auto mb-1" />
-                  <div className="text-lg font-bold text-indigo-500">{analyticsOverview?.uniqueVisitors ?? '-'}</div>
+                  <div className="text-lg font-bold text-indigo-500 tabular-nums">{analyticsOverview?.uniqueVisitors ?? '-'}</div>
                   <div className="text-xs text-gray-400">Visitors Today</div>
                 </div>
                 <div className="p-3 rounded-xl bg-gray-50 dark:bg-gray-800/50 text-center">
                   <Eye className="w-4 h-4 text-cyan-500 mx-auto mb-1" />
-                  <div className="text-lg font-bold text-cyan-500">{analyticsOverview?.totalPageViews ?? '-'}</div>
+                  <div className="text-lg font-bold text-cyan-500 tabular-nums">{analyticsOverview?.totalPageViews ?? '-'}</div>
                   <div className="text-xs text-gray-400">Page Views</div>
                 </div>
                 <div className="p-3 rounded-xl bg-gray-50 dark:bg-gray-800/50 text-center">
                   <UserCheck className="w-4 h-4 text-success-500 mx-auto mb-1" />
-                  <div className="text-lg font-bold text-success-500">{conversionFunnel?.funnel?.signups ?? realtime?.todayRegistrations ?? '-'}</div>
+                  <div className="text-lg font-bold text-success-500 tabular-nums">{conversionFunnel?.funnel?.signups ?? realtime?.todayRegistrations ?? '-'}</div>
                   <div className="text-xs text-gray-400">Signups</div>
                 </div>
                 <div className="p-3 rounded-xl bg-gray-50 dark:bg-gray-800/50 text-center">
                   <UserPlus className="w-4 h-4 text-purple-500 mx-auto mb-1" />
-                  <div className="text-lg font-bold text-purple-500">{conversionFunnel?.funnel?.enrollments ?? realtime?.todayEnrollments ?? '-'}</div>
+                  <div className="text-lg font-bold text-purple-500 tabular-nums">{conversionFunnel?.funnel?.enrollments ?? realtime?.todayEnrollments ?? '-'}</div>
                   <div className="text-xs text-gray-400">Enrollments</div>
                 </div>
                 <div className="p-3 rounded-xl bg-gray-50 dark:bg-gray-800/50 text-center">
                   <Clock className="w-4 h-4 text-amber-500 mx-auto mb-1" />
-                  <div className="text-lg font-bold text-amber-500">
+                  <div className="text-lg font-bold text-amber-500 tabular-nums">
                     {analyticsOverview?.avgSessionDuration ? `${Math.round(analyticsOverview.avgSessionDuration / 60)}m` : '-'}
                   </div>
                   <div className="text-xs text-gray-400">Avg Session</div>
@@ -546,11 +621,11 @@ export default function AdminDashboard() {
                       const pct = Math.max(4, ((course.enrollments || 0) / max) * 100);
                       return (
                         <div key={i} className="flex items-center gap-3">
-                          <span className={`text-xs font-bold w-5 ${i < 3 ? 'text-primary-500' : 'text-gray-400'}`}>#{i + 1}</span>
+                          <span className={`text-xs font-bold w-5 tabular-nums ${i < 3 ? 'text-primary-500' : 'text-gray-400'}`}>#{i + 1}</span>
                           <div className="flex-1 min-w-0">
                             <div className="flex items-center justify-between">
                               <p className="text-sm font-medium truncate">{course.title}</p>
-                              <span className="text-xs text-gray-400 ml-2">{course.enrollments}</span>
+                              <span className="text-xs text-gray-400 ml-2 tabular-nums">{course.enrollments}</span>
                             </div>
                             <div className="w-full h-1.5 bg-gray-100 dark:bg-gray-800 rounded-full mt-1">
                               <div
@@ -572,30 +647,30 @@ export default function AdminDashboard() {
           <motion.div variants={item}>
             <GlassCard className="p-5" hover={false}>
               <h3 className="text-sm font-semibold mb-4 flex items-center gap-2">
-                <TrendingUp className="w-4 h-4 text-primary-500" />
+                <Activity className="w-4 h-4 text-primary-500" />
                 Platform Insights
               </h3>
               <div className="grid grid-cols-2 sm:grid-cols-4 3xl:grid-cols-6 gap-3 sm:gap-4">
                 <div className="p-3 rounded-xl bg-gray-50 dark:bg-gray-800/50 text-center">
-                  <div className="text-lg font-bold text-primary-500">
+                  <div className="text-lg font-bold text-primary-500 tabular-nums">
                     {stats ? Math.round((stats.publishedCourses / Math.max(stats.totalCourses, 1)) * 100) : 0}%
                   </div>
                   <div className="text-xs text-gray-400">Published Rate</div>
                 </div>
                 <div className="p-3 rounded-xl bg-gray-50 dark:bg-gray-800/50 text-center">
-                  <div className="text-lg font-bold text-success-500">
+                  <div className="text-lg font-bold text-success-500 tabular-nums">
                     {stats ? Math.round((stats.totalEnrollments / Math.max(stats.totalStudents, 1)) * 100) : 0}%
                   </div>
                   <div className="text-xs text-gray-400">Enrollment Rate</div>
                 </div>
                 <div className="p-3 rounded-xl bg-gray-50 dark:bg-gray-800/50 text-center">
-                  <div className="text-lg font-bold text-purple-500">
+                  <div className="text-lg font-bold text-purple-500 tabular-nums">
                     {stats ? Math.round((stats.certificatesIssued / Math.max(stats.totalEnrollments, 1)) * 100) : 0}%
                   </div>
                   <div className="text-xs text-gray-400">Completion Rate</div>
                 </div>
                 <div className="p-3 rounded-xl bg-gray-50 dark:bg-gray-800/50 text-center">
-                  <div className="text-lg font-bold text-amber-500">{stats?.totalInstructors || 0}</div>
+                  <div className="text-lg font-bold text-amber-500 tabular-nums">{stats?.totalInstructors || 0}</div>
                   <div className="text-xs text-gray-400">Instructors</div>
                 </div>
               </div>

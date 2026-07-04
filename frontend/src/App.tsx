@@ -8,10 +8,36 @@ import api from '@/lib/axios';
 import { OnboardingProvider } from '@/guides/OnboardingContext';
 import { OnboardingModal } from '@/guides/OnboardingModal';
 import { AnalyticsTracker } from '@/hooks/useAnalyticsTracker';
+import { ScrollToTop, ErrorBoundary } from '@/components/ui';
+
+function PageSkeleton() {
+  return (
+    <div className="min-h-[60vh] flex items-center justify-center p-8">
+      <div className="w-full max-w-4xl space-y-6">
+        <div className="relative overflow-hidden h-10 w-64 rounded-xl bg-gray-200 dark:bg-gray-700">
+          <div className="absolute inset-0 shimmer" />
+        </div>
+        <div className="relative overflow-hidden h-5 w-96 rounded-lg bg-gray-200 dark:bg-gray-700">
+          <div className="absolute inset-0 shimmer" />
+        </div>
+        <div className="grid grid-cols-3 gap-4">
+          {[1, 2, 3].map((i) => (
+            <div key={i} className="relative overflow-hidden h-48 rounded-2xl bg-gray-200 dark:bg-gray-700">
+              <div className="absolute inset-0 shimmer" />
+            </div>
+          ))}
+        </div>
+        <div className="relative overflow-hidden h-32 rounded-2xl bg-gray-200 dark:bg-gray-700">
+          <div className="absolute inset-0 shimmer" />
+        </div>
+      </div>
+    </div>
+  );
+}
 
 function SuspenseWrapper({ children }: { children: React.ReactNode }) {
   return (
-    <Suspense fallback={<div className="min-h-screen flex items-center justify-center"><Loader text="Loading..." /></div>}>
+    <Suspense fallback={<PageSkeleton />}>
       {children}
     </Suspense>
   );
@@ -28,10 +54,12 @@ const BlogPost = lazy(() => import('@/pages/BlogPost'));
 const Contact = lazy(() => import('@/pages/Contact'));
 const Pricing = lazy(() => import('@/pages/Pricing'));
 const Community = lazy(() => import('@/pages/Community'));
+const CommunityDetail = lazy(() => import('@/pages/CommunityDetail'));
 const Login = lazy(() => import('@/pages/Login'));
 const Signup = lazy(() => import('@/pages/Signup'));
 const ForgotPassword = lazy(() => import('@/pages/ForgotPassword'));
 const ResetPassword = lazy(() => import('@/pages/ResetPassword'));
+const SetPassword = lazy(() => import('@/pages/SetPassword'));
 const VerifyEmail = lazy(() => import('@/pages/VerifyEmail'));
 const VerifyPending = lazy(() => import('@/pages/VerifyPending'));
 const Verified = lazy(() => import('@/pages/Verified'));
@@ -42,6 +70,13 @@ const Apply = lazy(() => import('@/pages/Apply'));
 const NotFound = lazy(() => import('@/pages/NotFound'));
 const VerifyPayment = lazy(() => import('@/pages/VerifyPayment'));
 const VerifyCertificate = lazy(() => import('@/pages/public/VerifyCertificate'));
+const Schools = lazy(() => import('@/pages/public/Schools'));
+const SchoolDetail = lazy(() => import('@/pages/public/SchoolDetail'));
+const ProgramDetail = lazy(() => import('@/pages/public/ProgramDetail'));
+const CareerCenter = lazy(() => import('@/pages/public/CareerCenter'));
+const JobBoard = lazy(() => import('@/pages/public/JobBoard'));
+const InternshipsPage = lazy(() => import('@/pages/public/InternshipsPage'));
+const AlumniDirectory = lazy(() => import('@/pages/public/AlumniDirectory'));
 const FAQ = lazy(() => import('@/pages/FAQ'));
 const Careers = lazy(() => import('@/pages/Careers'));
 const Partners = lazy(() => import('@/pages/Partners'));
@@ -73,6 +108,7 @@ const StudentExamResults = lazy(() => import('@/pages/student/ExamResults'));
 const StudentChallenges = lazy(() => import('@/pages/student/Challenges'));
 const StudentRoadmap = lazy(() => import('@/pages/student/Roadmap'));
 const StudentStudyPlans = lazy(() => import('@/pages/student/StudyPlans'));
+const StudentMentorship = lazy(() => import('@/pages/student/Mentorship'));
 
 // Instructor pages
 const InstructorDashboard = lazy(() => import('@/pages/instructor/Dashboard'));
@@ -90,6 +126,7 @@ const InstructorCourseProposals = lazy(() => import('@/pages/instructor/CoursePr
 const InstructorQuizzes = lazy(() => import('@/pages/instructor/Quizzes'));
 const InstructorPayouts = lazy(() => import('@/pages/instructor/Payouts'));
 const InstructorProfile = lazy(() => import('@/pages/instructor/Profile'));
+const InstructorMentorship = lazy(() => import('@/pages/instructor/Mentorship'));
 
 // Admin pages
 const AdminDashboard = lazy(() => import('@/pages/admin/Dashboard'));
@@ -113,6 +150,7 @@ const AdminMessages = lazy(() => import('@/pages/admin/Messages'));
 const AdminPayouts = lazy(() => import('@/pages/admin/Payouts'));
 const AdminManagement = lazy(() => import('@/pages/admin/AdminManagement'));
 const AdminCalendar = lazy(() => import('@/pages/admin/Calendar'));
+const AdminVideos = lazy(() => import('@/pages/admin/Videos'));
 
 function GuestRoute({ children }: { children: React.ReactNode }) {
   const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
@@ -163,10 +201,14 @@ function App() {
   return (
     <OnboardingProvider>
       <AnalyticsTracker />
+      <ScrollToTop />
       <Routes>
-        <Route element={<MainLayout />}>
+        <Route element={<ErrorBoundary><MainLayout /></ErrorBoundary>}>
           <Route path="/" element={<GuestRoute><SuspenseWrapper><Home /></SuspenseWrapper></GuestRoute>} />
           <Route path="/about" element={<SuspenseWrapper><About /></SuspenseWrapper>} />
+          <Route path="/schools" element={<SuspenseWrapper><Schools /></SuspenseWrapper>} />
+          <Route path="/schools/:slug" element={<SuspenseWrapper><SchoolDetail /></SuspenseWrapper>} />
+          <Route path="/schools/programs/:slug" element={<SuspenseWrapper><ProgramDetail /></SuspenseWrapper>} />
           <Route path="/courses" element={<SuspenseWrapper><Courses /></SuspenseWrapper>} />
           <Route path="/courses/:slug" element={<SuspenseWrapper><CourseDetails /></SuspenseWrapper>} />
           <Route path="/blog" element={<SuspenseWrapper><Blog /></SuspenseWrapper>} />
@@ -174,10 +216,12 @@ function App() {
           <Route path="/contact" element={<SuspenseWrapper><Contact /></SuspenseWrapper>} />
           <Route path="/pricing" element={<SuspenseWrapper><Pricing /></SuspenseWrapper>} />
           <Route path="/community" element={<SuspenseWrapper><Community /></SuspenseWrapper>} />
+          <Route path="/community/:id" element={<SuspenseWrapper><CommunityDetail /></SuspenseWrapper>} />
           <Route path="/login" element={<SuspenseWrapper><Login /></SuspenseWrapper>} />
           <Route path="/signup" element={<SuspenseWrapper><Signup /></SuspenseWrapper>} />
           <Route path="/forgot-password" element={<SuspenseWrapper><ForgotPassword /></SuspenseWrapper>} />
           <Route path="/reset-password/:token" element={<SuspenseWrapper><ResetPassword /></SuspenseWrapper>} />
+          <Route path="/auth/set-password/:token" element={<SuspenseWrapper><SetPassword /></SuspenseWrapper>} />
           <Route path="/verify-email/:token" element={<SuspenseWrapper><VerifyEmail /></SuspenseWrapper>} />
           <Route path="/auth/verify-pending" element={<SuspenseWrapper><VerifyPending /></SuspenseWrapper>} />
           <Route path="/auth/verified" element={<SuspenseWrapper><Verified /></SuspenseWrapper>} />
@@ -188,6 +232,10 @@ function App() {
           <Route path="/verify-payment" element={<SuspenseWrapper><VerifyPayment /></SuspenseWrapper>} />
           <Route path="/verify-certificate" element={<SuspenseWrapper><VerifyCertificate /></SuspenseWrapper>} />
           <Route path="/checkout" element={<SuspenseWrapper><Checkout /></SuspenseWrapper>} />
+          <Route path="/career" element={<SuspenseWrapper><CareerCenter /></SuspenseWrapper>} />
+          <Route path="/career/jobs" element={<SuspenseWrapper><JobBoard /></SuspenseWrapper>} />
+          <Route path="/career/internships" element={<SuspenseWrapper><InternshipsPage /></SuspenseWrapper>} />
+          <Route path="/career/alumni" element={<SuspenseWrapper><AlumniDirectory /></SuspenseWrapper>} />
           <Route path="/faq" element={<SuspenseWrapper><FAQ /></SuspenseWrapper>} />
           <Route path="/careers" element={<SuspenseWrapper><Careers /></SuspenseWrapper>} />
           <Route path="/partners" element={<SuspenseWrapper><Partners /></SuspenseWrapper>} />
@@ -221,6 +269,7 @@ function App() {
           <Route path="study-plans" element={<SuspenseWrapper><StudentStudyPlans /></SuspenseWrapper>} />
           <Route path="profile" element={<SuspenseWrapper><StudentProfile /></SuspenseWrapper>} />
           <Route path="settings" element={<SuspenseWrapper><StudentSettings /></SuspenseWrapper>} />
+          <Route path="mentoring" element={<SuspenseWrapper><StudentMentorship /></SuspenseWrapper>} />
         </Route>
 
         <Route path="/instructor" element={<DashboardLayout requiredRole="instructor" />}>
@@ -243,6 +292,7 @@ function App() {
           <Route path="exams/:examId" element={<SuspenseWrapper><AdminExams /></SuspenseWrapper>} />
           <Route path="exams/monitor" element={<SuspenseWrapper><AdminExamMonitor /></SuspenseWrapper>} />
           <Route path="profile" element={<SuspenseWrapper><InstructorProfile /></SuspenseWrapper>} />
+          <Route path="mentoring" element={<SuspenseWrapper><InstructorMentorship /></SuspenseWrapper>} />
         </Route>
 
         <Route path="/admin" element={<DashboardLayout requiredRole="admin" />}>
@@ -266,6 +316,7 @@ function App() {
           <Route path="admin-management" element={<SuspenseWrapper><AdminManagement /></SuspenseWrapper>} />
           <Route path="analytics" element={<SuspenseWrapper><AdminAnalytics /></SuspenseWrapper>} />
           <Route path="calendar" element={<SuspenseWrapper><AdminCalendar /></SuspenseWrapper>} />
+          <Route path="videos" element={<SuspenseWrapper><AdminVideos /></SuspenseWrapper>} />
           <Route path="settings" element={<SuspenseWrapper><AdminSettings /></SuspenseWrapper>} />
         </Route>
 

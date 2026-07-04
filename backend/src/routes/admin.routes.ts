@@ -11,6 +11,7 @@ import * as CertificateTemplateModel from '../models/certificateTemplate';
 import * as ExamModel from '../models/exam';
 import * as ExamProctoringModel from '../models/examProctoring';
 import { query } from '../config/db';
+import { io, emitDashboardUpdate } from '../config/socket';
 import bcrypt from 'bcryptjs';
 import crypto from 'crypto';
 import { sendInstructorApprovalEmail, sendInstructorUpgradeEmail, slugify } from '../utils/helpers';
@@ -20,6 +21,7 @@ import { logAudit } from '../middleware/audit';
 import { uploadSingle } from '../middleware/upload';
 import { syncLearningPathForCourse } from '../models/learningPath';
 import * as AnalyticsService from '../services/analytics.service';
+import messageRoutes from './message.routes';
 
 const adminCreateCourseSchema = z.object({
   title: z.string().min(3).max(200),
@@ -53,6 +55,8 @@ const router = Router();
 
 // All admin routes require admin role
 router.use(authenticate, authorize('admin', 'super_admin'));
+
+router.use('/messages', messageRoutes);
 
 // GET /admin/dashboard
 router.get('/dashboard', async (req: Request, res: Response, next: NextFunction) => {

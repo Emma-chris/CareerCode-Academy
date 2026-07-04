@@ -25,7 +25,7 @@ router.post('/chat', authenticate, async (req: AuthRequest, res: Response, next:
         success: true,
         data: {
           role: 'assistant',
-          content: `Hi ${user?.firstName || 'there'}! I am your AI Study Assistant.\n\nCurrently, I'm running in **Demo Mode** because the \`CLOUDFLARE_AI_TOKEN\` has not been configured in the backend \`.env\` file.\n\n*Admin note: Configure CLOUDFLARE_AI_TOKEN to enable real-time Llama-3.1-8b-instruct!*`
+          content: `Hi ${(user as any)?.firstName || 'there'}! I am your AI Study Assistant.\n\nCurrently, I'm running in **Demo Mode** because the \`CLOUDFLARE_AI_TOKEN\` has not been configured in the backend \`.env\` file.\n\n*Admin note: Configure CLOUDFLARE_AI_TOKEN to enable real-time Llama-3.1-8b-instruct!*`
         }
       });
     }
@@ -43,7 +43,7 @@ router.post('/chat', authenticate, async (req: AuthRequest, res: Response, next:
       {
         role: 'system',
         content: `You are an elite, highly encouraging, and brilliant coding mentor for CareerCode Academy. 
-Your student's name is ${user?.firstName || 'Developer'}. Address them warmly.
+Your student's name is ${(user as any)?.firstName || 'Developer'}. Address them warmly.
 Rules:
 1. Always format your responses beautifully using Markdown.
 2. Keep your explanations concise, deep, and easy to understand.

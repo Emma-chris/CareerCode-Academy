@@ -13,6 +13,7 @@ import {
   GraduationCap,
   DollarSign,
   Bell,
+  Target,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
@@ -20,15 +21,15 @@ const roleLinks: Record<string, { label: string; path: string; icon: any }[]> = 
   student: [
     { label: 'Dashboard', path: '/student/dashboard', icon: LayoutDashboard },
     { label: 'Courses', path: '/student/courses', icon: BookOpen },
-    { label: 'Assignments', path: '/student/assignments', icon: ClipboardList },
+    { label: 'Mentorship', path: '/student/mentoring', icon: Target },
     { label: 'Leaderboard', path: '/student/leaderboard', icon: Trophy },
     { label: 'Profile', path: '/student/profile', icon: User },
   ],
   instructor: [
     { label: 'Dashboard', path: '/instructor/dashboard', icon: LayoutDashboard },
     { label: 'Courses', path: '/instructor/courses', icon: BookOpen },
+    { label: 'Mentorship', path: '/instructor/mentoring', icon: Target },
     { label: 'Students', path: '/instructor/students', icon: Users },
-    { label: 'Schedule', path: '/instructor/schedule', icon: Calendar },
     { label: 'Messages', path: '/instructor/messages', icon: MessageSquare },
   ],
   admin: [

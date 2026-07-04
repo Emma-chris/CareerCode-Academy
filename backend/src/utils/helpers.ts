@@ -197,20 +197,52 @@ export function calculateProgress(totalLessons: number, completedLessons: number
   return Math.round((completedLessons / totalLessons) * 100);
 }
 
-export async function sendInstructorApprovalEmail(email: string, name: string, tempPassword: string): Promise<void> {
-  const loginUrl = `${process.env.FRONTEND_URL}/login`;
+export async function sendInstructorApprovalEmail(email: string, name: string, setupToken: string): Promise<void> {
+  const setupUrl = `${process.env.FRONTEND_URL}/auth/set-password/${setupToken}`;
   await sendMail({
     to: email,
-    subject: 'Welcome to CareerCode Academy - Instructor Application Approved!',
+    subject: 'CareerCode Academy - Your Instructor Account is Ready!',
     html: `
-      <h1>Congratulations, ${name}!</h1>
-      <p>Your application to become an instructor has been approved.</p>
-      <p>We've created an account for you. You can log in using the following temporary credentials:</p>
-      <p><strong>Email:</strong> ${email}</p>
-      <p><strong>Password:</strong> ${tempPassword}</p>
-      <br />
-      <a href="${loginUrl}" style="display:inline-block;padding:12px 24px;background:#4f46e5;color:#fff;text-decoration:none;border-radius:6px;">Log in to Instructor Dashboard</a>
-      <p>Please log in and change your password immediately from your profile settings.</p>
+      <!DOCTYPE html>
+      <html>
+      <head><meta charset="utf-8"></head>
+      <body style="margin:0;padding:0;background:#f4f4f6;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;">
+        <table width="100%" cellpadding="0" cellspacing="0" style="background:#f4f4f6;padding:40px 20px;">
+          <tr><td align="center">
+            <table width="600" cellpadding="0" cellspacing="0" style="background:#ffffff;border-radius:16px;overflow:hidden;box-shadow:0 4px 24px rgba(0,0,0,0.06);">
+              <tr><td style="background:linear-gradient(135deg,#4f46e5,#7c3aed);padding:32px 40px;text-align:center;">
+                <h1 style="color:#ffffff;margin:0;font-size:24px;font-weight:700;">Congratulations, ${name}!</h1>
+                <p style="color:rgba(255,255,255,0.85);margin:8px 0 0;font-size:14px;">Your instructor application has been approved</p>
+              </td></tr>
+              <tr><td style="padding:40px;">
+                <h2 style="color:#1e293b;font-size:20px;margin:0 0 8px;">Your Instructor Account is Ready</h2>
+                <p style="color:#64748b;font-size:15px;line-height:1.6;margin:0 0 24px;">
+                  We're excited to have you as part of the instructor community at CareerCode Academy.
+                  Click the button below to set your password and access your Instructor Dashboard.
+                </p>
+                <table cellpadding="0" cellspacing="0" style="margin:0 auto 24px;">
+                  <tr><td align="center">
+                    <a href="${setupUrl}" style="display:inline-block;padding:14px 36px;background:linear-gradient(135deg,#4f46e5,#7c3aed);color:#ffffff;text-decoration:none;border-radius:8px;font-size:15px;font-weight:600;">Set Your Password</a>
+                  </td></tr>
+                </table>
+                <p style="color:#64748b;font-size:14px;line-height:1.6;margin:0 0 8px;text-align:center;">
+                  Or copy this URL: <br/>
+                  <a href="${setupUrl}" style="color:#4f46e5;word-break:break-all;">${setupUrl}</a>
+                </p>
+                <p style="color:#94a3b8;font-size:13px;margin:24px 0 0;text-align:center;">
+                  This link expires in <strong>24 hours</strong>. If you did not apply to become an instructor, please ignore this email.
+                </p>
+              </td></tr>
+              <tr><td style="background:#f8fafc;padding:20px 40px;text-align:center;border-top:1px solid #e2e8f0;">
+                <p style="color:#94a3b8;font-size:12px;margin:0;">
+                  &copy; 2024 CareerCode Academy. All rights reserved.
+                </p>
+              </td></tr>
+            </table>
+          </td></tr>
+        </table>
+      </body>
+      </html>
     `,
   });
 }
