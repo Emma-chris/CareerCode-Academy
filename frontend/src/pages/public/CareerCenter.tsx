@@ -86,7 +86,7 @@ export default function CareerCenter() {
           </motion.div>
 
           {loading ? (
-            <div className="flex justify-center py-20"><Loader size="lg" text="Loading..." /></div>
+            <div className="flex justify-center py-20"><Loader size="lg" /></div>
           ) : (
             <>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-12">

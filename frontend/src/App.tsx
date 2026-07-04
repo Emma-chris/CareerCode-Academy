@@ -186,7 +186,7 @@ function App() {
   if (!initialized || !backendReady) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <Loader text="Loading..." />
+        <Loader />
       </div>
     );
   }
