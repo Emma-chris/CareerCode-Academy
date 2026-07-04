@@ -9,8 +9,10 @@ import {
   Send, User as UserIcon, Search, Loader2, Trash2, X,
   PlusCircle, CheckCheck, Reply, Smile, MessageSquare,
   Users, GraduationCap, Shield, ChevronDown, Check,
-  Clock, Filter,
+  Clock, Filter, Paperclip, Image as ImageIcon, FileText,
 } from 'lucide-react';
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
 
 const EMOJIS = ['😀','😂','😍','🥰','😎','🤔','👍','👎','🎉','❤️','🔥','💯','🙌','🚀','✨','💡','📚','🎓','✅','⭐'];
 
@@ -103,12 +105,14 @@ export function ChatView({
   const [quoteMsg, setQuoteMsg] = useState<{ id: string; content: string; sender: string } | null>(null);
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
   const [showScrollBtn, setShowScrollBtn] = useState(false);
+  const [attachment, setAttachment] = useState<File | null>(null);
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const messagesContainerRef = useRef<HTMLDivElement>(null);
   const typingTimeout = useRef<ReturnType<typeof setTimeout>>();
   const emojiRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     setApiPrefix(apiPrefix);
@@ -198,14 +202,27 @@ export function ChatView({
   };
 
   const handleSend = async () => {
-    const content = input.trim();
-    if (!content || !activeConversation) return;
-    let finalContent = content;
-    if (quoteMsg) finalContent = `> ${quoteMsg.content}\n\n${content}`;
-    await sendMessage(activeConversation, finalContent);
+    if ((!input.trim() && !attachment) || !activeConversation) return;
+    
+    let contentToSend = input;
+    if (quoteMsg) {
+      contentToSend = `> **${quoteMsg.sender}**:\n> ${quoteMsg.content}\n\n${contentToSend}`;
+    }
+
+    sendMessage(activeConversation, contentToSend, attachment || undefined);
     setInput('');
+    setAttachment(null);
     setQuoteMsg(null);
-    if (textareaRef.current) textareaRef.current.style.height = 'auto';
+    setShowEmojiPicker(false);
+    if (textareaRef.current) {
+      textareaRef.current.style.height = 'auto';
+    }
+  };
+
+  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files[0]) {
+      setAttachment(e.target.files[0]);
+    }
   };
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
@@ -456,7 +473,27 @@ export function ChatView({
                                   <p className={`text-[11px] ${isMine ? 'text-primary-200' : 'text-gray-400'} italic truncate`}>{quoteContent}</p>
                                 </div>
                               )}
-                              <div>{highlightText(actualContent || msg.content, msgSearch)}</div>
+                              <div className="whitespace-pre-wrap prose prose-sm max-w-none prose-p:my-1 prose-a:text-blue-400 dark:prose-invert">
+                                {msg.attachment_url && (
+                                  <div className="mb-2">
+                                    {msg.attachment_url.match(/\.(jpeg|jpg|gif|png)$/i) ? (
+                                      <img src={msg.attachment_url} alt="Attachment" className="max-w-full rounded-lg" />
+                                    ) : (
+                                      <a href={msg.attachment_url} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 p-2 bg-black/10 rounded-lg no-underline">
+                                        <FileText className="w-5 h-5" />
+                                        <span className="truncate flex-1">{msg.attachment_url.split('/').pop()}</span>
+                                      </a>
+                                    )}
+                                  </div>
+                                )}
+                                {msgSearch ? (
+                                  <div>{highlightText(actualContent || msg.content, msgSearch)}</div>
+                                ) : (
+                                  <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                                    {actualContent || msg.content}
+                                  </ReactMarkdown>
+                                )}
+                              </div>
                               <div className={`flex items-center justify-end gap-1 mt-1 ${isMine ? 'text-primary-200' : 'text-gray-400'}`}>
                                 {!isGrouped && (
                                   <span className="text-[10px]" title={new Date(msg.created_at).toLocaleString()}>
@@ -464,8 +501,15 @@ export function ChatView({
                                   </span>
                                 )}
                                 {isMine && !isGrouped && (
-                                  <span className="text-[10px] ml-0.5" title={msg.is_read ? 'Read' : 'Sent'}>
-                                    {msg.is_read ? <CheckCheck className="w-3 h-3" /> : <Check className="w-3 h-3" />}
+                                  <span className="text-[10px] ml-0.5 flex items-center gap-0.5" title={msg.is_read ? 'Read' : 'Sent'}>
+                                    {msg.is_read ? (
+                                      <>
+                                        <CheckCheck className="w-3 h-3 text-blue-400" />
+                                        <span className="text-[9px] opacity-80">Seen</span>
+                                      </>
+                                    ) : (
+                                      <Check className="w-3 h-3" />
+                                    )}
                                   </span>
                                 )}
                               </div>
@@ -538,20 +582,45 @@ export function ChatView({
                     </button>
                   </div>
                 )}
-                <div className="flex items-end gap-2 bg-gray-100 dark:bg-gray-800 rounded-2xl px-4 py-2 focus-within:ring-2 focus-within:ring-primary-500/40 transition-shadow">
-                  <div className="relative" ref={emojiRef}>
-                    <button type="button" onClick={() => setShowEmojiPicker(!showEmojiPicker)} className="p-1 hover:bg-gray-200 dark:hover:bg-gray-700 rounded-lg transition-colors mb-0.5">
-                      <Smile className="w-5 h-5 text-gray-400" />
-                    </button>
-                    {showEmojiPicker && (
-                      <div className="absolute bottom-full left-0 mb-2 p-3 bg-white dark:bg-gray-800 shadow-xl border border-gray-200 dark:border-gray-700 rounded-xl grid grid-cols-6 sm:grid-cols-5 gap-1 z-10">
-                        {EMOJIS.map(emoji => (
-                          <button key={emoji} type="button" onClick={() => insertEmoji(emoji)} className="w-8 h-8 flex items-center justify-center hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg text-lg transition-colors">
-                            {emoji}
-                          </button>
-                        ))}
-                      </div>
+                {attachment && (
+                  <div className="flex items-center gap-2 mb-2 px-3 py-2 bg-gray-100 dark:bg-gray-800 rounded-lg">
+                    {attachment.type.startsWith('image/') ? (
+                      <ImageIcon className="w-4 h-4 text-primary-500 flex-shrink-0" />
+                    ) : (
+                      <FileText className="w-4 h-4 text-primary-500 flex-shrink-0" />
                     )}
+                    <span className="text-sm font-medium truncate flex-1">{attachment.name}</span>
+                    <button onClick={() => setAttachment(null)} className="flex-shrink-0 p-0.5 hover:bg-gray-200 dark:hover:bg-gray-700 rounded">
+                      <X className="w-4 h-4 text-gray-400" />
+                    </button>
+                  </div>
+                )}
+                <div className="flex items-end gap-2 bg-gray-100 dark:bg-gray-800 rounded-2xl px-4 py-2 focus-within:ring-2 focus-within:ring-primary-500/40 transition-shadow">
+                  <input
+                    type="file"
+                    ref={fileInputRef}
+                    onChange={handleFileSelect}
+                    className="hidden"
+                    accept="image/*,.pdf,.doc,.docx,.txt"
+                  />
+                  <div className="flex items-center gap-1 mb-0.5">
+                    <button type="button" onClick={() => fileInputRef.current?.click()} className="p-1 hover:bg-gray-200 dark:hover:bg-gray-700 rounded-lg transition-colors">
+                      <Paperclip className="w-5 h-5 text-gray-400" />
+                    </button>
+                    <div className="relative" ref={emojiRef}>
+                      <button type="button" onClick={() => setShowEmojiPicker(!showEmojiPicker)} className="p-1 hover:bg-gray-200 dark:hover:bg-gray-700 rounded-lg transition-colors">
+                        <Smile className="w-5 h-5 text-gray-400" />
+                      </button>
+                      {showEmojiPicker && (
+                        <div className="absolute bottom-full left-0 mb-2 p-3 bg-white dark:bg-gray-800 shadow-xl border border-gray-200 dark:border-gray-700 rounded-xl grid grid-cols-6 sm:grid-cols-5 gap-1 z-10">
+                          {EMOJIS.map(emoji => (
+                            <button key={emoji} type="button" onClick={() => insertEmoji(emoji)} className="w-8 h-8 flex items-center justify-center hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg text-lg transition-colors">
+                              {emoji}
+                            </button>
+                          ))}
+                        </div>
+                      )}
+                    </div>
                   </div>
                   <textarea
                     ref={textareaRef}

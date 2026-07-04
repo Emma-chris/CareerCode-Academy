@@ -2,6 +2,7 @@ import { Router, Response, NextFunction } from 'express';
 import { AuthRequest } from '../middleware/auth';
 import * as MessageModel from '../models/message';
 import { io } from '../config/socket';
+import { uploadSingle, getFileUrl } from '../middleware/upload';
 
 const router = Router();
 
@@ -29,16 +30,21 @@ router.get('/:userId', async (req: AuthRequest, res: Response, next: NextFunctio
 });
 
 // POST /messages
-router.post('/', async (req: AuthRequest, res: Response, next: NextFunction) => {
+router.post('/', uploadSingle('attachment', 'messages'), async (req: AuthRequest, res: Response, next: NextFunction) => {
   try {
     const senderId = req.user!.userId;
     const { receiver_id, content } = req.body;
+    let attachmentUrl: string | undefined;
+
+    if (req.file) {
+      attachmentUrl = getFileUrl(req.file) || undefined;
+    }
     
-    if (!receiver_id || !content) {
-      return res.status(400).json({ success: false, message: 'receiver_id and content are required' });
+    if (!receiver_id || (!content && !attachmentUrl)) {
+      return res.status(400).json({ success: false, message: 'receiver_id and either content or attachment are required' });
     }
 
-    const message = await MessageModel.createMessage(senderId, receiver_id, content);
+    const message = await MessageModel.createMessage(senderId, receiver_id, content || '', attachmentUrl);
 
     // Emit the message to the receiver via socket
     if (io) {

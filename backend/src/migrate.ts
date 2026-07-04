@@ -62,10 +62,18 @@ async function migrate() {
         sender_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
         receiver_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
         content TEXT NOT NULL,
+        attachment_url TEXT,
         is_read BOOLEAN DEFAULT false,
         created_at TIMESTAMPTZ DEFAULT NOW()
       )
     `);
+    console.log('✓ messages table created');
+
+    await query(`
+      ALTER TABLE messages
+      ADD COLUMN IF NOT EXISTS attachment_url TEXT;
+    `);
+    console.log('✓ attachment_url added to messages');
     console.log('✓ messages table created');
 
     await query(`

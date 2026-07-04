@@ -5,6 +5,7 @@ export interface Message {
   sender_id: string;
   receiver_id: string;
   content: string;
+  attachment_url?: string;
   is_read: boolean;
   created_at: Date;
 }
@@ -75,13 +76,13 @@ export async function getMessagesBetween(userId1: string, userId2: string): Prom
   return rows;
 }
 
-export async function createMessage(senderId: string, receiverId: string, content: string): Promise<Message> {
+export async function createMessage(senderId: string, receiverId: string, content: string, attachmentUrl?: string): Promise<Message> {
   const sql = `
-    INSERT INTO messages (sender_id, receiver_id, content) 
-    VALUES ($1, $2, $3) 
+    INSERT INTO messages (sender_id, receiver_id, content, attachment_url) 
+    VALUES ($1, $2, $3, $4) 
     RETURNING *
   `;
-  const { rows } = await query(sql, [senderId, receiverId, content]);
+  const { rows } = await query(sql, [senderId, receiverId, content, attachmentUrl || null]);
   return rows[0];
 }
 

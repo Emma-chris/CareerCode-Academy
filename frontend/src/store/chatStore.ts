@@ -7,6 +7,7 @@ export interface Message {
   sender_id: string;
   receiver_id: string;
   content: string;
+  attachment_url?: string;
   is_read: boolean;
   created_at: string;
 }
@@ -46,7 +47,7 @@ interface ChatState {
   disconnectSocket: () => void;
   fetchConversations: () => Promise<void>;
   setActiveConversation: (userId: string) => Promise<void>;
-  sendMessage: (receiverId: string, content: string) => Promise<void>;
+  sendMessage: (receiverId: string, content: string, attachment?: File) => Promise<void>;
   addMessage: (message: Message) => void;
   deleteMessage: (messageId: string) => Promise<void>;
   markAsRead: (senderId: string) => Promise<void>;
@@ -135,10 +136,24 @@ export const useChatStore = create<ChatState>((set, get) => ({
     }
   },
 
-  sendMessage: async (receiverId: string, content: string) => {
+  sendMessage: async (receiverId: string, content: string, attachment?: File) => {
     try {
       const prefix = get().apiPrefix;
-      const { data } = await api.post(`${prefix}/messages`, { receiver_id: receiverId, content });
+      let requestData;
+      let headers = {};
+      
+      if (attachment) {
+        const formData = new FormData();
+        formData.append('receiver_id', receiverId);
+        formData.append('content', content);
+        formData.append('attachment', attachment);
+        requestData = formData;
+        headers = { 'Content-Type': 'multipart/form-data' };
+      } else {
+        requestData = { receiver_id: receiverId, content };
+      }
+      
+      const { data } = await api.post(`${prefix}/messages`, requestData, { headers });
       get().addMessage(data.data);
       get().emitTyping(receiverId, false);
     } catch (error) {
