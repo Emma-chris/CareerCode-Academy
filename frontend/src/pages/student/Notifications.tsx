@@ -101,7 +101,7 @@ export default function Notifications() {
               >
                 <div
                   className={cn(
-                    'rounded-2xl border border-white/20 dark:border-gray-800/50 bg-white/70 dark:bg-gray-900/70 shadow-lg shadow-black/5 backdrop-blur-xl p-4 cursor-pointer transition-all hover:-translate-y-0.5',
+                    'rounded-2xl border border-gray-200/60 dark:border-gray-800/50 bg-white/70 dark:bg-gray-900/70 shadow-lg shadow-black/5 backdrop-blur-xl p-4 cursor-pointer transition-all hover:-translate-y-0.5',
                     !notification.read ? 'border-l-4 border-l-primary-500' : ''
                   )}
                   onClick={() => { if (!notification.read) markNotificationRead(notification.id); }}

@@ -16,10 +16,11 @@ const iconMap: Record<string, any> = {
 };
 
 const schoolCareers: Record<string, { careers: string[]; placement: string; salary: string }> = {
-  'Software Development': { careers: ['Frontend Developer', 'Backend Developer', 'Full-Stack Engineer'], placement: '92%', salary: '$95K' },
-  'Data & AI': { careers: ['Data Scientist', 'ML Engineer', 'Data Analyst'], placement: '94%', salary: '$110K' },
-  'Design': { careers: ['UI/UX Designer', 'Product Designer', 'Visual Designer'], placement: '88%', salary: '$85K' },
-  'Business': { careers: ['Product Manager', 'Business Analyst', 'Tech Consultant'], placement: '90%', salary: '$90K' },
+  'School of Software Development': { careers: ['Frontend Developer', 'Backend Developer', 'Full-Stack Engineer'], placement: '92%', salary: '$95K' },
+  'School of Data & Artificial Intelligence': { careers: ['Data Scientist', 'ML Engineer', 'Data Analyst'], placement: '94%', salary: '$110K' },
+  'School of Design & Creative Technology': { careers: ['UI/UX Designer', 'Product Designer', 'Visual Designer'], placement: '88%', salary: '$85K' },
+  'School of Business & Digital Careers': { careers: ['Product Manager', 'Business Analyst', 'Tech Consultant'], placement: '90%', salary: '$90K' },
+  'School of Career Readiness': { careers: ['Career Coach', 'Talent Specialist', 'HR Coordinator'], placement: '95%', salary: '$75K' },
 };
 
 const defaultCareers = { careers: ['Software Developer'], placement: '90%', salary: '$85K' };

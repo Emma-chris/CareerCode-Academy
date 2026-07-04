@@ -22,6 +22,13 @@ import {
   Target,
   User,
   Film,
+  Plus,
+  FileQuestion,
+  MessageCircle,
+  BarChart3,
+  DollarSign,
+  Star,
+  FolderOpen,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useAuthStore } from '@/store/authStore';
@@ -54,23 +61,21 @@ const roleSidebarLinks: Record<string, { label: string; path: string; icon: any 
     { label: 'Settings', path: '/student/settings', icon: Settings },
   ],
   instructor: [
-    { label: 'Dashboard', path: '/instructor/dashboard', icon: LayoutDashboard },
-    { label: 'Analytics', path: '/instructor/analytics', icon: LayoutDashboard },
-    { label: 'Courses', path: '/instructor/courses', icon: BookOpen },
-    { label: 'Quizzes', path: '/instructor/quizzes', icon: ClipboardList },
-    { label: 'Exams', path: '/instructor/exams', icon: ClipboardList },
-    { label: 'Exam Monitor', path: '/instructor/exams/monitor', icon: Monitor },
-    { label: 'Course Proposals', path: '/instructor/course-proposals', icon: GitBranch },
+    { label: 'Dashboard Overview', path: '/instructor/dashboard', icon: LayoutDashboard },
+    { label: 'My Programs', path: '/instructor/programs', icon: GitBranch },
+    { label: 'My Courses', path: '/instructor/courses', icon: BookOpen },
+    { label: 'Course Builder', path: '/instructor/courses/new', icon: Plus },
     { label: 'Students', path: '/instructor/students', icon: Users },
     { label: 'Assignments', path: '/instructor/assignments', icon: ClipboardList },
-    { label: 'Submissions', path: '/instructor/submissions', icon: ClipboardList },
-    { label: 'Announcements', path: '/instructor/announcements', icon: Bell },
+    { label: 'Quizzes & Exams', path: '/instructor/quizzes', icon: FileQuestion },
     { label: 'Live Classes', path: '/instructor/live-classes', icon: Calendar },
-    { label: 'Messages', path: '/instructor/messages', icon: Users },
-    { label: 'Schedule', path: '/instructor/schedule', icon: Calendar },
-    { label: 'Mentorship', path: '/instructor/mentoring', icon: Users },
-    { label: 'Payouts', path: '/instructor/payouts', icon: LayoutDashboard },
-    { label: 'Profile', path: '/instructor/profile', icon: User },
+    { label: 'Discussions', path: '/instructor/discussions', icon: MessageCircle },
+    { label: 'Analytics', path: '/instructor/analytics', icon: BarChart3 },
+    { label: 'Earnings', path: '/instructor/earnings', icon: DollarSign },
+    { label: 'Certificates', path: '/instructor/certificates', icon: Award },
+    { label: 'Reviews & Feedback', path: '/instructor/reviews', icon: Star },
+    { label: 'Resources', path: '/instructor/resources', icon: FolderOpen },
+    { label: 'Settings', path: '/instructor/profile', icon: Settings },
   ],
   admin: [
     { label: 'Dashboard', path: '/admin/dashboard', icon: LayoutDashboard },
@@ -175,7 +180,7 @@ export function Sidebar({ isOpen, onToggle }: SidebarProps) {
 
       <aside
         className={cn(
-          'fixed top-14 sm:top-16 left-0 bottom-0 z-40 glass border-r border-white/20 dark:border-gray-800/50 overflow-y-auto scrollbar-thin transition-transform duration-300 lg:translate-x-0 safe-bottom',
+          'fixed top-14 sm:top-16 left-0 bottom-0 z-40 glass border-r border-gray-200/60 dark:border-gray-800/50 overflow-y-auto scrollbar-thin transition-transform duration-300 lg:translate-x-0 safe-bottom',
           collapsed ? 'w-16' : 'w-64',
           isOpen ? 'translate-x-0' : '-translate-x-full'
         )}
@@ -277,7 +282,7 @@ export function Sidebar({ isOpen, onToggle }: SidebarProps) {
           </div>
 
           {/* User Profile at Bottom */}
-          <div className="p-4 border-t border-white/20 dark:border-gray-800/50">
+          <div className="p-4 border-t border-gray-200/60 dark:border-gray-800/50">
             <Link
               to={`/${role}/profile`}
               className={cn(

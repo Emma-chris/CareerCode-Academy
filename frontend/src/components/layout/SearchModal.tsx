@@ -98,7 +98,7 @@ export function SearchModal({ isOpen, onClose }: SearchModalProps) {
             className="w-full max-w-2xl mx-4 glass-card overflow-hidden shadow-2xl"
             onClick={(e) => e.stopPropagation()}
           >
-            <div className="flex items-center gap-3 px-5 py-4 border-b border-white/20 dark:border-gray-800/50">
+            <div className="flex items-center gap-3 px-5 py-4 border-b border-gray-200/60 dark:border-gray-800/50">
               <Search className="w-5 h-5 text-gray-400 flex-shrink-0" />
               <input
                 ref={inputRef}

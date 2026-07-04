@@ -120,6 +120,14 @@ const InstructorQuizzes = lazy(() => import('@/pages/instructor/Quizzes'));
 const InstructorPayouts = lazy(() => import('@/pages/instructor/Payouts'));
 const InstructorProfile = lazy(() => import('@/pages/instructor/Profile'));
 const InstructorMentorship = lazy(() => import('@/pages/instructor/Mentorship'));
+const InstructorPrograms = lazy(() => import('@/pages/instructor/Programs'));
+const InstructorDiscussions = lazy(() => import('@/pages/instructor/Discussions'));
+const InstructorReviews = lazy(() => import('@/pages/instructor/Reviews'));
+const InstructorCertificates = lazy(() => import('@/pages/instructor/Certificates'));
+const InstructorResources = lazy(() => import('@/pages/instructor/Resources'));
+const InstructorNotifications = lazy(() => import('@/pages/instructor/Notifications'));
+const InstructorEarnings = lazy(() => import('@/pages/instructor/Earnings'));
+const InstructorCourseBuilder = lazy(() => import('@/pages/instructor/CourseBuilder'));
 
 // Admin pages
 const AdminDashboard = lazy(() => import('@/pages/admin/Dashboard'));
@@ -270,7 +278,7 @@ function App() {
           <Route path="analytics" element={<SuspenseWrapper><InstructorAnalytics /></SuspenseWrapper>} />
           <Route path="courses" element={<SuspenseWrapper><InstructorManageCourses /></SuspenseWrapper>} />
           <Route path="course-proposals" element={<SuspenseWrapper><InstructorCourseProposals /></SuspenseWrapper>} />
-          <Route path="courses/new" element={<SuspenseWrapper><InstructorCourseEditor /></SuspenseWrapper>} />
+          <Route path="courses/new" element={<SuspenseWrapper><InstructorCourseBuilder /></SuspenseWrapper>} />
           <Route path="courses/:slug/edit" element={<SuspenseWrapper><InstructorCourseEditor /></SuspenseWrapper>} />
           <Route path="students" element={<SuspenseWrapper><InstructorStudents /></SuspenseWrapper>} />
           <Route path="assignments" element={<SuspenseWrapper><InstructorAssignments /></SuspenseWrapper>} />
@@ -280,12 +288,19 @@ function App() {
           <Route path="messages" element={<SuspenseWrapper><InstructorMessages /></SuspenseWrapper>} />
           <Route path="schedule" element={<SuspenseWrapper><InstructorSchedule /></SuspenseWrapper>} />
           <Route path="quizzes" element={<SuspenseWrapper><InstructorQuizzes /></SuspenseWrapper>} />
+          <Route path="earnings" element={<SuspenseWrapper><InstructorEarnings /></SuspenseWrapper>} />
           <Route path="payouts" element={<SuspenseWrapper><InstructorPayouts /></SuspenseWrapper>} />
           <Route path="exams" element={<SuspenseWrapper><AdminExams /></SuspenseWrapper>} />
           <Route path="exams/:examId" element={<SuspenseWrapper><AdminExams /></SuspenseWrapper>} />
           <Route path="exams/monitor" element={<SuspenseWrapper><AdminExamMonitor /></SuspenseWrapper>} />
           <Route path="profile" element={<SuspenseWrapper><InstructorProfile /></SuspenseWrapper>} />
           <Route path="mentoring" element={<SuspenseWrapper><InstructorMentorship /></SuspenseWrapper>} />
+          <Route path="programs" element={<SuspenseWrapper><InstructorPrograms /></SuspenseWrapper>} />
+          <Route path="discussions" element={<SuspenseWrapper><InstructorDiscussions /></SuspenseWrapper>} />
+          <Route path="reviews" element={<SuspenseWrapper><InstructorReviews /></SuspenseWrapper>} />
+          <Route path="certificates" element={<SuspenseWrapper><InstructorCertificates /></SuspenseWrapper>} />
+          <Route path="resources" element={<SuspenseWrapper><InstructorResources /></SuspenseWrapper>} />
+          <Route path="notifications" element={<SuspenseWrapper><InstructorNotifications /></SuspenseWrapper>} />
         </Route>
 
         <Route path="/admin" element={<DashboardLayout requiredRole="admin" />}>

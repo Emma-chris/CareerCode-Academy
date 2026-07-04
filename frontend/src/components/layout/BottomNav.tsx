@@ -4,16 +4,16 @@ import { motion } from 'framer-motion';
 import {
   LayoutDashboard,
   BookOpen,
-  ClipboardList,
+  Users,
+  MessageSquare,
+  Plus,
+  DollarSign,
+  BarChart3,
+  Target,
   Trophy,
   User,
-  Users,
-  Calendar,
-  MessageSquare,
   GraduationCap,
-  DollarSign,
-  Bell,
-  Target,
+  Calendar,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
@@ -28,9 +28,9 @@ const roleLinks: Record<string, { label: string; path: string; icon: any }[]> = 
   instructor: [
     { label: 'Dashboard', path: '/instructor/dashboard', icon: LayoutDashboard },
     { label: 'Courses', path: '/instructor/courses', icon: BookOpen },
-    { label: 'Mentorship', path: '/instructor/mentoring', icon: Target },
+    { label: 'Builder', path: '/instructor/courses/new', icon: Plus },
     { label: 'Students', path: '/instructor/students', icon: Users },
-    { label: 'Messages', path: '/instructor/messages', icon: MessageSquare },
+    { label: 'Earnings', path: '/instructor/earnings', icon: DollarSign },
   ],
   admin: [
     { label: 'Dashboard', path: '/admin/dashboard', icon: LayoutDashboard },
@@ -51,7 +51,7 @@ export function BottomNav({ role = 'student' }: BottomNavProps) {
 
   return (
     <nav
-      className="fixed bottom-0 left-0 right-0 z-50 glass border-t border-white/20 dark:border-gray-800/50 lg:hidden"
+      className="fixed bottom-0 left-0 right-0 z-50 glass border-t border-gray-200/60 dark:border-gray-800/50 lg:hidden"
       aria-label="Mobile navigation"
       style={{ paddingBottom: 'env(safe-area-inset-bottom, 0px)' }}
     >

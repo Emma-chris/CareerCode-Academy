@@ -10,7 +10,7 @@ function ShimmerBlock({ className }: { className?: string }) {
 
 export function CardSkeleton({ className }: { className?: string }) {
   return (
-    <div className={cn('rounded-2xl border border-white/20 dark:border-gray-800/50 bg-white/70 dark:bg-gray-900/70 p-5 animate-fade-in', className)}>
+    <div className={cn('rounded-2xl border border-gray-200/60 dark:border-gray-800/50 bg-white/70 dark:bg-gray-900/70 p-5 animate-fade-in', className)}>
       <div className="flex items-center gap-3 mb-4">
         <ShimmerBlock className="w-10 h-10 rounded-xl" />
         <div className="flex-1 space-y-2">
@@ -30,7 +30,7 @@ export function StatsSkeleton() {
   return (
     <div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-3">
       {Array.from({ length: 6 }).map((_, i) => (
-        <div key={i} className={cn('rounded-2xl border border-white/20 dark:border-gray-800/50 bg-white/70 dark:bg-gray-900/70 p-4 animate-fade-in')} style={{ animationDelay: `${i * 0.05}s` }}>
+        <div key={i} className={cn('rounded-2xl border border-gray-200/60 dark:border-gray-800/50 bg-white/70 dark:bg-gray-900/70 p-4 animate-fade-in')} style={{ animationDelay: `${i * 0.05}s` }}>
           <div className="flex items-center gap-3">
             <ShimmerBlock className="w-10 h-10 rounded-xl" />
             <div className="flex-1 space-y-2">
@@ -67,7 +67,7 @@ export function HeroSkeleton() {
 
 export function ChartSkeleton({ className }: { className?: string }) {
   return (
-    <div className={cn('rounded-2xl border border-white/20 dark:border-gray-800/50 bg-white/70 dark:bg-gray-900/70 p-5 animate-fade-in', className)}>
+    <div className={cn('rounded-2xl border border-gray-200/60 dark:border-gray-800/50 bg-white/70 dark:bg-gray-900/70 p-5 animate-fade-in', className)}>
       <ShimmerBlock className="h-5 w-32 rounded mb-4" />
       <ShimmerBlock className="h-48 rounded-xl" />
     </div>

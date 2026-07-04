@@ -3,18 +3,26 @@ import api from '@/lib/axios';
 import { Course } from './courseStore';
 
 export interface DashboardStats {
-  activeCourses: number;
   totalStudents: number;
-  totalRevenue: number;
+  activeStudents: number;
+  totalCourses: number;
+  publishedCourses: number;
+  draftCourses: number;
+  completionRate: number;
   averageRating: string;
+  certificatesIssued: number;
+  totalWatchTime: number;
+  monthlyRevenue: number;
   pendingReviews: number;
-  unreadMessages: number;
   upcomingLiveSessions: number;
   assignmentsToGrade: number;
+  unreadMessages: number;
 }
 
 export interface TopCourse {
+  id: string;
   title: string;
+  slug: string;
   students: number;
   rating: string;
   revenue: number;
@@ -27,6 +35,75 @@ export interface RecentActivity {
   type: 'enrollment' | 'submission' | 'review' | 'question';
 }
 
+export interface Review {
+  id: string;
+  courseId: string;
+  courseTitle: string;
+  userId: string;
+  userName: string;
+  userAvatar: string;
+  rating: number;
+  comment: string;
+  createdAt: string;
+  replied: boolean;
+  reply?: string;
+}
+
+export interface Certificate {
+  id: string;
+  studentName: string;
+  studentEmail: string;
+  courseTitle: string;
+  issueDate: string;
+  verificationStatus: 'verified' | 'pending' | 'invalid';
+  certificateUrl: string;
+}
+
+export interface Resource {
+  id: string;
+  name: string;
+  type: string;
+  size: number;
+  courseId: string;
+  courseTitle: string;
+  downloadCount: number;
+  url: string;
+  createdAt: string;
+}
+
+export interface Discussion {
+  id: string;
+  courseId: string;
+  courseTitle: string;
+  title: string;
+  content: string;
+  authorName: string;
+  authorAvatar: string;
+  repliesCount: number;
+  isPinned: boolean;
+  createdAt: string;
+  lastActivity: string;
+}
+
+export interface Notification {
+  id: string;
+  type: 'enrollment' | 'review' | 'submission' | 'discussion' | 'live_class' | 'certificate';
+  title: string;
+  message: string;
+  read: boolean;
+  createdAt: string;
+  link?: string;
+}
+
+export interface Program {
+  id: string;
+  title: string;
+  slug: string;
+  school: string;
+  courseCount: number;
+  studentCount: number;
+}
+
 interface InstructorState {
   stats: DashboardStats | null;
   topCourses: TopCourse[];
@@ -34,6 +111,8 @@ interface InstructorState {
   myCourses: Course[];
   enrollmentTrend: { month: string; enrollments: number }[];
   monthlyRevenue: { month: string; revenue: number }[];
+  coursePerformance: { course: string; students: number; rating: number; revenue: number }[];
+  engagementData: { month: string; active: number; inactive: number }[];
   isLoading: boolean;
   error: string | null;
 
@@ -43,10 +122,23 @@ interface InstructorState {
   liveClasses: any[];
   schedule: any[];
   courseProposals: any[];
+  assignments: any[];
+  assignmentSubmissions: Record<string, any[]>;
+
+  reviews: Review[];
+  certificates: Certificate[];
+  resources: Resource[];
+  discussions: Discussion[];
+  notifications: Notification[];
+  programs: Program[];
 
   fetchDashboardStats: () => Promise<void>;
   fetchMyCourses: () => Promise<void>;
   deleteCourse: (id: string) => Promise<void>;
+  publishCourse: (id: string) => Promise<void>;
+  unpublishCourse: (id: string) => Promise<void>;
+  archiveCourse: (id: string) => Promise<void>;
+  duplicateCourse: (id: string) => Promise<void>;
   fetchCourseProposals: () => Promise<void>;
   createCourseProposal: (data: any) => Promise<void>;
   fetchAnalytics: () => Promise<void>;
@@ -57,13 +149,28 @@ interface InstructorState {
   fetchLiveClasses: () => Promise<void>;
   createLiveClass: (data: any) => Promise<void>;
   fetchSchedule: () => Promise<void>;
-
-  assignments: any[];
-  assignmentSubmissions: Record<string, any[]>;
   fetchAssignmentsByCourse: (courseId: string) => Promise<void>;
   createAssignment: (payload: any) => Promise<any>;
   updateAssignment: (id: string, payload: any) => Promise<void>;
   deleteAssignment: (id: string) => Promise<void>;
+
+  fetchReviews: () => Promise<void>;
+  replyToReview: (id: string, reply: string) => Promise<void>;
+  reportReview: (id: string) => Promise<void>;
+  fetchCertificates: () => Promise<void>;
+  reissueCertificate: (id: string) => Promise<void>;
+  fetchResources: () => Promise<void>;
+  uploadResource: (formData: FormData) => Promise<void>;
+  deleteResource: (id: string) => Promise<void>;
+  fetchDiscussions: () => Promise<void>;
+  createDiscussion: (data: any) => Promise<void>;
+  pinDiscussion: (id: string, pinned: boolean) => Promise<void>;
+  fetchNotifications: () => Promise<void>;
+  markNotificationRead: (id: string) => Promise<void>;
+  markAllNotificationsRead: () => Promise<void>;
+  fetchPrograms: () => Promise<void>;
+  fetchEarnings: () => Promise<any>;
+  fetchWithdrawalHistory: () => Promise<any[]>;
 }
 
 export const useInstructorStore = create<InstructorState>((set, get) => ({
@@ -73,6 +180,8 @@ export const useInstructorStore = create<InstructorState>((set, get) => ({
   myCourses: [],
   enrollmentTrend: [],
   monthlyRevenue: [],
+  coursePerformance: [],
+  engagementData: [],
   isLoading: false,
   error: null,
 
@@ -85,16 +194,25 @@ export const useInstructorStore = create<InstructorState>((set, get) => ({
   assignments: [],
   assignmentSubmissions: {},
 
+  reviews: [],
+  certificates: [],
+  resources: [],
+  discussions: [],
+  notifications: [],
+  programs: [],
+
   fetchDashboardStats: async () => {
     set({ isLoading: true, error: null });
     try {
       const { data } = await api.get('/instructor/dashboard/stats');
       set({
         stats: data.data.stats,
-        topCourses: data.data.topCourses,
-        recentActivity: data.data.recentActivity,
+        topCourses: data.data.topCourses || [],
+        recentActivity: data.data.recentActivity || [],
         enrollmentTrend: data.data.enrollmentTrend || [],
         monthlyRevenue: data.data.monthlyRevenue || [],
+        coursePerformance: data.data.coursePerformance || [],
+        engagementData: data.data.engagementData || [],
         isLoading: false
       });
     } catch (error: any) {
@@ -131,6 +249,50 @@ export const useInstructorStore = create<InstructorState>((set, get) => ({
         isLoading: false,
         error: error.response?.data?.message || 'Failed to delete course'
       });
+      throw error;
+    }
+  },
+
+  publishCourse: async (id: string) => {
+    try {
+      await api.put(`/courses/${id}/publish`);
+      set({
+        myCourses: get().myCourses.map(c => c.id === id ? { ...c, published: true } : c)
+      });
+    } catch (error) {
+      throw error;
+    }
+  },
+
+  unpublishCourse: async (id: string) => {
+    try {
+      await api.put(`/courses/${id}/unpublish`);
+      set({
+        myCourses: get().myCourses.map(c => c.id === id ? { ...c, published: false } : c)
+      });
+    } catch (error) {
+      throw error;
+    }
+  },
+
+  archiveCourse: async (id: string) => {
+    try {
+      await api.put(`/courses/${id}/archive`);
+      set({
+        myCourses: get().myCourses.filter(c => c.id !== id)
+      });
+    } catch (error) {
+      throw error;
+    }
+  },
+
+  duplicateCourse: async (id: string) => {
+    try {
+      const { data } = await api.post(`/courses/${id}/duplicate`);
+      set({
+        myCourses: [...get().myCourses, data.data]
+      });
+    } catch (error) {
       throw error;
     }
   },
@@ -288,6 +450,182 @@ export const useInstructorStore = create<InstructorState>((set, get) => ({
     } catch (error) {
       console.error(error);
       throw error;
+    }
+  },
+
+  fetchReviews: async () => {
+    try {
+      const { data } = await api.get('/instructor/reviews');
+      set({ reviews: data.data || [] });
+    } catch (error) {
+      console.error(error);
+    }
+  },
+
+  replyToReview: async (id: string, reply: string) => {
+    try {
+      await api.put(`/instructor/reviews/${id}/reply`, { reply });
+      set({
+        reviews: get().reviews.map(r =>
+          r.id === id ? { ...r, replied: true, reply } : r
+        )
+      });
+    } catch (error) {
+      console.error(error);
+      throw error;
+    }
+  },
+
+  reportReview: async (id: string) => {
+    try {
+      await api.put(`/instructor/reviews/${id}/report`);
+    } catch (error) {
+      console.error(error);
+      throw error;
+    }
+  },
+
+  fetchCertificates: async () => {
+    try {
+      const { data } = await api.get('/instructor/certificates');
+      set({ certificates: data.data || [] });
+    } catch (error) {
+      console.error(error);
+    }
+  },
+
+  reissueCertificate: async (id: string) => {
+    try {
+      await api.post(`/instructor/certificates/${id}/reissue`);
+    } catch (error) {
+      console.error(error);
+      throw error;
+    }
+  },
+
+  fetchResources: async () => {
+    try {
+      const { data } = await api.get('/instructor/resources');
+      set({ resources: data.data || [] });
+    } catch (error) {
+      console.error(error);
+    }
+  },
+
+  uploadResource: async (formData: FormData) => {
+    try {
+      const { data } = await api.post('/instructor/resources', formData, {
+        headers: { 'Content-Type': 'multipart/form-data' }
+      });
+      set({ resources: [data.data, ...get().resources] });
+    } catch (error) {
+      console.error(error);
+      throw error;
+    }
+  },
+
+  deleteResource: async (id: string) => {
+    try {
+      await api.delete(`/instructor/resources/${id}`);
+      set({ resources: get().resources.filter(r => r.id !== id) });
+    } catch (error) {
+      console.error(error);
+      throw error;
+    }
+  },
+
+  fetchDiscussions: async () => {
+    try {
+      const { data } = await api.get('/instructor/discussions');
+      set({ discussions: data.data || [] });
+    } catch (error) {
+      console.error(error);
+    }
+  },
+
+  createDiscussion: async (payload: any) => {
+    try {
+      const { data } = await api.post('/instructor/discussions', payload);
+      set({ discussions: [data.data, ...get().discussions] });
+    } catch (error) {
+      console.error(error);
+      throw error;
+    }
+  },
+
+  pinDiscussion: async (id: string, pinned: boolean) => {
+    try {
+      await api.put(`/instructor/discussions/${id}/pin`, { pinned });
+      set({
+        discussions: get().discussions.map(d =>
+          d.id === id ? { ...d, isPinned: pinned } : d
+        )
+      });
+    } catch (error) {
+      console.error(error);
+      throw error;
+    }
+  },
+
+  fetchNotifications: async () => {
+    try {
+      const { data } = await api.get('/instructor/notifications');
+      set({ notifications: data.data || [] });
+    } catch (error) {
+      console.error(error);
+    }
+  },
+
+  markNotificationRead: async (id: string) => {
+    try {
+      await api.put(`/instructor/notifications/${id}/read`);
+      set({
+        notifications: get().notifications.map(n =>
+          n.id === id ? { ...n, read: true } : n
+        )
+      });
+    } catch (error) {
+      console.error(error);
+    }
+  },
+
+  markAllNotificationsRead: async () => {
+    try {
+      await api.put('/instructor/notifications/read-all');
+      set({
+        notifications: get().notifications.map(n => ({ ...n, read: true }))
+      });
+    } catch (error) {
+      console.error(error);
+    }
+  },
+
+  fetchPrograms: async () => {
+    try {
+      const { data } = await api.get('/instructor/programs');
+      set({ programs: data.data || [] });
+    } catch (error) {
+      console.error(error);
+    }
+  },
+
+  fetchEarnings: async () => {
+    try {
+      const { data } = await api.get('/instructor/earnings');
+      return data.data;
+    } catch (error) {
+      console.error(error);
+      return null;
+    }
+  },
+
+  fetchWithdrawalHistory: async () => {
+    try {
+      const { data } = await api.get('/instructor/withdrawals');
+      return data.data || [];
+    } catch (error) {
+      console.error(error);
+      return [];
     }
   }
 }));

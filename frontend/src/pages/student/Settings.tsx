@@ -12,7 +12,6 @@ const settingsSections = [
   {
     title: 'Preferences',
     items: [
-      { icon: Palette, label: 'Theme', description: 'Toggle dark mode', type: 'toggle' },
       { icon: Globe, label: 'Language', description: 'English (US)', type: 'select' },
       { icon: Volume2, label: 'Sound Effects', description: 'Play sounds for notifications', type: 'toggle' },
     ],
@@ -91,17 +90,7 @@ export default function Settings() {
                     </div>
                   </div>
 
-                  {item.type === 'toggle' && item.label === 'Theme' ? (
-                    <button
-                      onClick={toggleDarkMode}
-                      className={`relative w-11 h-6 rounded-full transition-colors ${darkMode ? 'bg-primary-500' : 'bg-gray-300 dark:bg-gray-600'}`}
-                      aria-label={`Switch to ${darkMode ? 'light' : 'dark'} mode`}
-                    >
-                      <div className={`absolute top-0.5 w-5 h-5 rounded-full bg-white shadow-sm flex items-center justify-center transition-transform ${darkMode ? 'translate-x-[22px]' : 'translate-x-0.5'}`}>
-                        {darkMode ? <Moon className="w-3 h-3 text-primary-500" /> : <Sun className="w-3 h-3 text-yellow-500" />}
-                      </div>
-                    </button>
-                  ) : item.type === 'toggle' ? (
+                  {item.type === 'toggle' ? (
                     <button
                       onClick={() => toggle(item.label)}
                       className={`relative w-11 h-6 rounded-full transition-colors ${toggles[item.label] ? 'bg-primary-500' : 'bg-gray-300 dark:bg-gray-600'}`}

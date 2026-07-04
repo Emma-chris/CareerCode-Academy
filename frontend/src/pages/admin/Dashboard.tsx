@@ -84,7 +84,7 @@ const quickActions = [
 const CustomTooltip = ({ active, payload, label }: any) => {
   if (active && payload && payload.length) {
     return (
-      <div className="glass-card p-3 text-sm shadow-xl border border-white/20 dark:border-gray-800/50">
+      <div className="glass-card p-3 text-sm shadow-xl border border-gray-200/60 dark:border-gray-800/50">
         <p className="font-medium text-gray-900 dark:text-gray-100 mb-1">{label}</p>
         {payload.map((entry: any, i: number) => (
           <p key={i} style={{ color: entry.color }} className="text-xs font-medium">

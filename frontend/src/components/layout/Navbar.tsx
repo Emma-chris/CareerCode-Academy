@@ -25,10 +25,9 @@ const navLinks = [
 const megaMenuSchools = [
   { icon: Code2, name: 'Software Development', desc: 'Web, mobile, and backend', slug: 'software-development', color: 'from-blue-500 to-cyan-500' },
   { icon: Database, name: 'Data & AI', desc: 'Data science, ML, AI', slug: 'data-ai', color: 'from-purple-500 to-pink-500' },
-  { icon: Palette, name: 'Design', desc: 'UI/UX and product design', slug: 'design', color: 'from-pink-500 to-rose-500' },
-  { icon: Briefcase, name: 'Business', desc: 'Product management, analytics', slug: 'business', color: 'from-amber-500 to-orange-500' },
-  { icon: Shield, name: 'Cybersecurity', desc: 'Security engineering', slug: 'cybersecurity', color: 'from-red-500 to-rose-500' },
-  { icon: Globe, name: 'Cloud Computing', desc: 'AWS, Azure, GCP', slug: 'cloud-computing', color: 'from-sky-500 to-indigo-500' },
+  { icon: Palette, name: 'Design & Creative', desc: 'UI/UX and product design', slug: 'design-creative', color: 'from-pink-500 to-rose-500' },
+  { icon: Briefcase, name: 'Business & Digital', desc: 'Product management, analytics', slug: 'business-digital', color: 'from-amber-500 to-orange-500' },
+  { icon: GraduationCap, name: 'Career Readiness', desc: 'Resume, interviews, freelancing', slug: 'career-readiness', color: 'from-emerald-500 to-teal-500' },
 ];
 
 const megaMenuCourses = [
@@ -50,7 +49,7 @@ interface MegaMenuProps {
 
 function MegaMenu({ items, basePath, renderItem }: MegaMenuProps) {
   return (
-    <div className="absolute top-full left-1/2 -translate-x-1/2 mt-2 w-[600px] glass-card p-4 shadow-2xl border border-white/20 dark:border-gray-800/50 z-50">
+    <div className="absolute top-full left-1/2 -translate-x-1/2 mt-2 w-[600px] glass-card p-4 shadow-2xl border border-gray-200/60 dark:border-gray-800/50 z-50">
       <div className="grid grid-cols-2 gap-2">
         {items.map((item) => (
           <Link
@@ -147,7 +146,7 @@ export function Navbar() {
 
   return (
     <>
-      <nav className="fixed top-0 left-0 right-0 z-50 glass border-b border-white/20 dark:border-gray-800/50 transition-shadow duration-300">
+      <nav className="fixed top-0 left-0 right-0 z-50 glass border-b border-gray-200/60 dark:border-gray-800/50 transition-shadow duration-300">
         <div className="max-w-screen-5xl mx-auto px-3 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-14 sm:h-16">
             <Link to="/" className="flex items-center gap-2 group flex-shrink-0" aria-label="Go to homepage">
@@ -243,13 +242,7 @@ export function Navbar() {
               </button>
 
               <PageGuideButton className="p-2 rounded-xl text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors hidden lg:flex" />
-              <button
-                onClick={toggleDarkMode}
-                aria-label={darkMode ? 'Switch to light mode' : 'Switch to dark mode'}
-                className="p-2 rounded-xl text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors touch-target flex items-center justify-center"
-              >
-                {darkMode ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
-              </button>
+
 
               {isAuthenticated && (
                 <NotificationsBell />
@@ -347,7 +340,7 @@ export function Navbar() {
               initial={{ opacity: 0, height: 0 }}
               animate={{ opacity: 1, height: 'auto' }}
               exit={{ opacity: 0, height: 0 }}
-              className="xl:hidden border-t border-white/20 dark:border-gray-800/50 overflow-hidden"
+              className="xl:hidden border-t border-gray-200/60 dark:border-gray-800/50 overflow-hidden"
             >
               <div className="px-3 sm:px-4 py-3 space-y-1 max-h-[calc(100dvh-4rem)] overflow-y-auto safe-bottom">
                 {navLinks.map((link) => (

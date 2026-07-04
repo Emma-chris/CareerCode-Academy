@@ -458,6 +458,8 @@ router.post(
     } catch (error: any) {
       if (error.name === 'JsonWebTokenError' || error.name === 'TokenExpiredError') {
         next(new UnauthorizedError('Invalid or expired refresh token'));
+      } else if (error.code === '23505') {
+        next(new UnauthorizedError('Refresh token already used — please re-authenticate'));
       } else {
         next(error);
       }

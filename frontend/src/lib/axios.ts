@@ -49,6 +49,8 @@ function resolveUploadPaths(obj: any, baseUrl: string): any {
   return obj;
 }
 
+let refreshPromise: Promise<any> | null = null;
+
 api.interceptors.response.use(
   (response) => {
     const baseUrl = import.meta.env.VITE_API_URL?.replace('/api/v1', '') || '';
@@ -69,11 +71,15 @@ api.interceptors.response.use(
           return Promise.reject(error);
         }
 
-        const refreshUrl = import.meta.env.VITE_API_URL
-          ? `${import.meta.env.VITE_API_URL}/auth/refresh-token`
-          : '/api/v1/auth/refresh-token';
-          
-        const { data } = await axios.post(refreshUrl, { refreshToken }, { withCredentials: true });
+        if (!refreshPromise) {
+          const refreshUrl = import.meta.env.VITE_API_URL
+            ? `${import.meta.env.VITE_API_URL}/auth/refresh-token`
+            : '/api/v1/auth/refresh-token';
+          refreshPromise = axios.post(refreshUrl, { refreshToken }, { withCredentials: true })
+            .finally(() => { refreshPromise = null; });
+        }
+
+        const { data } = await refreshPromise;
         
         if (data && data.success && data.data) {
           useAuthStore.setState({

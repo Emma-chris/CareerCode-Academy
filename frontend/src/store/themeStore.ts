@@ -15,33 +15,20 @@ function applyDarkMode(value: boolean) {
   }
 }
 
-function getInitialDarkMode(): boolean {
-  if (typeof window === 'undefined') return false;
-  try {
-    const stored = JSON.parse(localStorage.getItem('careercode-theme') || '{}');
-    return stored?.state?.darkMode ?? false;
-  } catch {
-    return false;
-  }
-}
-
-const initialDarkMode = getInitialDarkMode();
+const initialDarkMode = true;
 applyDarkMode(initialDarkMode);
 
 export const useThemeStore = create<ThemeState>()(
   persist(
     (set, get) => ({
-      darkMode: initialDarkMode,
+      darkMode: true,
 
       toggleDarkMode: () => {
-        const newDarkMode = !get().darkMode;
-        set({ darkMode: newDarkMode });
-        applyDarkMode(newDarkMode);
+        // Light mode removed
       },
 
       setDarkMode: (value) => {
-        set({ darkMode: value });
-        applyDarkMode(value);
+        // Light mode removed
       },
     }),
     {

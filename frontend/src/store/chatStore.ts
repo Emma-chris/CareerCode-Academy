@@ -1,6 +1,7 @@
 import { create } from 'zustand';
 import api from '@/lib/axios';
 import { io, Socket } from 'socket.io-client';
+import { useAuthStore } from '@/store/authStore';
 
 export interface Message {
   id: string;
@@ -75,7 +76,11 @@ export const useChatStore = create<ChatState>((set, get) => ({
     let { socket } = get();
     if (!socket) {
       const SOCKET_URL = import.meta.env.VITE_API_URL?.replace('/api/v1', '') || '';
-      socket = io(SOCKET_URL, { transports: ['websocket', 'polling'] });
+      const token = useAuthStore.getState().token;
+      socket = io(SOCKET_URL, { 
+        transports: ['websocket', 'polling'],
+        auth: { token }
+      });
 
       socket.on('connect', () => {
         socket!.emit('join_room', userId);
