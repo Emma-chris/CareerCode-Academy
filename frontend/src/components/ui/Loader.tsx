@@ -21,10 +21,16 @@ const borderSizes = {
 };
 
 function Spinner({ size = 'md' }: { size?: 'sm' | 'md' | 'lg' }) {
+  const imgSizes = {
+    sm: 'w-8 h-8',
+    md: 'w-16 h-16',
+    lg: 'w-24 h-24',
+  };
   return (
-    <div className="relative">
-      <div className={cn(sizes[size], 'rounded-full border-primary-500/20 border-t-primary-500 border-r-secondary-500 animate-spin')} />
-      <div className={cn('absolute inset-0 rounded-full animate-pulse-ring border border-primary-500/20', sizes[size])} />
+    <div className="relative flex items-center justify-center">
+      <div className={cn(imgSizes[size], 'relative animate-pulse')}>
+        <img src="/screen.png" alt="Loading" className="w-full h-full object-contain drop-shadow-lg" />
+      </div>
     </div>
   );
 }
