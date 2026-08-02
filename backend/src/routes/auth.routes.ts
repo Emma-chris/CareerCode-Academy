@@ -8,7 +8,8 @@ import { authenticate, AuthRequest } from '../middleware/auth';
 import * as UserModel from '../models/user';
 import * as NotificationModel from '../models/notification';
 import * as TokenModel from '../models/token';
-import { emitDashboardUpdate } from '../config/socket';
+import { emitDashboardUpdate, emitPasswordResetLink } from '../config/socket';
+import { isDatabaseAvailable } from '../config/db';
 import {
   generateToken,
   generateRefreshToken,
@@ -39,6 +40,7 @@ const loginSchema = z.object({
 
 const forgotPasswordSchema = z.object({
   email: z.string().email('Invalid email address'),
+  channelId: z.string().optional(),
 });
 
 const resetPasswordSchema = z.object({
@@ -167,7 +169,23 @@ router.post(
   validate(forgotPasswordSchema),
   async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const { email } = req.body;
+      const { email, channelId } = req.body;
+
+      if (!isDatabaseAvailable()) {
+        console.warn('[Mail] DATABASE_URL is not set — returning dev mode success response for forgot-password:', email);
+        if (channelId) {
+          emitPasswordResetLink(channelId, {
+            success: true,
+            email,
+            message: 'Password reset link generated (dev mode - no DB).',
+          });
+        }
+        return res.json({
+          success: true,
+          message: 'If the email exists, a password reset link has been sent.',
+        });
+      }
+
       const user = await UserModel.getUserByEmail(email);
 
       if (user) {
@@ -178,6 +196,15 @@ router.post(
           reset_token: resetToken,
           reset_token_expiry: resetTokenExpiry,
         });
+
+        if (channelId) {
+          emitPasswordResetLink(channelId, {
+            success: true,
+            email,
+            token: resetToken,
+            message: 'Password reset link generated.',
+          });
+        }
 
         await sendPasswordResetEmail(email, resetToken);
       }
