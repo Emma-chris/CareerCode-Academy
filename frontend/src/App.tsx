@@ -102,6 +102,7 @@ const StudentChallenges = lazy(() => import('@/pages/student/Challenges'));
 const StudentRoadmap = lazy(() => import('@/pages/student/Roadmap'));
 const StudentStudyPlans = lazy(() => import('@/pages/student/StudyPlans'));
 const StudentMentorship = lazy(() => import('@/pages/student/Mentorship'));
+const StudentSkillTree = lazy(() => import('@/pages/student/SkillTree'));
 
 // Instructor pages
 const InstructorDashboard = lazy(() => import('@/pages/instructor/Dashboard'));
@@ -272,6 +273,7 @@ function App() {
           <Route path="profile" element={<SuspenseWrapper><StudentProfile /></SuspenseWrapper>} />
           <Route path="settings" element={<SuspenseWrapper><StudentSettings /></SuspenseWrapper>} />
           <Route path="mentoring" element={<SuspenseWrapper><StudentMentorship /></SuspenseWrapper>} />
+          <Route path="skill-tree/:courseId" element={<SuspenseWrapper><StudentSkillTree /></SuspenseWrapper>} />
         </Route>
 
         <Route path="/instructor" element={<DashboardLayout requiredRole="instructor" />}>

@@ -42,6 +42,7 @@ import videoRoutes from './routes/video.routes';
 import showcaseVideoRoutes from './routes/showcase-video.routes';
 import challengeRoutes from './routes/challenge.routes';
 import examRoutes from './routes/exam.routes';
+import gamificationRoutes from './routes/gamification.routes';
 import payoutRoutes from './routes/payout.routes';
 import testRoutes from './routes/test.routes';
 import analyticsRoutes from './routes/analytics.routes';
@@ -170,6 +171,7 @@ app.use('/api/v1/pages', pageRoutes);
 app.use('/api/v1/videos', videoRoutes);
 app.use('/api/v1/challenges', challengeRoutes);
 app.use('/api/v1/exams', examRoutes);
+app.use('/api/v1/gamification', gamificationRoutes);
 app.use('/api/v1/payouts', payoutRoutes);
 app.use('/api/v1/analytics', analyticsRoutes);
 app.use('/api/v1/schools', schoolRoutes);
@@ -223,6 +225,10 @@ async function start() {
   startProctoringCleanupWorker();
   const { startTokenCleanupWorker } = await import('./workers/tokenCleanupWorker');
   startTokenCleanupWorker();
+
+  // Heart regeneration: 1 heart per 30 min for all users
+  const { regenerateHearts } = await import('./models/gamification');
+  setInterval(() => { regenerateHearts().catch(() => {}); }, 60000);
 }
 
 start();

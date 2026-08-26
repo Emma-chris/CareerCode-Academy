@@ -3,6 +3,7 @@ import { authenticate, authorize, AuthRequest } from '../middleware/auth';
 import { query } from '../config/db';
 import * as QuizModel from '../models/quiz';
 import { NotFoundError, ForbiddenError } from '../utils/errors';
+import { awardXp, loseHeart } from '../models/gamification';
 
 const router = Router();
 
@@ -245,6 +246,15 @@ router.post('/:id/submit', authenticate, async (req: AuthRequest, res: Response,
       attempt = await QuizModel.createAttempt({ quiz_id: quizId, user_id: userId, answers: answers || [], score: finalScore, passed });
     }
 
+    // Gamification: award XP on pass, lose heart on fail
+    let heartsRemaining: number | undefined;
+    if (passed) {
+      const xpAmount = finalScore >= 100 ? 30 : finalScore >= 85 ? 20 : 15;
+      await awardXp(userId, xpAmount, 'quiz_pass', `Passed quiz with ${finalScore}%`);
+    } else {
+      heartsRemaining = await loseHeart(userId);
+    }
+
     res.json({
       success: true,
       data: {
@@ -254,6 +264,7 @@ router.post('/:id/submit', authenticate, async (req: AuthRequest, res: Response,
         attempt,
         correctCount: score / (questions[0]?.points || 1),
         totalQuestions: questions.length,
+        heartsRemaining,
       },
     });
   } catch (error) {

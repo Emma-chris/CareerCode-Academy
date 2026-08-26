@@ -20,13 +20,14 @@ import ChallengeCard from '../../components/student/ChallengeCard';
 import LessonQuiz from '../../components/student/LessonQuiz';
 import SolveChallenge from '../../components/student/SolveChallenge';
 import VideoPlayer from '../../components/VideoPlayer';
+import { HeartsBar } from '../../components/student/HeartsBar';
 import toast from 'react-hot-toast';
 import {
   PlayCircle, CheckCircle, Lock, ChevronLeft, ChevronRight,
   FileText, Download, BookOpen, Clock, Award,
   ChevronDown, ChevronUp, PenLine, HelpCircle, Code,
   Bookmark, BookmarkCheck, PartyPopper,
-  Megaphone, BarChart3, Brain,
+  Megaphone, BarChart3, Brain, GitBranch,
   Bold, Italic, Underline, Highlighter, Undo, Redo,
 } from 'lucide-react';
 import SEO from '@/components/seo/SEO';
@@ -108,6 +109,7 @@ export default function CourseView() {
   const [playbackSpeed, setPlaybackSpeed] = useState(1);
   const [autoPlayNext, setAutoPlayNext] = useState(true);
   const [showCompletion, setShowCompletion] = useState(false);
+  const [showXpPopup, setShowXpPopup] = useState(false);
   const saveTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const currentLessonIdRef = useRef<string | null>(null);
 
@@ -248,7 +250,11 @@ export default function CourseView() {
     try {
       await api.post('/progress', { lessonId: currentLesson.id, completed: newCompleted, courseId: course.id });
       setLessonProgress(prev => ({ ...prev, [currentLesson.id]: newCompleted }));
-      toast.success(newCompleted ? 'Lesson completed!' : 'Progress updated');
+      toast.success(newCompleted ? 'Lesson completed! +10 XP' : 'Progress updated');
+      if (newCompleted) {
+        setShowXpPopup(true);
+        setTimeout(() => setShowXpPopup(false), 2000);
+      }
       if (newCompleted && autoPlayNext && currentLessonIndex < totalLessons - 1) {
         setTimeout(() => goToLesson(currentLessonIndex + 1), 800);
       }
@@ -363,6 +369,11 @@ export default function CourseView() {
             <PlayCircle className="w-3 h-3" /> Auto
           </button>
           <Badge className="bg-blue-500/20 text-blue-400 text-xs">{progressPercent}% complete</Badge>
+          {course?.id && (
+            <Link to={`/student/skill-tree/${course.id}`} className="flex items-center gap-1 text-[10px] font-medium px-2 py-1 rounded-lg bg-purple-500/20 text-purple-400 hover:bg-purple-500/30 transition-colors">
+              <GitBranch className="w-3 h-3" /> Skill Tree
+            </Link>
+          )}
           <button onClick={() => setSidebarOpen(!sidebarOpen)} className="text-gray-400 hover:text-white lg:hidden">
             <BookOpen className="w-5 h-5" />
           </button>
@@ -510,7 +521,10 @@ export default function CourseView() {
               )}
 
               {activeTab === 'quiz' && (
-                lessonQuiz ? <LessonQuiz quiz={lessonQuiz} /> : <p className="text-gray-400 text-sm">No quiz available for this lesson.</p>
+                <div className="space-y-3">
+                  <HeartsBar hearts={5} maxHearts={5} nextHeartIn={null} />
+                  {lessonQuiz ? <LessonQuiz quiz={lessonQuiz} /> : <p className="text-gray-400 text-sm">No quiz available for this lesson.</p>}
+                </div>
               )}
 
               {activeTab === 'resources' && (
@@ -683,6 +697,18 @@ export default function CourseView() {
           </div>
         </div>
       </div>
+
+      {/* XP Popup */}
+      <AnimatePresence>
+        {showXpPopup && (
+          <motion.div initial={{ opacity: 0, y: -20, scale: 0.9 }} animate={{ opacity: 1, y: 0, scale: 1 }} exit={{ opacity: 0, y: -20, scale: 0.9 }} className="fixed top-24 left-1/2 -translate-x-1/2 z-50">
+            <div className="flex items-center gap-2 px-4 py-2 rounded-full bg-yellow-500/20 border border-yellow-500/40 shadow-lg shadow-yellow-500/20">
+              <span className="text-yellow-400 font-bold text-lg">+10 XP</span>
+              <CheckCircle className="w-4 h-4 text-yellow-400" />
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* Completion Celebration */}
       <AnimatePresence>

@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { motion } from 'framer-motion';
 import {
-  BookOpen, CheckCircle, Award, Clock, Flame, Zap, TrendingUp, TrendingDown,
+  BookOpen, CheckCircle, Award, Clock, Flame, Zap, TrendingUp, TrendingDown, Trophy,
 } from 'lucide-react';
 import { GlassCard } from '@/components/ui/GlassCard';
 import { cn } from '@/lib/utils';
@@ -84,6 +84,7 @@ interface StatsCardsProps {
     completedLessons: number;
     totalLearningHours: number;
     currentStreak: number;
+    bestStreak: number;
     xpPoints: number;
   } | null;
 }
@@ -95,11 +96,12 @@ export function StatsCards({ stats }: StatsCardsProps) {
     { icon: Award, label: 'Certificates Earned', value: stats?.certificates || 0, color: 'text-amber-500', bg: 'bg-amber-500/10', trend: 0, delay: 0.15 },
     { icon: Clock, label: 'Learning Hours', value: stats?.totalLearningHours || 0, color: 'text-purple-500', bg: 'bg-purple-500/10', suffix: 'h', trend: 15, delay: 0.2 },
     { icon: Flame, label: 'Current Streak', value: stats?.currentStreak || 0, color: 'text-orange-500', bg: 'bg-orange-500/10', suffix: 'd', trend: 5, delay: 0.25 },
+    { icon: Trophy, label: 'Best Streak', value: stats?.bestStreak || 0, color: 'text-amber-400', bg: 'bg-amber-400/10', suffix: 'd', delay: 0.28 },
     { icon: Zap, label: 'XP Points', value: stats?.xpPoints || 0, color: 'text-yellow-500', bg: 'bg-yellow-500/10', trend: 22, delay: 0.3 },
   ];
 
   return (
-    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 3xl:grid-cols-8 4xl:grid-cols-10 5xl:grid-cols-12 gap-2 sm:gap-3">
+    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-7 3xl:grid-cols-7 4xl:grid-cols-7 5xl:grid-cols-7 gap-2 sm:gap-3">
       {cards.map((card) => (
         <StatCard key={card.label} {...card} />
       ))}

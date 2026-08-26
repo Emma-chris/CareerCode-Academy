@@ -2,6 +2,7 @@ import { Router, Response, NextFunction } from 'express';
 import { authenticate, AuthRequest } from '../middleware/auth';
 import { query } from '../config/db';
 import { emitStudentUpdate } from '../config/socket';
+import { awardXp, updateStreak } from '../models/gamification';
 
 const router = Router();
 
@@ -167,6 +168,9 @@ router.post(
              VALUES ($1, 'Certificate Earned!', $2, 'certificate')`,
             [userId, `Congratulations! You earned a certificate for "${courseTitle}"`]
           );
+
+          // Gamification: award bonus XP for course completion
+          await awardXp(userId, 50, 'course_complete', `Completed course: ${courseTitle}`);
         }
       }
 
@@ -180,7 +184,15 @@ router.post(
           isCompleted,
         },
       });
-      emitStudentUpdate(userId);
+
+      // Gamification: award XP and update streak for completed lessons
+      if (completed) {
+        const newTotal = await awardXp(userId, 10, 'lesson_complete', 'Completed a lesson');
+        await updateStreak(userId);
+        emitStudentUpdate(userId);
+      } else {
+        emitStudentUpdate(userId);
+      }
     } catch (error) {
       next(error);
     }

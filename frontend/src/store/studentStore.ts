@@ -14,6 +14,13 @@ export interface StudentStats {
   xpPoints: number;
   level: number;
   rank: number;
+  hearts: number;
+  maxHearts: number;
+  nextHeartIn: number | null;
+  streakFreezes: number;
+  dailyXpGoal: number;
+  dailyXpEarned: number;
+  dailyGoalReached: boolean;
 }
 
 export interface RecentCourse {
@@ -238,6 +245,13 @@ export const useStudentStore = create<StudentState>((set, get) => ({
           xpPoints: data.stats.xpPoints || 0,
           level: data.stats.level || 1,
           rank: data.stats.rank || 0,
+          hearts: data.stats.hearts ?? 5,
+          maxHearts: data.stats.maxHearts ?? 5,
+          nextHeartIn: data.stats.nextHeartIn ?? null,
+          streakFreezes: data.stats.streakFreezes || 0,
+          dailyXpGoal: data.stats.dailyXpGoal || 50,
+          dailyXpEarned: data.stats.dailyXpEarned || 0,
+          dailyGoalReached: data.stats.dailyGoalReached || false,
         },
         recentCourses: data.recentCourses || [],
         recentActivity: data.recentActivity || [],

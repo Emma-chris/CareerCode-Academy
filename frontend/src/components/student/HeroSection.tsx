@@ -5,6 +5,8 @@ import { useAuthStore } from '@/store/authStore';
 import { useStudentStore } from '@/store/studentStore';
 import { useSocket } from '@/hooks/useSocket';
 import { Link } from 'react-router-dom';
+import { HeartsBar } from './HeartsBar';
+import { DailyGoalProgress } from './DailyGoalProgress';
 
 const motivationalQuotes = [
   'The expert in anything was once a beginner.',
@@ -96,6 +98,8 @@ export function HeroSection() {
             <div className="flex flex-wrap items-center gap-2 mt-4 text-white/80 text-sm">
               {stats && (
                 <>
+                  <HeartsBar hearts={stats.hearts} maxHearts={stats.maxHearts} nextHeartIn={stats.nextHeartIn} />
+                  <DailyGoalProgress xpEarned={stats.dailyXpEarned} goal={stats.dailyXpGoal} />
                   <div className="flex items-center gap-1.5 bg-white/10 px-3 py-1.5 rounded-full">
                     <Zap className="w-4 h-4 text-yellow-300" />
                     <span><strong className="text-white">{stats.xpPoints || 0}</strong> XP</span>

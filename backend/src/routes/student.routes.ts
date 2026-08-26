@@ -3,6 +3,7 @@ import { authenticate, AuthRequest } from '../middleware/auth';
 import { query } from '../config/db';
 import { io } from '../config/socket';
 import { createNotification } from '../models/notification';
+import { getHearts, getDailyProgress, updateStreak } from '../models/gamification';
 import messageRoutes from './message.routes';
 
 const router = Router();
@@ -189,7 +190,8 @@ router.get('/dashboard', async (req: AuthRequest, res: Response, next: NextFunct
           (SELECT COUNT(*)::int FROM enrollments WHERE user_id = $1 AND completed = true) AS completed_courses,
           COALESCE((SELECT SUM(jsonb_array_length(completed_lessons))::int FROM enrollments WHERE user_id = $1), 0) AS completed_lessons,
           COALESCE((SELECT COUNT(*)::int FROM certificates WHERE user_id = $1), 0) AS certificates,
-          COALESCE((SELECT ROUND(AVG(progress))::int FROM enrollments WHERE user_id = $1), 0) AS average_progress
+          COALESCE((SELECT ROUND(AVG(progress))::int FROM enrollments WHERE user_id = $1), 0) AS average_progress,
+          COALESCE((SELECT streak_freezes FROM users WHERE id = $1), 0) AS streak_freezes
       `, [userId]),
 
       // Additional stats for new badges
@@ -282,11 +284,15 @@ router.get('/dashboard', async (req: AuthRequest, res: Response, next: NextFunct
     const xpPoints = Number(xpRes.rows[0]?.xp_points) || 0;
     const level = Math.floor(xpPoints / 500) + 1;
 
-    const [streak, analytics, rank] = await Promise.all([
+    const [streak, analytics, rank, hearts, dailyProgress] = await Promise.all([
       computeStreak(userId),
       computeAnalytics(userId),
       computeRank(userId),
+      getHearts(userId),
+      getDailyProgress(userId),
     ]);
+
+    const streakData = await updateStreak(userId);
 
     const recentCourses = coursesRes.rows.map((c: any) => ({
       id: c.course_id,
@@ -351,10 +357,18 @@ router.get('/dashboard', async (req: AuthRequest, res: Response, next: NextFunct
           certificates: certificatesCount,
           averageProgress: Number(stats.average_progress) || 0,
           totalLearningHours,
-          currentStreak: streak,
+          currentStreak: streakData.current,
+          bestStreak: streakData.best,
           xpPoints,
           level,
           rank,
+          hearts: hearts.hearts,
+          maxHearts: hearts.maxHearts,
+          nextHeartIn: hearts.nextHeartIn,
+          streakFreezes: Number(statsRes.rows[0]?.streak_freezes) || 0,
+          dailyXpGoal: dailyProgress.goal,
+          dailyXpEarned: dailyProgress.xpEarned,
+          dailyGoalReached: dailyProgress.goalReached,
         },
         recentCourses,
         recentActivity,
