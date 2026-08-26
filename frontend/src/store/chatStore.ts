@@ -1,0 +1,236 @@
+import { create } from 'zustand';
+import api from '@/lib/axios';
+import { io, Socket } from 'socket.io-client';
+import { useAuthStore } from '@/store/authStore';
+
+export interface Message {
+  id: string;
+  sender_id: string;
+  receiver_id: string;
+  content: string;
+  attachment_url?: string;
+  is_read: boolean;
+  created_at: string;
+}
+
+export interface ConversationUser {
+  id: string;
+  name: string;
+  avatar: string | null;
+  role: string;
+  unread_count?: number;
+  last_message?: string;
+  last_message_at?: string;
+}
+
+export interface ChatUser {
+  id: string;
+  name: string;
+  email: string;
+  role: string;
+  avatar: string | null;
+}
+
+interface ChatState {
+  socket: Socket | null;
+  conversations: ConversationUser[];
+  activeConversation: string | null;
+  messages: Message[];
+  isLoading: boolean;
+  apiPrefix: string;
+  onlineUsers: Set<string>;
+  typingUsers: Set<string>;
+  searchResults: ChatUser[];
+  isSearching: boolean;
+
+  setApiPrefix: (prefix: string) => void;
+  initializeSocket: (userId: string) => void;
+  disconnectSocket: () => void;
+  fetchConversations: () => Promise<void>;
+  setActiveConversation: (userId: string) => Promise<void>;
+  sendMessage: (receiverId: string, content: string, attachment?: File) => Promise<void>;
+  addMessage: (message: Message) => void;
+  deleteMessage: (messageId: string) => Promise<void>;
+  markAsRead: (senderId: string) => Promise<void>;
+  markAllAsRead: () => Promise<void>;
+  emitTyping: (receiverId: string, typing: boolean) => void;
+  searchUsers: (query: string) => Promise<void>;
+  clearSearch: () => void;
+}
+
+export const useChatStore = create<ChatState>((set, get) => ({
+  socket: null,
+  conversations: [],
+  activeConversation: null,
+  messages: [],
+  isLoading: false,
+  apiPrefix: '/instructor',
+  onlineUsers: new Set(),
+  typingUsers: new Set(),
+  searchResults: [],
+  isSearching: false,
+
+  setApiPrefix: (prefix: string) => set({ apiPrefix: prefix }),
+
+  initializeSocket: (userId: string) => {
+    let { socket } = get();
+    if (!socket) {
+      const SOCKET_URL = import.meta.env.VITE_API_URL?.replace('/api/v1', '') || '';
+      const token = useAuthStore.getState().token;
+      socket = io(SOCKET_URL, { 
+        transports: ['websocket', 'polling'],
+        auth: { token }
+      });
+
+      socket.on('connect', () => {
+        socket!.emit('join_room', userId);
+      });
+
+      socket.on('receive_message', (message: Message) => {
+        get().addMessage(message);
+        get().fetchConversations();
+      });
+
+      socket.on('online_users', (data: { count: number; users: { id: string }[] }) => {
+        set({ onlineUsers: new Set(data.users.map(u => u.id)) });
+      });
+
+      socket.on('user_typing', (data: { senderId: string; typing: boolean }) => {
+        set((state) => {
+          const next = new Set(state.typingUsers);
+          if (data.typing) next.add(data.senderId);
+          else next.delete(data.senderId);
+          return { typingUsers: next };
+        });
+      });
+
+      set({ socket });
+    }
+  },
+
+  disconnectSocket: () => {
+    const { socket } = get();
+    if (socket) {
+      socket.disconnect();
+      set({ socket: null, onlineUsers: new Set(), typingUsers: new Set() });
+    }
+  },
+
+  fetchConversations: async () => {
+    set({ isLoading: true });
+    try {
+      const prefix = get().apiPrefix;
+      const { data } = await api.get(`${prefix}/messages/conversations`);
+      set({ conversations: data.data, isLoading: false });
+    } catch (error) {
+      console.error(error);
+      set({ isLoading: false });
+    }
+  },
+
+  setActiveConversation: async (userId: string) => {
+    set({ activeConversation: userId, isLoading: true, messages: [] });
+    try {
+      const prefix = get().apiPrefix;
+      const { data } = await api.get(`${prefix}/messages/${userId}`);
+      set({ messages: data.data, isLoading: false });
+      get().markAsRead(userId);
+    } catch (error) {
+      console.error(error);
+      set({ isLoading: false });
+    }
+  },
+
+  sendMessage: async (receiverId: string, content: string, attachment?: File) => {
+    try {
+      const prefix = get().apiPrefix;
+      let requestData;
+      let headers = {};
+      
+      if (attachment) {
+        const formData = new FormData();
+        formData.append('receiver_id', receiverId);
+        formData.append('content', content);
+        formData.append('attachment', attachment);
+        requestData = formData;
+        headers = { 'Content-Type': 'multipart/form-data' };
+      } else {
+        requestData = { receiver_id: receiverId, content };
+      }
+      
+      const { data } = await api.post(`${prefix}/messages`, requestData, { headers });
+      get().addMessage(data.data);
+      get().emitTyping(receiverId, false);
+    } catch (error) {
+      console.error(error);
+    }
+  },
+
+  addMessage: (message: Message) => {
+    const { messages, activeConversation } = get();
+    if (
+      (message.sender_id === activeConversation) ||
+      (message.receiver_id === activeConversation)
+    ) {
+      set({ messages: [...messages, message] });
+    }
+  },
+
+  deleteMessage: async (messageId: string) => {
+    try {
+      const prefix = get().apiPrefix;
+      await api.delete(`${prefix}/messages/${messageId}`);
+      set({ messages: get().messages.filter(m => m.id !== messageId) });
+    } catch (error) {
+      console.error(error);
+    }
+  },
+
+  markAsRead: async (senderId: string) => {
+    try {
+      const prefix = get().apiPrefix;
+      await api.put(`${prefix}/messages/read`, { senderId });
+      set((state) => ({
+        conversations: state.conversations.map(c =>
+          c.id === senderId ? { ...c, unread_count: 0 } : c
+        ),
+      }));
+    } catch (error) {
+      console.error(error);
+    }
+  },
+
+  emitTyping: (receiverId: string, typing: boolean) => {
+    const { socket } = get();
+    if (!socket) return;
+    const event = typing ? 'typing' : 'stop_typing';
+    socket.emit(event, { receiverId, senderId: '' });
+  },
+
+  markAllAsRead: async () => {
+    try {
+      const prefix = get().apiPrefix;
+      await api.put(`${prefix}/messages/read-all`);
+      set((state) => ({
+        conversations: state.conversations.map(c => ({ ...c, unread_count: 0 })),
+      }));
+    } catch (error) {
+      console.error(error);
+    }
+  },
+
+  searchUsers: async (query: string) => {
+    if (!query.trim()) { set({ searchResults: [], isSearching: false }); return; }
+    set({ isSearching: true });
+    try {
+      const prefix = get().apiPrefix;
+      const { data } = await api.get(`${prefix}/users?search=${encodeURIComponent(query)}&limit=20`);
+      set({ searchResults: data.data, isSearching: false });
+    } catch (error) {
+      console.error(error);
+      set({ isSearching: false });
+    }
+  },
+
+  clearSearch: () => set({ searchResults: [], isSearching: false }),
+}));
