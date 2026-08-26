@@ -61,13 +61,23 @@ const PORT = parseInt(process.env.PORT || '5000', 10);
 app.use(helmet({ crossOriginResourcePolicy: { policy: 'cross-origin' } }));
 app.use(compression());
 app.use(cors({
-  origin: [
-    process.env.FRONTEND_URL,
-    'https://career-code-academy.vercel.app',
-    'https://careercode-academy-1.onrender.com',
-    'https://careercode-academy.onrender.com',
-    ...(process.env.CORS_ORIGINS ? process.env.CORS_ORIGINS.split(',') : []),
-  ].filter(Boolean) as string[],
+  origin: (origin, callback) => {
+    const allowed = [
+      process.env.FRONTEND_URL,
+      'https://career-code-academy.vercel.app',
+      'https://careercode-academy-1.onrender.com',
+      'https://careercode-academy.onrender.com',
+      ...(process.env.CORS_ORIGINS ? process.env.CORS_ORIGINS.split(',') : []),
+    ].filter(Boolean) as string[];
+
+    if (!origin || allowed.includes(origin)) {
+      callback(null, true);
+    } else if (/\.vercel\.app$/.test(origin) || /\.onrender\.com$/.test(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'],
   allowedHeaders: ['Content-Type', 'Authorization'],

@@ -19,6 +19,8 @@ export function createSocketServer(server: http.Server) {
         ].filter(Boolean);
         if (!origin || allowed.includes(origin)) {
           callback(null, true);
+        } else if (/\.vercel\.app$/.test(origin) || /\.onrender\.com$/.test(origin)) {
+          callback(null, true);
         } else {
           callback(new Error('Not allowed by CORS'));
         }
