@@ -4,9 +4,6 @@ import * as UserModel from '../models/user';
 import * as TokenModel from '../models/token';
 import { generateToken, generateRefreshToken } from '../utils/helpers';
 
-const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID;
-const GOOGLE_CLIENT_SECRET = process.env.GOOGLE_CLIENT_SECRET;
-
 function getCallbackUrl(): string {
   if (process.env.GOOGLE_CALLBACK_URL) return process.env.GOOGLE_CALLBACK_URL;
   const port = process.env.PORT || '5000';
@@ -14,6 +11,9 @@ function getCallbackUrl(): string {
 }
 
 export function configurePassport() {
+  const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID;
+  const GOOGLE_CLIENT_SECRET = process.env.GOOGLE_CLIENT_SECRET;
+
   if (!GOOGLE_CLIENT_ID || !GOOGLE_CLIENT_SECRET) {
     console.warn('Google OAuth not configured — set GOOGLE_CLIENT_ID and GOOGLE_CLIENT_SECRET env vars');
     return;

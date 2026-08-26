@@ -665,6 +665,7 @@ router.get(
   (req: Request, res: Response, next: NextFunction) => {
     passport.authenticate('google', { session: false }, (err: any, data: any) => {
       if (err || !data) {
+        console.error('Google OAuth callback error:', err || 'No user data returned');
         const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:3000';
         return res.redirect(`${frontendUrl}/login?error=google_auth_failed`);
       }
