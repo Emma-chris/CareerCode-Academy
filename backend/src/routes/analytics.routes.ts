@@ -176,4 +176,104 @@ router.post('/track/heartbeat', (req: Request, res: Response) => {
   res.status(200).json({ success: true });
 });
 
+// POST /analytics/track/batch — accept multiple events in one request
+router.post('/track/batch', (req: Request, res: Response) => {
+  const visitorId = getVisitorId(req);
+  const userId = getUserId(req);
+  const { events } = req.body || {};
+
+  if (!visitorId || !Array.isArray(events) || events.length === 0) {
+    return res.status(200).json({ success: true });
+  }
+
+  for (const event of events) {
+    const { endpoint, data } = event || {};
+    if (!endpoint || !data) continue;
+
+    try {
+      switch (endpoint) {
+        case 'page-view': {
+          if (!data.page_url) break;
+          const dedupKey = `${visitorId}:${data.page_url}`;
+          const now = Date.now();
+          const lastView = pageViewDedup.get(dedupKey) || 0;
+          if (now - lastView < DEDUP_WINDOW) break;
+          pageViewDedup.set(dedupKey, now);
+
+          VisitorModel.insertPageView({
+            visitor_id: visitorId,
+            user_id: userId,
+            page_url: String(data.page_url).substring(0, 1000),
+            route_name: data.route_name ? String(data.route_name).substring(0, 255) : null,
+            time_spent_sec: Math.min(Math.max(Number(data.time_spent_sec) || 0, 0), 86400),
+            is_exit_page: !!data.is_exit_page,
+          }).catch(() => {});
+
+          setImmediate(() => {
+            emitAnalyticsEvent('page-view', { page_url: data.page_url, visitorId, userId, route_name: data.route_name });
+          });
+          break;
+        }
+        case 'click': {
+          if (!data.page_url || !data.element_text) break;
+          VisitorModel.insertClickEvent({
+            visitor_id: visitorId,
+            user_id: userId,
+            page_url: String(data.page_url).substring(0, 1000),
+            element_selector: data.element_selector ? String(data.element_selector).substring(0, 500) : null,
+            element_text: String(data.element_text).substring(0, 500),
+            element_type: data.element_type ? String(data.element_type).substring(0, 100) : null,
+          }).catch(() => {});
+
+          setImmediate(() => {
+            emitAnalyticsEvent('click', { page_url: data.page_url, visitorId, userId, element_text: data.element_text });
+          });
+          break;
+        }
+        case 'scroll': {
+          if (!data.page_url) break;
+          const depthNum = Number(data.depth) || 0;
+          VisitorModel.upsertScrollEvent({
+            visitor_id: visitorId,
+            user_id: userId,
+            page_url: String(data.page_url).substring(0, 1000),
+            depth_25: depthNum >= 25,
+            depth_50: depthNum >= 50,
+            depth_75: depthNum >= 75,
+            depth_100: depthNum >= 100,
+            max_depth: Math.min(Math.max(Number(data.max_depth) || depthNum, depthNum), 100),
+          }).catch(() => {});
+
+          setImmediate(() => {
+            emitAnalyticsEvent('scroll', { page_url: data.page_url, visitorId, userId, depth: depthNum });
+          });
+          break;
+        }
+        case 'journey': {
+          if (!data.page_url) break;
+          VisitorModel.upsertUserJourney({
+            visitor_id: visitorId,
+            user_id: userId,
+            page_url: String(data.page_url).substring(0, 1000),
+            conversion_type: data.conversion_type ? String(data.conversion_type).substring(0, 50) : null,
+            converted: !!data.converted,
+            enrolled_course_id: data.enrolled_course_id || null,
+          }).catch(() => {});
+
+          setImmediate(() => {
+            emitAnalyticsEvent('journey', { page_url: data.page_url, visitorId, userId, conversion_type: data.conversion_type, converted: !!data.converted });
+          });
+          break;
+        }
+        default:
+          break;
+      }
+    } catch {
+      // Skip bad events
+    }
+  }
+
+  res.status(200).json({ success: true });
+});
+
 export default router;
