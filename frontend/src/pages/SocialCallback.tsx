@@ -18,7 +18,13 @@ export default function SocialCallback() {
     }
 
     setTokens(token, refreshToken).then(() => {
-      navigate('/dashboard', { replace: true });
+      const user = useAuthStore.getState().user;
+      const target = user?.role === 'instructor' 
+        ? '/instructor/dashboard' 
+        : user?.role === 'admin' || user?.role === 'super_admin'
+        ? '/admin/dashboard'
+        : '/student/dashboard';
+      navigate(target, { replace: true });
     }).catch(() => {
       navigate('/login?error=oauth_auth_failed', { replace: true });
     });

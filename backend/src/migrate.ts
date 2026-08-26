@@ -1,4 +1,6 @@
 import { query } from './config/db';
+import fs from 'fs';
+import path from 'path';
 
 async function migrate() {
   console.log('Starting migration to Neon...');
@@ -891,6 +893,9 @@ async function migrate() {
     await query('CREATE INDEX IF NOT EXISTS idx_video_analytics_user ON video_analytics(user_id)');
     console.log('✓ showcase video indexes created');
 
+    // Run dynamic SQL migrations
+    await runSqlMigrations();
+
     console.log('Migration completed successfully!');
     await syncAllLearningPaths();
     console.log('✓ learning paths synced');
@@ -967,4 +972,31 @@ async function syncAllLearningPaths() {
       SELECT 1 FROM learning_path_courses lpc WHERE lpc.path_id = lp.id
     )`
   );
+}
+
+async function runSqlMigrations() {
+  const migrationsDir = path.join(process.cwd(), 'migrations');
+  if (!fs.existsSync(migrationsDir)) {
+    console.warn('Migrations directory not found at:', migrationsDir);
+    return;
+  }
+
+  const files = fs.readdirSync(migrationsDir)
+    .filter(f => f.endsWith('.sql'))
+    .sort();
+
+  console.log(`Found ${files.length} SQL migration files. Running them...`);
+
+  for (const file of files) {
+    console.log(`Running migration: ${file}`);
+    const filePath = path.join(migrationsDir, file);
+    const sql = fs.readFileSync(filePath, 'utf8');
+    try {
+      await query(sql);
+      console.log(`✓ Migration ${file} executed successfully`);
+    } catch (err: any) {
+      console.error(`✗ Error executing migration ${file}:`, err.message || err);
+      throw err;
+    }
+  }
 }
