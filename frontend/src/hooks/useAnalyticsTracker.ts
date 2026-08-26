@@ -30,7 +30,7 @@ interface JourneyEvent {
 }
 
 const TRACKING_ENABLED = import.meta.env.PROD || import.meta.env.VITE_ANALYTICS_ENABLED === 'true';
-const ANALYTICS_API = import.meta.env.VITE_API_URL || '/api/v1';
+const ANALYTICS_API = '';
 const BATCH_INTERVAL_MS = 5000;
 const HEARTBEAT_INTERVAL_MS = 30000;
 
