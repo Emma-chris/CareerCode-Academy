@@ -20,7 +20,7 @@ export function createSocketServer(server: http.Server) {
         if (!origin || allowed.includes(origin)) {
           callback(null, true);
         } else {
-          callback(null, true);
+          callback(new Error('Not allowed by CORS'));
         }
       },
       methods: ['GET', 'POST', 'PUT', 'DELETE'],
