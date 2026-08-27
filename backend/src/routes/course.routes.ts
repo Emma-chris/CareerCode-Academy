@@ -22,10 +22,11 @@ const createCourseSchema = z.object({
   price: z.number().min(0, 'Price must be 0 or more'),
   discountPercentage: z.number().min(0).max(100).optional(),
   category: z.string().min(2, 'Category is required'),
-  level: z.enum(['beginner', 'intermediate', 'advanced']),
-  duration: z.number().min(1, 'Duration must be at least 1 minute'),
+  level: z.enum(['beginner', 'intermediate', 'advanced']).optional(),
+  duration: z.number().min(1).optional(),
   thumbnail: z.string().min(1).optional(),
   published: z.boolean().optional(),
+  skill_level: z.string().optional(),
 });
 
 const updateCourseSchema = z.object({
@@ -171,10 +172,15 @@ router.post(
       }
       const slug = slugify(data.title);
 
+      const rawLevel = data.level || data.skill_level || 'beginner';
+      const level = ['beginner', 'intermediate', 'advanced'].includes(rawLevel) ? rawLevel : 'beginner';
+
       const course = await CourseModel.createCourse({
         ...data,
         instructor_id: req.user!.userId,
         thumbnail: (req as any).file ? getFileUrl((req as any).file) : data.thumbnail,
+        level,
+        duration: data.duration !== undefined ? data.duration : 1,
         slug,
       });
 
