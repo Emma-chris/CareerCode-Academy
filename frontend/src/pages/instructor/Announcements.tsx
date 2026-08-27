@@ -42,7 +42,7 @@ export default function InstructorAnnouncements() {
 
   return (
     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
-      <div className="flex items-center justify-between mb-8">
+      <div className="flex flex-wrap items-center justify-between gap-3 mb-8">
         <div>
           <h1 className="text-2xl sm:text-3xl font-bold mb-2">Announcements</h1>
           <p className="text-gray-500">Broadcast messages to your enrolled students.</p>
@@ -110,7 +110,7 @@ export default function InstructorAnnouncements() {
                 <Megaphone className="w-5 h-5 text-primary-500" />
               </div>
               <div className="flex-1">
-                <div className="flex items-center justify-between mb-1">
+                <div className="flex flex-wrap items-center justify-between gap-2 mb-1">
                   <h3 className="font-semibold text-lg">{ann.title}</h3>
                   <span className="text-xs text-gray-500">{new Date(ann.created_at).toLocaleDateString()}</span>
                 </div>

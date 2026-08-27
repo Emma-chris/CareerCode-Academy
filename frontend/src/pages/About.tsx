@@ -213,7 +213,7 @@ export default function About() {
 
       <section className="py-16">
         <div className="max-w-screen-4xl mx-auto px-4 sm:px-6 lg:px-8">
-          <GlassCard className="p-12 text-center">
+          <GlassCard className="p-6 sm:p-8 md:p-12 text-center">
             <Heart className="w-12 h-12 text-primary-500 mx-auto mb-4" />
             <h2 className="text-3xl font-bold mb-4">Ready to Start Your Journey?</h2>
             <p className="text-lg text-gray-600 dark:text-gray-400 mb-8 max-w-xl mx-auto">

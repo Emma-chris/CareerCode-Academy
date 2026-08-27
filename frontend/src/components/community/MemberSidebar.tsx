@@ -1,6 +1,8 @@
 import { useCommunityStore, ChannelMember } from '@/store/communityStore';
 import { cn } from '@/lib/utils';
-import { Crown, Shield, User } from 'lucide-react';
+import { Crown, Shield, User, Users, X } from 'lucide-react';
+import { useState } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 
 function PresenceDot({ online }: { online: boolean }) {
   return (
@@ -54,8 +56,9 @@ function MemberItem({ member }: { member: ChannelMember }) {
   );
 }
 
-export function MemberSidebar() {
+export function MemberSidebar({ showMembers = true }: { showMembers?: boolean }) {
   const { members } = useCommunityStore();
+  const [open, setOpen] = useState(false);
 
   // Group by role
   const owners = members.filter((m) => m.role === 'owner');
@@ -64,12 +67,19 @@ export function MemberSidebar() {
 
   const onlineCount = members.length;
 
-  return (
-    <div className="w-60 flex-shrink-0 bg-gray-900/80 border-l border-gray-700/50 h-full flex flex-col overflow-hidden">
-      <div className="p-3 border-b border-gray-700/50">
+  const content = (
+    <>
+      <div className="p-3 border-b border-gray-700/50 flex items-center justify-between">
         <h3 className="text-xs font-semibold uppercase tracking-wider text-gray-400">
           Members — {onlineCount}
         </h3>
+        <button
+          onClick={() => setOpen(false)}
+          className="lg:hidden p-1 rounded-lg hover:bg-white/10 text-gray-400 hover:text-white transition-colors"
+          aria-label="Close members"
+        >
+          <X className="w-4 h-4" />
+        </button>
       </div>
 
       <div className="flex-1 overflow-y-auto p-2 space-y-3">
@@ -109,6 +119,50 @@ export function MemberSidebar() {
           </div>
         )}
       </div>
-    </div>
+    </>
+  );
+
+  return (
+    <>
+      {/* Desktop */}
+      {showMembers && (
+        <div className="hidden lg:flex w-60 flex-shrink-0 bg-gray-900/80 border-l border-gray-700/50 h-full flex-col overflow-hidden">
+          {content}
+        </div>
+      )}
+
+      {/* Mobile toggle button */}
+      <button
+        onClick={() => setOpen(true)}
+        className="lg:hidden fixed top-20 right-4 z-50 p-2 bg-gray-800 rounded-lg border border-gray-700 text-gray-300"
+        aria-label="Show members"
+      >
+        <Users className="w-5 h-5" />
+      </button>
+
+      {/* Mobile overlay */}
+      <AnimatePresence>
+        {open && (
+          <>
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="lg:hidden fixed inset-0 bg-black/60 z-40"
+              onClick={() => setOpen(false)}
+            />
+            <motion.div
+              initial={{ x: 280 }}
+              animate={{ x: 0 }}
+              exit={{ x: 280 }}
+              transition={{ type: 'spring', damping: 25, stiffness: 300 }}
+              className="lg:hidden fixed right-0 top-0 bottom-0 w-72 bg-gray-900 z-50 shadow-2xl flex flex-col"
+            >
+              {content}
+            </motion.div>
+          </>
+        )}
+      </AnimatePresence>
+    </>
   );
 }

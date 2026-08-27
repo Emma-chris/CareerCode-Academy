@@ -52,7 +52,7 @@ export default function InternshipsPage() {
             <h1 className="text-3xl sm:text-4xl font-bold">Internships</h1>
             <p className="text-gray-400 mt-1">Gain real-world experience with top companies.</p>
           </div>
-          <div className="flex gap-2 w-full sm:w-auto">
+          <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
             <div className="relative flex-1 sm:flex-initial">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
               <input type="text" placeholder="Search..." value={search} onChange={e => setSearch(e.target.value)}
@@ -60,7 +60,7 @@ export default function InternshipsPage() {
             </div>
             <Select value={typeFilter} onChange={e => setTypeFilter(e.target.value)}
               options={[{ value: 'all', label: 'All Types' }, { value: 'remote', label: 'Remote' }, { value: 'onsite', label: 'On-Site' }, { value: 'hybrid', label: 'Hybrid' }]}
-              className="w-auto min-w-[120px]" />
+              className="w-full sm:w-auto sm:min-w-[120px]" />
           </div>
         </div>
 
@@ -75,7 +75,7 @@ export default function InternshipsPage() {
             {filtered.map((intern, i) => (
               <motion.div key={intern.id} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.03 }}>
                 <GlassCard hover={false} className="p-5">
-                  <div className="flex items-start gap-4">
+                  <div className="flex flex-wrap items-start gap-4">
                     <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-purple-500/20 to-pink-500/20 flex items-center justify-center shrink-0">
                       <Building className="w-6 h-6 text-purple-500" />
                     </div>
@@ -94,14 +94,16 @@ export default function InternshipsPage() {
                         {intern.stipend && <span className="flex items-center gap-1"><DollarSign className="w-3 h-3" /> {intern.stipend}</span>}
                       </div>
                       {intern.requirements && (
-                        <p className="text-xs text-gray-500 mt-2"><span className="text-gray-400 font-medium">Requirements:</span> {intern.requirements}</p>
+                        <p className="text-xs text-gray-500 mt-2 line-clamp-3 break-words"><span className="text-gray-400 font-medium">Requirements:</span> {intern.requirements}</p>
                       )}
                     </div>
-                    <a href={intern.application_url || '#'} target="_blank" rel="noopener noreferrer" className="shrink-0">
-                      <Button size="sm" variant="outline" disabled={!intern.application_url}>
-                        <ExternalLink className="w-3.5 h-3.5 mr-1" /> Apply
-                      </Button>
-                    </a>
+                    <div className="shrink-0 w-full sm:w-auto">
+                      <a href={intern.application_url || '#'} target="_blank" rel="noopener noreferrer" className="inline-flex sm:inline-block">
+                        <Button size="sm" variant="outline" disabled={!intern.application_url} className="w-full sm:w-auto">
+                          <ExternalLink className="w-3.5 h-3.5 mr-1" /> Apply
+                        </Button>
+                      </a>
+                    </div>
                   </div>
                 </GlassCard>
               </motion.div>

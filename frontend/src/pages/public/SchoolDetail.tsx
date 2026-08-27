@@ -155,14 +155,14 @@ export default function SchoolDetail() {
             { label: school.name },
           ]} className="mb-6" />
 
-          <div className="flex items-start gap-6">
+          <div className="flex flex-col sm:flex-row items-start gap-4 sm:gap-6">
             <div className={`w-20 h-20 rounded-2xl bg-gradient-to-br ${school.color || 'from-primary-500 to-accent-500'} flex items-center justify-center shrink-0`}>
               <Icon className="w-10 h-10 text-white" />
             </div>
             <div className="flex-1 min-w-0">
               <h1 className="text-3xl sm:text-4xl font-bold text-white mb-3">{school.name}</h1>
               <p className="text-lg text-gray-400 max-w-3xl">{school.description}</p>
-              <div className="flex items-center gap-4 mt-4">
+              <div className="flex flex-wrap items-center gap-3 sm:gap-4 mt-4">
                 <Badge variant="primary" size="md">{programs.length} Programs</Badge>
                 {schoolVideo && (
                   <Button size="sm" variant="outline" onClick={() => setVideoOpen(true)} className="flex items-center gap-2">
@@ -172,7 +172,7 @@ export default function SchoolDetail() {
               </div>
             </div>
             {schoolVideo?.thumbnail_url && (
-              <div className="shrink-0 cursor-pointer" onClick={() => setVideoOpen(true)}>
+              <div className="hidden md:block shrink-0 cursor-pointer" onClick={() => setVideoOpen(true)}>
                 <div className="relative w-40 h-24 rounded-xl overflow-hidden group">
                   <img src={schoolVideo.thumbnail_url} alt="" className="w-full h-full object-cover" />
                   <div className="absolute inset-0 bg-black/40 flex items-center justify-center group-hover:bg-black/60 transition-colors">
@@ -223,7 +223,7 @@ export default function SchoolDetail() {
                   { value: '95%', label: 'Completion Rate', icon: CheckCircle, color: 'text-blue-400' },
                   { value: '15K+', label: 'Alumni Worldwide', icon: Users, color: 'text-purple-400' },
                 ].map((stat) => (
-                  <div key={stat.label} className="rounded-xl bg-white/5 dark:bg-gray-800/50 border border-white/10 dark:border-gray-700/50 p-4 text-center">
+                  <div key={stat.label} className="rounded-xl bg-white/5 dark:bg-gray-800/50 border border-white/10 dark:border-gray-700/50 p-3 sm:p-4 text-center">
                     <stat.icon className={`w-5 h-5 ${stat.color} mx-auto mb-1.5`} />
                     <p className="text-xl font-bold text-white">{stat.value}</p>
                     <p className="text-xs text-gray-500">{stat.label}</p>

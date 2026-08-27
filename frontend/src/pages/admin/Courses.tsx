@@ -325,7 +325,7 @@ export default function AdminCourses() {
 
   return (
     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-6">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
           <h1 className="text-2xl sm:text-3xl font-bold">Courses</h1>
           <p className="text-gray-500 mt-1">Moderate and manage all courses.</p>
@@ -357,7 +357,7 @@ export default function AdminCourses() {
           {TABS.map((t) => (
             <button
               key={t} onClick={() => setTab(t)}
-              className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all capitalize whitespace-nowrap ${tab === t ? 'bg-white dark:bg-gray-700 text-primary-600 dark:text-primary-400 shadow-sm' : 'text-gray-400 hover:text-gray-700 dark:hover:text-gray-300'}`}
+              className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all capitalize whitespace-nowrap flex-shrink-0 ${tab === t ? 'bg-white dark:bg-gray-700 text-primary-600 dark:text-primary-400 shadow-sm' : 'text-gray-400 hover:text-gray-700 dark:hover:text-gray-300'}`}
             >
               {t.replace('_', ' ')}
             </button>
@@ -780,7 +780,7 @@ export default function AdminCourses() {
                       {chs.length > 0 && (
                         <div className="space-y-1.5 mt-2">
                           {chs.map((ch: any) => (
-                            <div key={ch.id} className="flex items-center justify-between p-2 rounded-lg bg-gray-50 dark:bg-gray-800/50 text-xs">
+                            <div key={ch.id} className="flex flex-wrap items-center justify-between gap-2 p-2 rounded-lg bg-gray-50 dark:bg-gray-800/50 text-xs">
                               <div className="flex items-center gap-2">
                                 <Code className="w-3 h-3 text-purple-500" />
                                 <span className="font-medium">{ch.title}</span>

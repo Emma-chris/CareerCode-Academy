@@ -815,7 +815,7 @@ export default function CourseBuilder() {
 
   const renderStep3 = () => (
     <div className="space-y-4">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
           <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Curriculum</h3>
           <p className="text-sm text-gray-500">{formData.sections.length} sections &middot; {totalLessons} lessons</p>

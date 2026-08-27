@@ -61,7 +61,7 @@ export default function AdminCalendar() {
 
   return (
     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
-      <div className="flex items-center justify-between mb-6">
+      <div className="flex flex-wrap items-center justify-between gap-3 mb-6">
         <div>
           <h1 className="text-2xl sm:text-3xl font-bold">Platform Calendar</h1>
           <p className="text-gray-500 mt-1">All courses, assignments, live classes, quizzes, and exams.</p>
@@ -82,7 +82,7 @@ export default function AdminCalendar() {
         </div>
       </div>
 
-      <div className="grid lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div className="lg:col-span-2">
           <GlassCard className="p-5" hover={false}>
             <div className="flex items-center justify-between mb-5">

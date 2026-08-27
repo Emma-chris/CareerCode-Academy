@@ -173,7 +173,7 @@ export default function ExamMonitor() {
   return (
     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-6">
       {/* Header */}
-      <div className="flex items-center justify-between">
+      <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
           <h1 className="text-2xl sm:text-3xl font-bold">Exam Monitor</h1>
           <p className="text-gray-400 mt-1">Live monitoring and recorded history of exam sessions.</p>
@@ -257,7 +257,7 @@ export default function ExamMonitor() {
                     </div>
 
                     {/* View mode toggle */}
-                    <div className="flex gap-1 mb-3">
+                    <div className="flex flex-wrap gap-1 mb-3">
                       {(['composite', 'screen', 'camera'] as const).map((mode) => (
                         <button
                           key={mode}
@@ -324,7 +324,7 @@ export default function ExamMonitor() {
       {tab === 'history' && (
         <div className="space-y-4">
           {/* Search */}
-          <div className="flex items-center gap-2">
+          <div className="flex flex-wrap items-center gap-2">
             <div className="relative flex-1 max-w-md">
               <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
               <input
@@ -357,7 +357,7 @@ export default function ExamMonitor() {
                     : null;
                   return (
                     <GlassCard key={entry.attempt_id} className="p-4">
-                      <div className="flex items-start justify-between">
+                      <div className="flex flex-wrap items-start justify-between gap-2">
                         <div className="flex items-center gap-3 min-w-0 flex-1">
                           <div className="w-10 h-10 rounded-full bg-primary-500/10 flex items-center justify-center shrink-0">
                             <User className="w-5 h-5 text-primary-400" />

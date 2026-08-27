@@ -187,7 +187,7 @@ export default function ProgramDetail() {
                               <p className="text-white font-semibold">{isFree ? 'Free' : `$${Number(course.price).toFixed(0)}`}</p>
                             </div>
                           </div>
-                          <div className="flex items-center gap-4 mt-2 text-xs text-gray-500">
+                          <div className="flex flex-wrap items-center gap-2 sm:gap-4 mt-2 text-xs text-gray-500">
                             <div className="flex items-center gap-1"><Clock className="w-3 h-3" />{formatDuration(course.duration)}</div>
                             <div className="flex items-center gap-1"><Users className="w-3 h-3" />{course.student_count ?? 0}</div>
                             <div className="flex items-center gap-1"><Star className="w-3 h-3 text-yellow-500" />{course.avg_rating ?? '0.0'}</div>

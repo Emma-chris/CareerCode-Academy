@@ -95,7 +95,7 @@ export default function Certificate() {
           <Search className="w-4 h-4 text-primary-500" />
           Verify a Certificate
         </h2>
-        <div className="flex gap-2">
+        <div className="flex flex-col sm:flex-row gap-2">
           <input
             type="text"
             placeholder="Enter certificate verification code"
@@ -105,7 +105,7 @@ export default function Certificate() {
             onKeyDown={(e) => e.key === 'Enter' && handleVerify()}
             aria-label="Verification code"
           />
-          <Button onClick={handleVerify} loading={verifying}>Verify</Button>
+          <Button onClick={handleVerify} loading={verifying} className="w-full sm:w-auto">Verify</Button>
         </div>
         {verifyResult && (
           <div className="mt-4 p-4 bg-success-500/10 border border-success-500/30 rounded-xl">
@@ -143,7 +143,7 @@ export default function Certificate() {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: i * 0.1 }}
               >
-                <GlassCard className="p-8 text-center relative overflow-hidden" glow>
+                <GlassCard className="p-5 sm:p-8 text-center relative overflow-hidden" glow>
                   <div className="absolute top-0 right-0 w-40 h-40 bg-primary-500/5 rounded-full blur-3xl" />
                   <div className="absolute bottom-0 left-0 w-40 h-40 bg-secondary-500/5 rounded-full blur-3xl" />
 
@@ -157,13 +157,13 @@ export default function Certificate() {
                     <div className="w-16 h-16 rounded-2xl gradient-bg flex items-center justify-center mx-auto mb-4">
                       <Award className="w-8 h-8 text-white" />
                     </div>
-                    <h3 className="text-xl font-bold mb-1">Certificate of Completion</h3>
+                    <h3 className="text-lg sm:text-xl font-bold mb-1">Certificate of Completion</h3>
                     <p className="text-gray-500 text-sm mb-4">This certifies that</p>
-                    <p className="text-2xl font-bold gradient-text mb-2">
+                    <p className="text-xl sm:text-2xl font-bold gradient-text mb-2 break-words">
                       {item.user?.name || 'Student'}
                     </p>
                     <p className="text-gray-500 text-sm mb-4">has successfully completed</p>
-                    <p className="text-xl font-semibold mb-6">{course.title || 'Course'}</p>
+                    <p className="text-lg sm:text-xl font-semibold mb-6 break-words">{course.title || 'Course'}</p>
 
                     <div className="flex items-center justify-center gap-1 text-sm text-gray-500 mb-6">
                       <Calendar className="w-4 h-4" />
@@ -174,7 +174,7 @@ export default function Certificate() {
                       ID: {cert.verification_code}
                     </div>
 
-                    <div className="flex items-center justify-center gap-3">
+                    <div className="flex flex-wrap items-center justify-center gap-3">
                       <Button variant="outline" size="sm" onClick={() => handleShare(cert.verification_code)}>
                         <Share2 className="w-4 h-4 mr-1" /> Share
                       </Button>

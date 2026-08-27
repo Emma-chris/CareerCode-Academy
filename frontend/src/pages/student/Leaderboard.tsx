@@ -30,7 +30,7 @@ export default function Leaderboard() {
 
       {/* Podium */}
       {leaderboard.length >= 3 && (
-        <div className="flex items-end justify-center gap-4 mb-8">
+        <div className="flex items-end justify-center gap-2 sm:gap-4 mb-8">
           {/* 2nd Place */}
           <motion.div
             initial={{ opacity: 0, y: 40 }}
@@ -38,12 +38,12 @@ export default function Leaderboard() {
             transition={{ delay: 0.1 }}
             className="flex flex-col items-center gap-2"
           >
-            <div className="w-12 h-12 rounded-full bg-gray-400 flex items-center justify-center text-lg font-bold text-white shadow-lg">
+            <div className="w-10 sm:w-12 h-10 sm:h-12 rounded-full bg-gray-400 flex items-center justify-center text-base sm:text-lg font-bold text-white shadow-lg">
               {(leaderboard[1].name || '?').charAt(0)}
             </div>
-            <span className="text-sm font-medium text-gray-400 truncate max-w-[80px] text-center">{leaderboard[1].name || 'Anonymous'}</span>
-            <div className="w-16 h-20 bg-gray-200 dark:bg-gray-800 rounded-t-xl flex items-center justify-center">
-              <Medal className="w-5 h-5 text-gray-400" />
+            <span className="text-xs sm:text-sm font-medium text-gray-400 truncate max-w-[70px] sm:max-w-[80px] text-center">{leaderboard[1].name || 'Anonymous'}</span>
+            <div className="w-14 sm:w-16 h-16 sm:h-20 bg-gray-200 dark:bg-gray-800 rounded-t-xl flex items-center justify-center">
+              <Medal className="w-4 sm:w-5 h-4 sm:h-5 text-gray-400" />
             </div>
             <span className="text-xs text-gray-400 font-medium">2nd</span>
           </motion.div>
@@ -55,12 +55,12 @@ export default function Leaderboard() {
             transition={{ delay: 0 }}
             className="flex flex-col items-center gap-2"
           >
-            <div className="w-14 h-14 rounded-full bg-yellow-500 flex items-center justify-center text-xl font-bold text-white shadow-lg ring-4 ring-yellow-500/30">
+            <div className="w-12 sm:w-14 h-12 sm:h-14 rounded-full bg-yellow-500 flex items-center justify-center text-lg sm:text-xl font-bold text-white shadow-lg ring-4 ring-yellow-500/30">
               {(leaderboard[0].name || '?').charAt(0)}
             </div>
-            <span className="text-sm font-semibold truncate max-w-[90px] text-center">{leaderboard[0].name || 'Anonymous'}</span>
-            <div className="w-20 h-28 bg-gradient-to-t from-yellow-500/20 to-transparent rounded-t-xl flex items-center justify-center border border-yellow-500/30">
-              <Crown className="w-6 h-6 text-yellow-500" />
+            <span className="text-sm font-semibold truncate max-w-[80px] sm:max-w-[90px] text-center">{leaderboard[0].name || 'Anonymous'}</span>
+            <div className="w-16 sm:w-20 h-24 sm:h-28 bg-gradient-to-t from-yellow-500/20 to-transparent rounded-t-xl flex items-center justify-center border border-yellow-500/30">
+              <Crown className="w-5 sm:w-6 h-5 sm:h-6 text-yellow-500" />
             </div>
             <span className="text-xs font-semibold text-yellow-500">1st</span>
           </motion.div>
@@ -72,12 +72,12 @@ export default function Leaderboard() {
             transition={{ delay: 0.2 }}
             className="flex flex-col items-center gap-2"
           >
-            <div className="w-12 h-12 rounded-full bg-amber-600 flex items-center justify-center text-lg font-bold text-white shadow-lg">
+            <div className="w-10 sm:w-12 h-10 sm:h-12 rounded-full bg-amber-600 flex items-center justify-center text-base sm:text-lg font-bold text-white shadow-lg">
               {(leaderboard[2].name || '?').charAt(0)}
             </div>
-            <span className="text-sm font-medium text-gray-400 truncate max-w-[80px] text-center">{leaderboard[2].name || 'Anonymous'}</span>
-            <div className="w-16 h-16 bg-amber-600/10 dark:bg-amber-900/20 rounded-t-xl flex items-center justify-center border border-amber-600/20">
-              <Medal className="w-5 h-5 text-amber-600" />
+            <span className="text-xs sm:text-sm font-medium text-gray-400 truncate max-w-[70px] sm:max-w-[80px] text-center">{leaderboard[2].name || 'Anonymous'}</span>
+            <div className="w-14 sm:w-16 h-14 sm:h-16 bg-amber-600/10 dark:bg-amber-900/20 rounded-t-xl flex items-center justify-center border border-amber-600/20">
+              <Medal className="w-4 sm:w-5 h-4 sm:h-5 text-amber-600" />
             </div>
             <span className="text-xs text-gray-400 font-medium">3rd</span>
           </motion.div>

@@ -68,7 +68,7 @@ export default function JobBoard() {
             <h1 className="text-3xl sm:text-4xl font-bold">Job Board</h1>
             <p className="text-gray-400 mt-1">Explore opportunities from our partner companies.</p>
           </div>
-          <div className="flex gap-2 w-full sm:w-auto">
+          <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
             <div className="relative flex-1 sm:flex-initial">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
               <input
@@ -86,7 +86,7 @@ export default function JobBoard() {
                 { value: 'remote', label: 'Remote' },
                 { value: 'hybrid', label: 'Hybrid' },
               ]}
-              className="w-auto min-w-[120px]"
+              className="w-full sm:w-auto sm:min-w-[120px]"
             />
           </div>
         </div>
@@ -102,7 +102,7 @@ export default function JobBoard() {
             {filtered.map((job, i) => (
               <motion.div key={job.id} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.03 }}>
                 <GlassCard hover={false} className="p-5">
-                  <div className="flex items-start gap-4">
+                  <div className="flex flex-wrap items-start gap-4">
                     <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-primary-500/20 to-accent-500/20 flex items-center justify-center shrink-0">
                       <Building className="w-6 h-6 text-primary-500" />
                     </div>
@@ -125,11 +125,13 @@ export default function JobBoard() {
                         <span className="flex items-center gap-1"><Clock className="w-3 h-3" /> {new Date(job.created_at).toLocaleDateString()}</span>
                       </div>
                     </div>
-                    <a href={job.application_url || '#'} target="_blank" rel="noopener noreferrer" className="shrink-0">
-                      <Button size="sm" variant="outline" disabled={!job.application_url}>
-                        <ExternalLink className="w-3.5 h-3.5 mr-1" /> Apply
-                      </Button>
-                    </a>
+                    <div className="shrink-0 w-full sm:w-auto">
+                      <a href={job.application_url || '#'} target="_blank" rel="noopener noreferrer" className="inline-flex sm:inline-block">
+                        <Button size="sm" variant="outline" disabled={!job.application_url} className="w-full sm:w-auto">
+                          <ExternalLink className="w-3.5 h-3.5 mr-1" /> Apply
+                        </Button>
+                      </a>
+                    </div>
                   </div>
                 </GlassCard>
               </motion.div>

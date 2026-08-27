@@ -346,13 +346,13 @@ export default function CourseEditor() {
 
   return (
     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
-      <div className="flex items-center justify-between mb-6">
+      <div className="flex flex-wrap items-center justify-between gap-3 mb-6">
         <div className="flex items-center gap-4">
           <Link to="/instructor/courses" className="text-gray-500 hover:text-primary-500 transition-colors">
             <ChevronLeft className="w-5 h-5" />
           </Link>
           <div>
-            <h1 className="text-2xl font-bold">{isNew ? 'Create New Course' : 'Edit Course'}</h1>
+            <h1 className="text-2xl font-bold break-words">{isNew ? 'Create New Course' : 'Edit Course'}</h1>
             <p className="text-sm text-gray-500">{isNew ? 'Set up your course details' : `Editing: ${title}`}</p>
           </div>
         </div>
@@ -361,7 +361,7 @@ export default function CourseEditor() {
         </Button>
       </div>
 
-      <div className="grid lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div className="lg:col-span-2 space-y-6">
           <GlassCard className="p-6">
             <h2 className="text-lg font-semibold mb-4">Basic Information</h2>

@@ -177,7 +177,7 @@ export default function InstructorQuizzes() {
               </div>
               <div className="flex-1 min-w-0">
                 <div className="font-medium">{quiz.title}</div>
-                <div className="text-xs text-gray-500 flex items-center gap-3 mt-0.5">
+                <div className="text-xs text-gray-500 flex flex-wrap items-center gap-x-3 gap-y-1 mt-0.5">
                   <span className="flex items-center gap-1"><FileQuestion className="w-3 h-3" /> {quiz.questionCount || 0} questions</span>
                   {quiz.time_limit > 0 && <span className="flex items-center gap-1"><Clock className="w-3 h-3" /> {quiz.time_limit} min</span>}
                   <span>Pass: {quiz.passing_score}%</span>

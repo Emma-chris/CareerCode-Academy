@@ -271,7 +271,7 @@ export default function CommunityManagement() {
           <button
             key={tab.key}
             onClick={() => setActiveTab(tab.key)}
-            className={`px-4 py-2 rounded-xl text-sm font-medium whitespace-nowrap transition-all ${
+            className={`px-4 py-2 rounded-xl text-sm font-medium whitespace-nowrap flex-shrink-0 transition-all ${
               activeTab === tab.key
                 ? 'bg-primary-500/10 text-primary-400 border border-primary-500/20'
                 : 'text-gray-400 hover:bg-white/5 hover:text-gray-300'

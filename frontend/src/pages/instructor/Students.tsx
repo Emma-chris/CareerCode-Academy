@@ -385,7 +385,7 @@ export default function InstructorStudents() {
     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
       <SEO title="Students" />
 
-      <div className="flex items-center justify-between mb-8">
+      <div className="flex flex-wrap items-center justify-between gap-3 mb-8">
         <div>
           <h1 className="text-2xl sm:text-3xl font-bold mb-2">Students</h1>
           <p className="text-gray-500">Manage and monitor your enrolled students.</p>

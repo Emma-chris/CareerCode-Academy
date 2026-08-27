@@ -91,7 +91,7 @@ export default function AdminReports() {
       action: handleExportEnrollments,
       key: 'enrollments',
       extra: (
-        <div className="flex gap-2 mt-3">
+        <div className="flex flex-wrap gap-2 mt-3">
           <select value={status} onChange={(e) => setStatus(e.target.value)} className="text-xs rounded-lg bg-gray-100 dark:bg-gray-800 px-2 py-1 border-0 outline-none">
             <option value="all">All status</option>
             <option value="active">Active</option>

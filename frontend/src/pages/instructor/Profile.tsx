@@ -142,7 +142,7 @@ export default function InstructorProfile() {
     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
       <SEO title="Instructor Profile" />
 
-      <div className="flex items-center justify-between mb-6">
+      <div className="flex flex-wrap items-center justify-between gap-3 mb-6">
         <div>
           <h1 className="text-2xl sm:text-3xl font-bold mb-1">Profile</h1>
           <p className="text-gray-500">Manage your instructor profile and public information.</p>
@@ -238,7 +238,7 @@ export default function InstructorProfile() {
       </div>
 
       {/* Bio & Expertise */}
-      <div className="grid lg:grid-cols-3 gap-6 mb-6">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
         <div className="lg:col-span-2">
           <GlassCard className="p-6" hover={false}>
             <h3 className="font-semibold mb-3">About</h3>
@@ -325,7 +325,7 @@ export default function InstructorProfile() {
       {/* View My Courses link */}
       {!editing && (
         <GlassCard className="p-5" hover={false}>
-          <div className="flex items-center justify-between">
+          <div className="flex flex-wrap items-center justify-between gap-2">
             <div>
               <h3 className="font-semibold">Your Courses</h3>
               <p className="text-sm text-gray-500 mt-1">

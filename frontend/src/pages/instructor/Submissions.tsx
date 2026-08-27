@@ -90,7 +90,7 @@ export default function InstructorSubmissions() {
       </div>
 
       {/* Tabs */}
-      <div className="flex gap-4 mb-6 border-b border-gray-800">
+      <div className="flex gap-4 mb-6 border-b border-gray-800 overflow-x-auto scrollbar-hide">
         {([
           { key: 'assignments' as Tab, label: 'Assignments', count: submissions.length },
           { key: 'challenges' as Tab, label: 'Challenges', count: challengeSubs.length, pending: pendingCount },
@@ -98,7 +98,7 @@ export default function InstructorSubmissions() {
           <button
             key={t.key}
             onClick={() => setTab(t.key)}
-            className={`pb-2 text-sm font-medium border-b-2 transition-colors ${
+            className={`pb-2 text-sm font-medium border-b-2 transition-colors whitespace-nowrap flex-shrink-0 ${
               tab === t.key
                 ? 'text-blue-400 border-blue-500'
                 : 'text-gray-500 border-transparent hover:text-gray-300'
@@ -197,9 +197,9 @@ export default function InstructorSubmissions() {
 
           return (
             <GlassCard key={sub.id} className="p-6">
-              <div className="flex items-start justify-between mb-2">
-                <div className="flex-1">
-                  <div className="flex items-center gap-3 mb-1">
+                  <div className="flex items-start justify-between gap-3 mb-2">
+                <div className="flex-1 min-w-0">
+                  <div className="flex flex-wrap items-center gap-3 mb-1">
                     <div className={`w-7 h-7 rounded-lg flex items-center justify-center ${tc.color}`}>
                       <TypeIcon className="w-3.5 h-3.5" />
                     </div>

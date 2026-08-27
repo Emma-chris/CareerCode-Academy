@@ -219,7 +219,7 @@ export default function InstructorAnalytics() {
             </div>
           </motion.div>
 
-          <div className="grid lg:grid-cols-2 gap-4 sm:gap-6">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
             {/* Enrollment Trend */}
             <motion.div variants={item}>
               <GlassCard className="p-5" hover={false}>
@@ -309,7 +309,7 @@ export default function InstructorAnalytics() {
             </div>
           </motion.div>
 
-          <div className="grid lg:grid-cols-2 gap-4 sm:gap-6 mb-6">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6 mb-6">
             {/* Watch Time Trend */}
             <motion.div variants={item}>
               <GlassCard className="p-5" hover={false}>
@@ -420,7 +420,7 @@ export default function InstructorAnalytics() {
             </div>
           </motion.div>
 
-          <div className="grid lg:grid-cols-2 gap-4 sm:gap-6">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
             {/* Monthly Revenue Chart */}
             <motion.div variants={item}>
               <GlassCard className="p-5" hover={false}>

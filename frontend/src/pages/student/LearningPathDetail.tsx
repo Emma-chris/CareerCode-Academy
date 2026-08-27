@@ -66,18 +66,18 @@ export default function LearningPathDetail() {
         <div className={`absolute top-0 left-0 w-full h-2 bg-gradient-to-r ${path.color || 'from-blue-600 to-cyan-600'}`} />
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mt-2">
           <div>
-            <div className="flex items-center gap-3 mb-2">
+            <div className="flex flex-wrap items-center gap-x-3 gap-y-1 mb-2">
               <div className="w-12 h-12 rounded-xl bg-primary-500/10 flex items-center justify-center">
                 <GitBranch className="w-6 h-6 text-primary-500" />
               </div>
               <div>
-                <h1 className="text-2xl font-bold">{path.title}</h1>
+                <h1 className="text-xl sm:text-2xl font-bold break-words">{path.title}</h1>
                 <Badge className="capitalize">{path.level}</Badge>
               </div>
             </div>
             <p className="text-gray-500 mt-2 max-w-2xl">{path.description}</p>
 
-            <div className="flex items-center gap-4 mt-4 text-sm text-gray-500">
+            <div className="flex flex-wrap items-center gap-x-4 gap-y-1 mt-4 text-sm text-gray-500">
               <span className="flex items-center gap-1"><BookOpen className="w-4 h-4" /> {courses.length} courses</span>
               <span className="flex items-center gap-1"><Clock className="w-4 h-4" /> {Math.floor((path.total_duration || 0) / 60)} hours</span>
               <span className="flex items-center gap-1"><Users className="w-4 h-4" /> {path.students_count || 0} students</span>

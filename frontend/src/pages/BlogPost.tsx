@@ -108,7 +108,7 @@ export default function BlogPost() {
             <ArrowLeft className="w-4 h-4" /> Back to Blog
           </Link>
 
-          <div className="flex items-center gap-3 mb-4">
+          <div className="flex flex-wrap items-center gap-3 mb-4">
             <Badge variant="primary" size="md">{post.category}</Badge>
             <div className="flex items-center gap-1 text-sm text-gray-400"><Clock className="w-4 h-4" /> {post.readTime}</div>
             <div className="flex items-center gap-1 text-sm text-gray-400"><Calendar className="w-4 h-4" /> {formatDate(post.date)}</div>
@@ -117,7 +117,7 @@ export default function BlogPost() {
           <h1 className="text-3xl sm:text-4xl font-bold text-white mb-8">{post.title}</h1>
 
           <GlassCard className="p-8 sm:p-12 prose prose-gray dark:prose-invert max-w-none">
-            <div className="flex items-center gap-4 mb-8 pb-8 border-b border-gray-200 dark:border-gray-800">
+            <div className="flex flex-wrap items-center gap-3 mb-8 pb-8 border-b border-gray-200 dark:border-gray-800">
               <img src={post.avatar} alt={post.author} className="w-14 h-14 rounded-full object-cover" />
               <div>
                 <div className="font-semibold text-gray-900 dark:text-white">{post.author}</div>

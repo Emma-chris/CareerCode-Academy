@@ -106,7 +106,7 @@ export default function AdminCourseProposals() {
     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-6">
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
-          <h1 className="text-2xl font-bold">Course Proposals</h1>
+          <h1 className="text-xl sm:text-2xl font-bold">Course Proposals</h1>
           <p className="text-gray-500">Review, approve, or reject instructor course pitches.</p>
         </div>
       </div>

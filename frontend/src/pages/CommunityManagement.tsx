@@ -472,7 +472,7 @@ export default function CommunityManagement() {
                   />
                 </div>
 
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
                     <label className="text-xs font-medium text-gray-400 mb-1.5 block">Category</label>
                     <div className="relative">
@@ -575,7 +575,7 @@ export default function CommunityManagement() {
               exit={{ x: '100%' }}
               transition={{ type: 'spring', damping: 25, stiffness: 200 }}
               onClick={(e) => e.stopPropagation()}
-              className="fixed right-0 top-0 h-full w-96 bg-gray-900 border-l border-white/10 z-50 p-6 overflow-y-auto"
+              className="fixed right-0 top-0 h-full w-full sm:w-96 bg-gray-900 border-l border-white/10 z-50 p-6 overflow-y-auto"
             >
               <div className="flex items-center gap-3 mb-6">
                 <button
@@ -691,7 +691,7 @@ export default function CommunityManagement() {
               exit={{ x: '100%' }}
               transition={{ type: 'spring', damping: 25, stiffness: 200 }}
               onClick={(e) => e.stopPropagation()}
-              className="fixed right-0 top-0 h-full w-96 bg-gray-900 border-l border-white/10 z-50 p-6 overflow-y-auto"
+              className="fixed right-0 top-0 h-full w-full sm:w-96 bg-gray-900 border-l border-white/10 z-50 p-6 overflow-y-auto"
             >
               <div className="flex items-center gap-3 mb-6">
                 <button

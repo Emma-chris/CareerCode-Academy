@@ -186,7 +186,7 @@ export default function AdminPayouts() {
                     <label className="block text-sm font-medium text-red-700 dark:text-red-400 mb-2">
                       Rejection Reason
                     </label>
-                    <div className="flex gap-2">
+                    <div className="flex flex-wrap gap-2">
                       <input
                         type="text"
                         value={rejectReason}

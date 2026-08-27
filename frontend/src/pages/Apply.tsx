@@ -370,7 +370,7 @@ export default function Apply() {
                   <div className="space-y-3">
                     <div className="p-4 rounded-xl bg-gray-50 dark:bg-gray-800/50">
                       <p className="text-xs font-medium text-gray-400 uppercase tracking-wider mb-2">Personal Info</p>
-                      <div className="grid grid-cols-2 gap-2 text-sm">
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-sm">
                         <div><span className="text-gray-500">Name:</span> {formData.fullName}</div>
                         <div><span className="text-gray-500">Email:</span> {formData.email}</div>
                         <div><span className="text-gray-500">Phone:</span> {formData.phone}</div>
@@ -380,7 +380,7 @@ export default function Apply() {
 
                     <div className="p-4 rounded-xl bg-gray-50 dark:bg-gray-800/50">
                       <p className="text-xs font-medium text-gray-400 uppercase tracking-wider mb-2">Professional</p>
-                      <div className="grid grid-cols-2 gap-2 text-sm">
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-sm">
                         <div><span className="text-gray-500">Title:</span> {formData.professionalTitle}</div>
                         <div><span className="text-gray-500">Specialization:</span> {specializations.find(s => s.value === formData.specialization)?.label}</div>
                         <div><span className="text-gray-500">Experience:</span> {formData.yearsExperience}</div>
@@ -389,7 +389,7 @@ export default function Apply() {
 
                     <div className="p-4 rounded-xl bg-gray-50 dark:bg-gray-800/50">
                       <p className="text-xs font-medium text-gray-400 uppercase tracking-wider mb-2">Files</p>
-                      <div className="grid grid-cols-2 gap-2 text-sm">
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-sm">
                         <div><span className="text-gray-500">Resume:</span> {resume ? 'Uploaded' : 'Missing'}</div>
                         <div><span className="text-gray-500">Profile Image:</span> {profileImage ? 'Uploaded' : 'Missing'}</div>
                       </div>
@@ -407,7 +407,7 @@ export default function Apply() {
               ) : (
                 <div />
               )}
-              <Button type="submit" disabled={!canProceed && step < 4} loading={isSubmitting} className="min-w-[160px]">
+              <Button type="submit" disabled={!canProceed && step < 4} loading={isSubmitting} className="sm:min-w-[160px]">
                 {step < 4 ? (
                   <>Next <ArrowRight className="w-4 h-4" /></>
                 ) : (

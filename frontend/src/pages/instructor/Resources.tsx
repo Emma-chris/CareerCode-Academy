@@ -184,13 +184,13 @@ export default function Resources() {
             </div>
           </div>
 
-          <div className="flex items-center justify-center gap-3 mt-4">
+          <div className="flex flex-wrap items-center justify-center gap-3 mt-4">
             <Select
               options={courseOptions}
               placeholder="Select a course"
               value={selectedCourse}
               onChange={(e) => setSelectedCourse(e.target.value)}
-              className="w-64"
+              className="w-full sm:w-64"
             />
             <Button
               variant="primary"

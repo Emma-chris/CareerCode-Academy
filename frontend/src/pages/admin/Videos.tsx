@@ -136,9 +136,9 @@ export default function AdminVideos() {
 
   return (
     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
-      <div className="flex items-center justify-between mb-6">
+      <div className="flex flex-wrap items-center justify-between gap-3 mb-6">
         <div>
-          <h1 className="text-2xl font-bold text-white">Showcase Videos</h1>
+          <h1 className="text-xl sm:text-2xl font-bold text-white">Showcase Videos</h1>
           <p className="text-gray-400 text-sm mt-1">Manage videos for schools, programs, and courses</p>
         </div>
         <Button onClick={openCreate} className="flex items-center gap-2">

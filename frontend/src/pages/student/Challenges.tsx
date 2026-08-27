@@ -68,7 +68,7 @@ export default function Challenges() {
               <GlassCard key={ch.id} className="p-5">
                 <div className="flex items-start justify-between">
                   <div className="flex-1">
-                    <div className="flex items-center gap-2 mb-1">
+                    <div className="flex flex-wrap items-center gap-1 sm:gap-2 mb-1">
                       <div className={`w-7 h-7 rounded-lg flex items-center justify-center ${tc.color}`}>
                         <Icon className="w-3.5 h-3.5" />
                       </div>
@@ -87,7 +87,7 @@ export default function Challenges() {
                       )}
                     </div>
                     <p className="text-gray-400 text-sm">{ch.description}</p>
-                    <div className="flex items-center gap-3 mt-2 text-sm text-gray-400">
+                    <div className="flex flex-wrap items-center gap-x-3 gap-y-1 mt-2 text-xs sm:text-sm text-gray-400">
                       {ch.language && <span>{ch.language}</span>}
                       <span>Course: {ch.course_title}</span>
                       <span>Lesson: {ch.lesson_title}</span>

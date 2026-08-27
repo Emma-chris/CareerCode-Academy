@@ -90,7 +90,7 @@ export default function AdminPayments() {
 
   return (
     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-6">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
           <h1 className="text-2xl sm:text-3xl font-bold">Payments</h1>
           <p className="text-gray-500 mt-1">Transaction history and revenue analytics.</p>
@@ -150,7 +150,7 @@ export default function AdminPayments() {
       </div>
 
       {/* Charts */}
-      <div className="grid lg:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <GlassCard className="p-5" hover={false}>
           <h3 className="text-sm font-semibold mb-4">Monthly Revenue vs Refunds</h3>
           <div className="chart-fluid-sm">

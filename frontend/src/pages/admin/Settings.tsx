@@ -57,7 +57,7 @@ export default function AdminSettings() {
 
   return (
     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
-      <div className="flex items-center justify-between mb-8">
+      <div className="flex flex-wrap items-center justify-between gap-3 mb-8">
         <div>
           <h1 className="text-2xl sm:text-3xl font-bold mb-2">Platform Settings</h1>
           <p className="text-gray-500">Configure platform-wide settings and preferences.</p>
@@ -67,7 +67,7 @@ export default function AdminSettings() {
         </Button>
       </div>
 
-      <div className="grid lg:grid-cols-4 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
         <div className="space-y-1">
           {sections.map((section) => (
             <button

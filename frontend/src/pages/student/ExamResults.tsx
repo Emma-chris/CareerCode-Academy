@@ -70,18 +70,18 @@ export default function ExamResults() {
         </h1>
         <p className="text-gray-500 mb-4">{exam?.title}</p>
 
-        <div className="flex items-center justify-center gap-8 mb-4">
+        <div className="flex flex-col sm:flex-row items-center justify-center gap-4 sm:gap-8 mb-4">
           <div className="text-center">
-            <p className="text-4xl font-bold text-white">{score}%</p>
+            <p className="text-3xl sm:text-4xl font-bold text-white">{score}%</p>
             <p className="text-xs text-gray-500 mt-1">Your Score</p>
           </div>
           <div className="text-center">
-            <p className="text-4xl font-bold text-gray-400">{exam?.passing_score}%</p>
+            <p className="text-3xl sm:text-4xl font-bold text-gray-400">{exam?.passing_score}%</p>
             <p className="text-xs text-gray-500 mt-1">Passing Score</p>
           </div>
         </div>
 
-        <Badge variant={passed ? 'success' : 'danger'} size="md" className="text-base px-6 py-2">
+        <Badge variant={passed ? 'success' : 'danger'} size="md" className="text-sm sm:text-base px-4 sm:px-6 py-1.5 sm:py-2">
           {passed ? 'PASSED' : 'FAILED'}
         </Badge>
       </GlassCard>
@@ -121,7 +121,7 @@ export default function ExamResults() {
           <h2 className="font-semibold mb-4">Answer Review</h2>
           <div className="space-y-4">
             {answers.map((ans: any, i: number) => (
-              <div key={ans.id} className={`p-4 rounded-xl ${
+              <div key={ans.id} className={`p-3 sm:p-4 rounded-xl ${
                 ans.is_correct ? 'bg-emerald-500/5 border border-emerald-500/10' : 'bg-red-500/5 border border-red-500/10'
               }`}>
                 <div className="flex items-start gap-3">
@@ -154,7 +154,7 @@ export default function ExamResults() {
         </GlassCard>
       )}
 
-      <div className="flex justify-center gap-3 pb-8">
+      <div className="flex flex-wrap justify-center gap-3 pb-8">
         <Button variant="outline" onClick={() => navigate('/student/exams')}>Back to Exams</Button>
         {passed && (
           <Link to="/student/certificates">

@@ -249,12 +249,12 @@ export default function ManageCourses() {
       <SEO title="Manage Courses" description="Create, edit, and manage your courses." />
       <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
         {/* Header */}
-        <div className="flex items-center justify-between mb-8">
+        <div className="flex flex-wrap items-center justify-between gap-3 mb-8">
           <div>
             <h1 className="text-2xl sm:text-3xl font-bold mb-2">My Courses</h1>
             <p className="text-gray-500">Create, edit, and manage your courses.</p>
           </div>
-          <div className="flex items-center gap-3">
+          <div className="flex flex-wrap items-center gap-3">
             {myCourses.length > 0 && (
               <Button variant="outline" onClick={() => openBroadcast(null)}>
                 <Megaphone className="w-4 h-4 mr-2" /> Broadcast
@@ -267,7 +267,7 @@ export default function ManageCourses() {
         </div>
 
         {/* View Toggle + Search */}
-        <div className="flex items-center gap-4 mb-6">
+        <div className="flex flex-wrap items-center gap-4 mb-6">
           <div className="flex items-center bg-gray-100 dark:bg-gray-800 rounded-xl p-1">
             <button
               onClick={() => setViewMode('card')}
@@ -411,7 +411,7 @@ export default function ManageCourses() {
                         </div>
 
                         {/* Stats */}
-                        <div className="flex items-center gap-4 text-xs text-gray-500">
+                        <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-gray-500">
                           <span className="flex items-center gap-1">
                             <Users className="w-3.5 h-3.5" /> {course.enrollmentCount || 0}
                           </span>

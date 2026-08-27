@@ -440,7 +440,7 @@ export default function AdminExams() {
 
   return (
     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-6">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
           <h1 className="text-2xl sm:text-3xl font-bold">Exams</h1>
           <p className="text-gray-400 mt-1">Create and manage certification exams linked to courses.</p>
@@ -629,7 +629,7 @@ export default function AdminExams() {
                 ) : (
                   <div className="space-y-2">
                     {attempts.map((a) => (
-                      <div key={a.id} className="flex items-center justify-between p-3 rounded-xl bg-gray-800/50 cursor-pointer hover:bg-gray-800 transition-colors" onClick={() => loadAttemptDetail(a)}>
+                      <div key={a.id} className="flex flex-wrap items-center justify-between gap-2 p-3 rounded-xl bg-gray-800/50 cursor-pointer hover:bg-gray-800 transition-colors" onClick={() => loadAttemptDetail(a)}>
                         <div>
                           <p className="text-sm font-medium">{a.user_name}</p>
                           <p className="text-xs text-gray-400">{a.user_email}</p>
@@ -651,7 +651,7 @@ export default function AdminExams() {
       )}
 
       {/* Main Content: Exam List + Question Panel */}
-      <div className="grid lg:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Exam List */}
         <div className="space-y-4">
           {loading ? (
@@ -682,7 +682,7 @@ export default function AdminExams() {
                         Schedule: {new Date(exam.starts_at).toLocaleString()}{exam.ends_at ? ` — ${new Date(exam.ends_at).toLocaleString()}` : ''}
                       </p>
                     )}
-                    <div className="flex gap-1.5">
+                    <div className="flex flex-wrap gap-1.5">
                       <Button size="sm" variant="ghost" onClick={(e) => { e.stopPropagation(); togglePublished(exam); }} title={exam.is_published ? 'Unpublish' : 'Publish'}>
                         {exam.is_published ? <EyeOff className="w-3.5 h-3.5" /> : <Eye className="w-3.5 h-3.5" />}
                       </Button>
@@ -705,7 +705,7 @@ export default function AdminExams() {
         <div className="space-y-4">
           {selectedExam ? (
             <>
-              <div className="flex items-center justify-between">
+              <div className="flex flex-wrap items-center justify-between gap-2">
                 <div>
                   <h2 className="font-semibold text-sm">{selectedExam.title}</h2>
                   <p className="text-xs text-gray-400">{questions.length} question(s)</p>

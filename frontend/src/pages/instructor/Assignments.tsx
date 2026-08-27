@@ -200,7 +200,7 @@ export default function InstructorAssignments() {
                       </h3>
                     </div>
                     <p className="text-sm text-gray-500 mt-2 line-clamp-2">{a.description}</p>
-                    <div className="flex items-center gap-4 mt-3 text-xs text-gray-400">
+                    <div className="flex flex-wrap items-center gap-x-4 gap-y-1 mt-3 text-xs text-gray-400">
                       {a.due_date && (
                         <span><Calendar className="w-3 h-3 inline mr-1" />Due: {formatDate(a.due_date)}</span>
                       )}

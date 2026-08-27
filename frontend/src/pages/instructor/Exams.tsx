@@ -368,7 +368,7 @@ export default function Exams() {
     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
       <SEO title="Exams" />
 
-      <div className="flex items-center justify-between mb-6">
+      <div className="flex flex-wrap items-center justify-between gap-3 mb-6">
         <div>
           <h1 className="text-2xl sm:text-3xl font-bold mb-1">Exams</h1>
           <p className="text-gray-500">Create, manage, and publish exams for your courses.</p>
@@ -430,8 +430,8 @@ export default function Exams() {
             className="mt-4 overflow-hidden"
           >
             <GlassCard hover={false} className="p-5">
-              <div className="flex items-center justify-between mb-4">
-                <div className="flex items-center gap-3">
+              <div className="flex flex-wrap items-center justify-between gap-3 mb-4">
+                <div className="flex flex-wrap items-center gap-3">
                   <ClipboardList className="w-5 h-5 text-primary-500" />
                   <h3 className="font-semibold text-gray-900 dark:text-white">{expandedExam.title} — Questions</h3>
                   <Badge variant="primary" size="sm">{expandedExam.questionCount || 0} total</Badge>
@@ -520,7 +520,7 @@ export default function Exams() {
                       <div className="space-y-3">
                         <div>
                           <label className="text-xs font-medium text-gray-500 mb-1 block">Question Type</label>
-                          <div className="flex gap-2">
+                          <div className="flex flex-wrap gap-2">
                             {(['multiple_choice', 'true_false', 'essay'] as const).map(type => (
                               <button
                                 key={type}

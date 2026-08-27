@@ -99,7 +99,7 @@ function CommunityBrowser({ onSelectCommunity }: { onSelectCommunity: () => void
 
   return (
     <div className="h-[calc(100vh-64px)] flex flex-col bg-gray-950 overflow-hidden">
-      <div className="flex-shrink-0 px-6 pt-6 pb-4">
+      <div className="flex-shrink-0 px-4 sm:px-6 pt-6 pb-4">
         <div className="flex items-center justify-between mb-4">
           <div>
             <h1 className="text-2xl font-bold">
@@ -107,10 +107,10 @@ function CommunityBrowser({ onSelectCommunity }: { onSelectCommunity: () => void
             </h1>
             <p className="text-gray-400 text-sm mt-1">Browse and join communities to connect with fellow learners</p>
           </div>
-          <span className="text-sm text-gray-500">{communities.length} communities</span>
+          <span className="text-sm text-gray-500 ml-3">{communities.length} communities</span>
         </div>
-        <div className="flex gap-3">
-          <div className="relative flex-1">
+        <div className="flex flex-col sm:flex-row gap-3">
+          <div className="relative flex-1 min-w-0">
             <Search size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
             <input
               type="text"
@@ -120,12 +120,12 @@ function CommunityBrowser({ onSelectCommunity }: { onSelectCommunity: () => void
               className="w-full pl-10 pr-4 py-2.5 bg-white/5 border border-white/10 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:border-primary-500/50 text-sm"
             />
           </div>
-          <div className="flex bg-white/5 border border-white/10 rounded-xl overflow-hidden">
+          <div className="flex bg-white/5 border border-white/10 rounded-xl overflow-x-auto scrollbar-hide">
             {(['all', 'joined', 'discover'] as const).map((tab) => (
               <button
                 key={tab}
                 onClick={() => setFilter(tab)}
-                className={`px-4 py-2 text-sm font-medium transition-colors ${
+                className={`px-4 py-2 text-sm font-medium whitespace-nowrap transition-colors flex-shrink-0 ${
                   filter === tab
                     ? 'bg-primary-500 text-white'
                     : 'text-gray-400 hover:text-white'
@@ -137,7 +137,7 @@ function CommunityBrowser({ onSelectCommunity }: { onSelectCommunity: () => void
           </div>
         </div>
       </div>
-      <div className="flex-1 overflow-y-auto px-6 pb-6">
+      <div className="flex-1 overflow-y-auto px-4 sm:px-6 pb-6">
         {filtered.length === 0 ? (
           <div className="flex flex-col items-center justify-center h-64 text-gray-500">
             <Users size={48} className="mb-3 opacity-50" />
@@ -244,10 +244,9 @@ export default function Community() {
       <AnimatePresence mode="wait">
         {activeThread ? (
           <ThreadPanel key="thread" />
-        ) : showMembers ? (
-          <MemberSidebar key="members" />
         ) : null}
       </AnimatePresence>
+      <MemberSidebar showMembers={showMembers} />
     </div>
   );
 }

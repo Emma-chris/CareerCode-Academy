@@ -56,7 +56,7 @@ export default function NotFound() {
             className="mt-12 text-sm text-gray-400"
           >
             <p>Try these popular pages instead:</p>
-            <div className="flex items-center justify-center gap-4 mt-2">
+            <div className="flex flex-wrap items-center justify-center gap-x-4 gap-y-2 mt-2">
               <Link to="/" className="hover:text-primary-500 transition-colors">Home</Link>
               <Link to="/courses" className="hover:text-primary-500 transition-colors">Courses</Link>
               <Link to="/pricing" className="hover:text-primary-500 transition-colors">Pricing</Link>

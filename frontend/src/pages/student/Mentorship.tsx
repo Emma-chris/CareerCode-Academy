@@ -93,7 +93,7 @@ export default function StudentMentorship() {
     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
       <div className="max-w-screen-3xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="mb-8">
-          <h1 className="text-3xl font-bold mb-2">Mentorship</h1>
+          <h1 className="text-2xl sm:text-3xl font-bold mb-2">Mentorship</h1>
           <p className="text-gray-600 dark:text-gray-400">
             Book 1-on-1 mentoring sessions with your instructors.
           </p>
@@ -129,13 +129,13 @@ export default function StudentMentorship() {
             ) : (
               availableSlots.map((slot) => (
                 <GlassCard key={slot.id} className="p-5">
-                  <div className="flex items-start justify-between gap-4">
+                  <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4">
                     <div className="flex-1">
                       <h3 className="text-lg font-semibold mb-2">{slot.title}</h3>
                       {slot.description && (
                         <p className="text-sm text-gray-600 dark:text-gray-400 mb-3">{slot.description}</p>
                       )}
-                      <div className="flex flex-wrap items-center gap-4 text-sm text-gray-500">
+                      <div className="flex flex-wrap items-center gap-2 sm:gap-4 text-sm text-gray-500">
                         <span className="flex items-center gap-1">
                           <User className="w-4 h-4" /> {slot.instructor_name}
                         </span>
@@ -150,7 +150,7 @@ export default function StudentMentorship() {
                         </span>
                       </div>
                     </div>
-                    <Button onClick={() => setConfirmSlot(slot)}>Book</Button>
+                    <Button onClick={() => setConfirmSlot(slot)} className="w-full sm:w-auto">Book</Button>
                   </div>
                 </GlassCard>
               ))

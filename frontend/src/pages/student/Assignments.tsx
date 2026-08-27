@@ -44,12 +44,12 @@ export default function Assignments() {
 
   return (
     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
-      <div className="flex items-center justify-between mb-8">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-8">
         <div>
           <h1 className="text-2xl sm:text-3xl font-bold mb-2">Assignments</h1>
           <p className="text-gray-500">Track and submit your coursework.</p>
         </div>
-        <Button variant="outline" icon={<Upload className="w-4 h-4" />}>Submit Assignment</Button>
+        <Button variant="outline" icon={<Upload className="w-4 h-4" />} className="w-full sm:w-auto">Submit Assignment</Button>
       </div>
 
       <div className="flex flex-wrap gap-2 mb-6">

@@ -128,9 +128,9 @@ export default function CommunityDetail() {
           </Link>
 
           <GlassCard className="p-6 mb-6">
-            <div className="flex items-start justify-between gap-4 mb-4">
+            <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-2 sm:gap-4 mb-4">
               <h1 className="text-2xl sm:text-3xl font-bold">{discussion.title}</h1>
-              <Badge variant="primary" size="sm">{discussion.category}</Badge>
+              <Badge variant="primary" size="sm" className="w-fit sm:w-auto">{discussion.category}</Badge>
             </div>
 
             <div className="flex flex-wrap items-center gap-4 text-xs text-gray-500 mb-4">

@@ -69,14 +69,14 @@ export default function AdminTickets() {
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
           <input type="text" placeholder="Search tickets..." value={search} onChange={(e) => setSearch(e.target.value)} className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-gray-100 dark:bg-gray-800 border-0 outline-none focus:ring-2 focus:ring-primary-500/30 text-sm" />
         </div>
-        <div className="flex items-center gap-1 bg-gray-100 dark:bg-gray-800 rounded-xl p-1">
+        <div className="flex items-center gap-1 bg-gray-100 dark:bg-gray-800 rounded-xl p-1 max-w-full overflow-x-auto">
           {STATUS_TABS.map((s) => (
-            <button key={s} onClick={() => setTab(s)} className={`px-3 py-1.5 rounded-lg text-xs font-medium capitalize ${tab === s ? 'bg-white dark:bg-gray-700 text-primary-600 dark:text-primary-400 shadow-sm' : 'text-gray-300 hover:text-gray-700 dark:hover:text-gray-200'}`}>{s.replace('_', ' ')}</button>
+            <button key={s} onClick={() => setTab(s)} className={`px-3 py-1.5 rounded-lg text-xs font-medium capitalize flex-shrink-0 whitespace-nowrap ${tab === s ? 'bg-white dark:bg-gray-700 text-primary-600 dark:text-primary-400 shadow-sm' : 'text-gray-300 hover:text-gray-700 dark:hover:text-gray-200'}`}>{s.replace('_', ' ')}</button>
           ))}
         </div>
       </div>
 
-      <div className="grid lg:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
         <div className="lg:col-span-1 space-y-3 max-h-[70vh] overflow-y-auto pr-1">
           {filtered.map((ticket) => (
             <motion.div
@@ -101,7 +101,7 @@ export default function AdminTickets() {
         <div className="lg:col-span-2">
           {selectedTicket ? (
             <GlassCard className="p-5" hover={false}>
-              <div className="flex items-start justify-between mb-4">
+              <div className="flex flex-wrap items-start justify-between gap-2 mb-4">
                 <div>
                   <h3 className="font-bold">{selectedTicket.subject}</h3>
                   <p className="text-sm text-gray-300 mt-0.5">

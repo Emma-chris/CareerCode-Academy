@@ -308,7 +308,7 @@ export default function Courses() {
 
                             <div className="flex items-center gap-4 text-xs text-gray-500 dark:text-gray-400 mt-auto">
                               <div className="flex items-center gap-1"><Clock className="w-3.5 h-3.5" />{formatDuration(course.duration)}</div>
-                              <div className="flex items-center gap-1"><Award className="w-3.5 h-3-5 text-amber-500" />Certificate</div>
+                              <div className="flex items-center gap-1"><Award className="w-3.5 h-3.5 text-amber-500" />Certificate</div>
                             </div>
                           </div>
                         </GlassCard>

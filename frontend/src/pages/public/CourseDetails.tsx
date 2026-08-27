@@ -269,7 +269,7 @@ export default function CourseDetails() {
                 {course.description}
               </p>
 
-              <div className="flex flex-wrap items-center gap-6 text-sm text-gray-400">
+              <div className="flex flex-wrap items-center gap-4 sm:gap-6 text-sm text-gray-400">
                 <div className="flex items-center gap-1.5">
                   <Star className="w-4 h-4 text-yellow-400 fill-yellow-400" />
                   <span className="text-white font-medium">{avgRating}</span>
@@ -383,7 +383,7 @@ export default function CourseDetails() {
                   </div>
 
                   <Button
-                    className="w-full py-6 text-lg font-semibold bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700"
+                    className="w-full py-4 sm:py-6 text-base sm:text-lg font-semibold bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700"
                     onClick={handleEnroll}
                     disabled={isEnrolling || checkingEnrollment}
                   >

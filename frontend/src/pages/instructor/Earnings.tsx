@@ -226,7 +226,7 @@ export default function Earnings() {
 
       {/* Revenue Trend Chart */}
       <GlassCard className="p-6">
-        <div className="flex items-center justify-between mb-6">
+        <div className="flex flex-wrap items-center justify-between gap-4 mb-6">
           <h2 className="text-lg font-bold">Revenue Trend</h2>
           <div className="flex items-center gap-2 bg-gray-100 dark:bg-gray-800 rounded-xl p-1">
             <button
@@ -340,7 +340,7 @@ export default function Earnings() {
       </GlassCard>
 
       {/* Revenue by Program + Withdrawal History */}
-      <div className="grid lg:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Revenue by Program/Year */}
         <GlassCard className="p-6">
           <h2 className="text-lg font-bold mb-6">

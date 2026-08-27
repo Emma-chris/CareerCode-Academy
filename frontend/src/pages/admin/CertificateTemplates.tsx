@@ -136,8 +136,8 @@ export default function AdminCertificateTemplates() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold">Certificate Templates</h1>
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <h1 className="text-xl sm:text-2xl font-bold">Certificate Templates</h1>
         <Button onClick={() => setShowForm(true)}>
           <Plus size={16} className="mr-1" /> New Template
         </Button>
@@ -214,9 +214,9 @@ export default function AdminCertificateTemplates() {
         )}
         {templates.map(t => (
           <GlassCard key={t.id} className="p-4">
-            <div className="flex items-start justify-between">
-              <div className="flex-1">
-                <div className="flex items-center gap-2">
+            <div className="flex items-start justify-between gap-2">
+              <div className="flex-1 min-w-0">
+                <div className="flex flex-wrap items-center gap-2">
                   <h3 className="font-semibold">{t.name}</h3>
                   {t.show_signature && <Badge variant="default" className="text-xs">Sig</Badge>}
                   {t.show_stamp && <Badge variant="default" className="text-xs">Stamp</Badge>}

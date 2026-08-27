@@ -472,10 +472,10 @@ export default function CourseView() {
           </div>
 
           <div className="flex-1 flex flex-col overflow-hidden">
-            <div className="bg-gray-900 border-b border-gray-800 flex px-4 shrink-0">
+            <div className="bg-gray-900 border-b border-gray-800 flex px-4 shrink-0 overflow-x-auto scrollbar-hide">
               {TAB_CONFIG.map(tab => (
                 <button key={tab.key} onClick={() => setActiveTab(tab.key)}
-                  className={`flex items-center gap-1.5 px-4 py-2.5 text-xs font-medium border-b-2 transition-colors ${activeTab === tab.key ? 'text-blue-400 border-blue-500' : 'text-gray-400 border-transparent hover:text-gray-300'}`}
+                  className={`flex items-center gap-1.5 px-4 py-2.5 text-xs font-medium border-b-2 transition-colors whitespace-nowrap flex-shrink-0 ${activeTab === tab.key ? 'text-blue-400 border-blue-500' : 'text-gray-400 border-transparent hover:text-gray-300'}`}
                 >
                   <tab.icon className="w-3.5 h-3.5" /> {tab.label}
                 </button>
@@ -680,11 +680,11 @@ export default function CourseView() {
           </div>
 
           {/* Bottom Navigation */}
-          <div className="bg-gray-900 border-t border-gray-800 px-4 py-2 flex items-center justify-between shrink-0">
+          <div className="bg-gray-900 border-t border-gray-800 px-3 sm:px-4 py-2 flex flex-wrap items-center justify-between gap-2 shrink-0">
             <Button variant="outline" size="sm" onClick={() => goToLesson(currentLessonIndex - 1)} disabled={currentLessonIndex === 0}>
               <ChevronLeft className="w-4 h-4 mr-1" /> Previous
             </Button>
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2 flex-1 justify-center min-w-[150px] sm:flex-none">
               <span className="text-xs text-gray-400">{currentLessonIndex + 1} / {totalLessons}</span>
               <Button variant={lessonProgress[currentLesson?.id || ''] ? 'secondary' : 'primary'} size="sm" onClick={markCompleted} disabled={!currentLesson}
                 className={lessonProgress[currentLesson?.id || ''] ? 'bg-emerald-600 hover:bg-emerald-700' : ''}>

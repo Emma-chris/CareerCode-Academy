@@ -47,7 +47,7 @@ export default function AdminBroadcasts() {
 
   return (
     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-6">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
           <h1 className="text-2xl sm:text-3xl font-bold">Notifications</h1>
           <p className="text-gray-500 mt-1">Create and manage broadcast notifications.</p>

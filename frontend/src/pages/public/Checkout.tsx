@@ -121,13 +121,13 @@ export default function Checkout() {
   if (!course) return null;
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-950 pt-24 pb-16 relative">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-950 pt-16 sm:pt-24 pb-12 sm:pb-16 relative">
       {/* Dynamic Background */}
       <div className="absolute top-0 inset-x-0 h-96 bg-gradient-to-b from-blue-900/10 to-transparent pointer-events-none" />
       <div className="absolute -top-48 -right-48 w-96 h-96 bg-purple-500/10 rounded-full blur-[120px] pointer-events-none" />
       <div className="absolute top-48 -left-48 w-96 h-96 bg-blue-500/10 rounded-full blur-[120px] pointer-events-none" />
 
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 relative z-10">
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         
         {/* Back navigation */}
         <Link to={`/courses/${course.slug}`} className="inline-flex items-center text-gray-400 hover:text-white transition-colors mb-8 group">
@@ -232,7 +232,7 @@ export default function Checkout() {
                   
                   {/* Course Item */}
                   <div className="flex gap-4 items-start mb-8">
-                    <div className="w-24 h-20 rounded-xl bg-gray-100 dark:bg-gray-800 shrink-0 overflow-hidden relative group border border-gray-200 dark:border-gray-700">
+                    <div className="w-20 sm:w-24 h-16 sm:h-20 rounded-xl bg-gray-100 dark:bg-gray-800 shrink-0 overflow-hidden relative group border border-gray-200 dark:border-gray-700">
                       {course.thumbnail ? (
                         <img src={optimizeImageUrl(course.thumbnail, 120, 90)} alt="" className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" />
                       ) : (
@@ -280,7 +280,7 @@ export default function Checkout() {
                       <div className="flex justify-between items-end">
                         <span className="text-gray-800 dark:text-gray-300 font-medium">Total Amount</span>
                         <div className="text-right">
-                          <span className="text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-purple-600 dark:from-blue-400 dark:to-purple-400">
+                          <span className="text-2xl sm:text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-purple-600 dark:from-blue-400 dark:to-purple-400">
                             ₦{Number(course.price * (1 - (course.discount_percentage || 0) / 100)).toLocaleString()}
                           </span>
                         </div>
@@ -293,7 +293,7 @@ export default function Checkout() {
                   <Button
                     onClick={handlePay}
                     disabled={processing}
-                    className="w-full h-14 text-lg font-bold bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-500 hover:to-purple-500 text-white shadow-lg shadow-blue-500/25 transition-all hover:scale-[1.02] disabled:hover:scale-100 disabled:opacity-70 group border-0"
+                    className="w-full h-12 sm:h-14 text-base sm:text-lg font-bold bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-500 hover:to-purple-500 text-white shadow-lg shadow-blue-500/25 transition-all hover:scale-[1.02] disabled:hover:scale-100 disabled:opacity-70 group border-0"
                   >
                     {processing ? (
                       <span className="flex items-center justify-center">

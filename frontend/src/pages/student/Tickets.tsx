@@ -48,12 +48,12 @@ export default function StudentTickets() {
 
   return (
     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-6">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div>
-          <h1 className="text-2xl font-bold">Support Tickets</h1>
+          <h1 className="text-xl sm:text-2xl font-bold">Support Tickets</h1>
           <p className="text-gray-500 mt-1">Submit and track support requests.</p>
         </div>
-        <Button onClick={() => setShowForm(!showForm)}>
+        <Button onClick={() => setShowForm(!showForm)} className="w-full sm:w-auto">
           <Ticket className="w-4 h-4 mr-1.5" /> New Ticket
         </Button>
       </div>
@@ -109,7 +109,7 @@ export default function StudentTickets() {
             <GlassCard key={ticket.id} className="p-4" hover>
               <div className="flex items-start justify-between">
                 <div className="flex-1">
-                  <div className="flex items-center gap-2 mb-1">
+                  <div className="flex items-center gap-2 mb-1 flex-wrap">
                     <h3 className="font-semibold text-sm">{ticket.subject}</h3>
                     <Badge variant={ticket.status === 'closed' ? 'default' : ticket.status === 'in_progress' ? 'warning' : ticket.status === 'open' ? 'primary' : 'default'}>{ticket.status}</Badge>
                     <Badge variant={ticket.priority === 'urgent' ? 'danger' : ticket.priority === 'high' ? 'warning' : 'default'}>{ticket.priority}</Badge>

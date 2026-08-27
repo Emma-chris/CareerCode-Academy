@@ -51,13 +51,13 @@ export default function VerifyCertificate() {
       <div className="max-w-2xl mx-auto px-4">
         <div className="text-center mb-8">
           <Award className="w-16 h-16 text-blue-400 mx-auto mb-4" />
-          <h1 className="text-3xl font-bold text-white mb-2">Certificate Verification</h1>
+          <h1 className="text-2xl sm:text-3xl font-bold text-white mb-2">Certificate Verification</h1>
           <p className="text-gray-500">Verify the authenticity of a CareerCode Academy certificate</p>
         </div>
 
         {/* Search */}
         <GlassCard className="mb-8">
-          <div className="flex gap-2">
+          <div className="flex flex-col sm:flex-row gap-2">
             <input
               type="text"
               placeholder="Enter certificate verification code"
@@ -92,7 +92,7 @@ export default function VerifyCertificate() {
         )}
 
         {result && (
-          <GlassCard className="p-8 text-center relative overflow-hidden" glow>
+          <GlassCard className="p-4 sm:p-8 text-center relative overflow-hidden" glow>
             <div className="absolute top-0 right-0 w-48 h-48 bg-emerald-500/5 rounded-full blur-3xl" />
             <div className="absolute bottom-0 left-0 w-48 h-48 bg-blue-500/5 rounded-full blur-3xl" />
 
@@ -105,11 +105,11 @@ export default function VerifyCertificate() {
 
               <h2 className="text-2xl font-bold text-white mb-1">Certificate of Completion</h2>
               <p className="text-gray-500 mb-4">This certifies that</p>
-              <p className="text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-400 mb-2">
+              <p className="text-xl sm:text-2xl lg:text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-400 mb-2 break-words">
                 {result.user?.name || 'Student'}
               </p>
               <p className="text-gray-500 mb-4">has successfully completed</p>
-              <p className="text-2xl font-semibold text-white mb-6">
+              <p className="text-lg sm:text-xl lg:text-2xl font-semibold text-white mb-6 break-words">
                 {result.course?.title || 'a Course'}
               </p>
 
@@ -123,7 +123,7 @@ export default function VerifyCertificate() {
                 <p className="text-sm text-white font-mono">{result.verification_code}</p>
               </div>
 
-              <div className="flex items-center justify-center gap-2">
+              <div className="flex flex-wrap items-center justify-center gap-2">
                 <Button variant="outline" onClick={() => window.print()}>
                   Print
                 </Button>
