@@ -24,7 +24,7 @@ const createCourseSchema = z.object({
   category: z.string().min(2, 'Category is required'),
   level: z.enum(['beginner', 'intermediate', 'advanced']),
   duration: z.number().min(1, 'Duration must be at least 1 minute'),
-  thumbnail: z.string().url().optional(),
+  thumbnail: z.string().min(1).optional(),
   published: z.boolean().optional(),
 });
 
@@ -36,7 +36,7 @@ const updateCourseSchema = z.object({
   category: z.string().min(2).optional(),
   level: z.enum(['beginner', 'intermediate', 'advanced']).optional(),
   duration: z.number().min(1).optional(),
-  thumbnail: z.string().url().optional(),
+  thumbnail: z.string().min(1).optional(),
   published: z.boolean().optional(),
 });
 

@@ -525,6 +525,9 @@ export default function CourseBuilder() {
 
   const buildPayload = (published: boolean) => {
     const { step1, media, sections, pricing, price } = formData;
+    const rawLevel = step1.skillLevel || 'beginner';
+    const level = ['beginner', 'intermediate', 'advanced'].includes(rawLevel) ? rawLevel : 'beginner';
+    const duration = Math.max(1, totalLessons * 10);
     return {
       title: step1.title,
       subtitle: step1.subtitle || undefined,
@@ -532,7 +535,8 @@ export default function CourseBuilder() {
       category: step1.category,
       school: step1.school || undefined,
       program: step1.program || undefined,
-      skill_level: step1.skillLevel || undefined,
+      skill_level: level,
+      level,
       language: step1.language || 'en',
       tags: step1.tags
         ? step1.tags.split(',').map((t) => t.trim()).filter(Boolean)
@@ -549,6 +553,7 @@ export default function CourseBuilder() {
       })),
       pricing_model: pricing,
       price: pricing === 'paid' && price ? parseFloat(price) : 0,
+      duration,
       published,
     };
   };
