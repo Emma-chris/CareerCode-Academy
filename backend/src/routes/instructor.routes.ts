@@ -993,9 +993,15 @@ router.post('/broadcast', async (req: AuthRequest, res: Response, next: NextFunc
     }
 
     // Verify instructor owns these courses
+    const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+    const validUuids = (Array.isArray(courseIds) ? courseIds : []).filter((id: string) => uuidRegex.test(id));
+    if (validUuids.length === 0) {
+      return res.status(400).json({ success: false, message: 'courseIds must contain valid course IDs' });
+    }
+
     const courseCheck = await query(
-      `SELECT id FROM courses WHERE id = ANY($1::int[]) AND instructor_id = $2`,
-      [courseIds, instructorId]
+      `SELECT id FROM courses WHERE id = ANY($1::uuid[]) AND instructor_id = $2`,
+      [validUuids, instructorId]
     );
     if (courseCheck.rows.length === 0) {
       return res.status(403).json({ success: false, message: 'You do not own any of the specified courses' });
@@ -1007,7 +1013,7 @@ router.post('/broadcast', async (req: AuthRequest, res: Response, next: NextFunc
       SELECT DISTINCT e.user_id, u.name, u.email
       FROM enrollments e
       JOIN users u ON e.user_id = u.id
-      WHERE e.course_id = ANY($1::int[]) AND e.status = 'active'
+      WHERE e.course_id = ANY($1::uuid[]) AND e.status = 'active'
     `, [validIds]);
 
     const students = enrolled.rows;
