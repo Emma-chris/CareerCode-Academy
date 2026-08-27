@@ -16,6 +16,39 @@ router.use(authenticate, authorize('instructor', 'admin', 'super_admin'));
 router.use('/messages', messageRoutes);
 
 // ----------------------------------------------------------------------
+// PROGRAMS
+// ----------------------------------------------------------------------
+// GET /instructor/programs — programs that contain courses owned by the instructor
+router.get('/programs', async (req: AuthRequest, res: Response, next: NextFunction) => {
+  try {
+    const instructorId = req.user!.userId;
+
+    const result = await query(
+      `SELECT
+         p.id,
+         p.name as title,
+         p.slug,
+         s.name as school,
+         COUNT(DISTINCT c.id)::int as "courseCount",
+         COUNT(DISTINCT e.user_id)::int as "studentCount"
+       FROM programs p
+       JOIN schools s ON s.id = p.school_id
+       JOIN courses c ON c.instructor_id = $1
+         AND (c.program_id = p.id OR EXISTS(
+               SELECT 1 FROM program_courses pc WHERE pc.program_id = p.id AND pc.course_id = c.id))
+       LEFT JOIN enrollments e ON e.course_id = c.id
+       GROUP BY p.id, p.name, p.slug, s.name
+       ORDER BY p.name ASC`,
+      [instructorId]
+    );
+
+    res.json({ success: true, data: result.rows });
+  } catch (error) {
+    next(error);
+  }
+});
+
+// ----------------------------------------------------------------------
 // DASHBOARD STATS
 // ----------------------------------------------------------------------
 router.get('/dashboard/stats', async (req: AuthRequest, res: Response, next: NextFunction) => {
