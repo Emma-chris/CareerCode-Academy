@@ -1,6 +1,10 @@
 import dotenv from 'dotenv';
 dotenv.config();
 
+import { validateEnv } from './config/env';
+// Validate env early (logs warnings in dev, exits in prod)
+try { validateEnv(); console.log('✅ Environment variables validated'); } catch {}
+
 import express from 'express';
 import cors from 'cors';
 import helmet from 'helmet';

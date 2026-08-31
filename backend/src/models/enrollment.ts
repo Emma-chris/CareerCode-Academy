@@ -53,9 +53,13 @@ export async function getAllEnrollmentsPaginated(limit: number, offset: number, 
 }
 
 export async function getEnrollmentsByUser(userId: string, limit?: number, offset?: number): Promise<Enrollment[]> {
-  let sql = `SELECT e.*, c.title as course_title, c.thumbnail as course_thumbnail, c.slug as course_slug, c.category,
-            u.name as instructor_name,
-            (SELECT COUNT(*)::int FROM lessons WHERE course_id = c.id) as total_lessons
+  let sql = `SELECT e.*, c.title as course_title, c.thumbnail as course_thumbnail, c.slug as course_slug, c.category, c.level, c.duration, c.price, c.description as course_description,
+            u.name as instructor_name, u.avatar as instructor_avatar,
+            (SELECT COUNT(*)::int FROM lessons WHERE course_id = c.id) as total_lessons,
+            (SELECT COUNT(*)::int FROM modules WHERE course_id = c.id) as total_modules,
+            COALESCE((SELECT COUNT(*)::int FROM lesson_progress WHERE user_id = e.user_id AND course_id = c.id AND completed = true), 0) as completed_lessons_count,
+            (SELECT l.title FROM lessons l LEFT JOIN lesson_progress lp ON lp.lesson_id = l.id AND lp.user_id = e.user_id AND lp.completed = true WHERE l.course_id = c.id AND lp.lesson_id IS NULL ORDER BY l.order_index ASC LIMIT 1) as next_lesson_title,
+            (SELECT l.id FROM lessons l LEFT JOIN lesson_progress lp ON lp.lesson_id = l.id AND lp.user_id = e.user_id AND lp.completed = true WHERE l.course_id = c.id AND lp.lesson_id IS NULL ORDER BY l.order_index ASC LIMIT 1) as next_lesson_id
      FROM enrollments e
      JOIN courses c ON e.course_id = c.id
      JOIN users u ON c.instructor_id = u.id
