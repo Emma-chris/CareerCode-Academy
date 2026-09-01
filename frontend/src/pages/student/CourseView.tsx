@@ -24,11 +24,7 @@ import {
   FileText, Download, BookOpen, Clock, Award,
   ChevronDown, ChevronUp, PenLine, HelpCircle, Code,
   Bookmark, BookmarkCheck, PartyPopper,
-<<<<<<< HEAD
-  Megaphone, BarChart3, Brain, GitBranch,
-=======
-  Megaphone, BarChart3, Brain, Layers, GraduationCap, Target, Sparkles,
->>>>>>> 83a2bd0 (feat: Practical Learning Hub + env validation + local dev)
+  Megaphone, BarChart3, Brain, GitBranch, Layers, GraduationCap, Target, Sparkles,
   Bold, Italic, Underline, Highlighter, Undo, Redo,
 } from 'lucide-react';
 import SEO from '@/components/seo/SEO';
@@ -360,14 +356,11 @@ export default function CourseView() {
     try {
       await api.post('/progress', { lessonId: currentLesson.id, completed: newCompleted, courseId: course.id });
       setLessonProgress(prev => ({ ...prev, [currentLesson.id]: newCompleted }));
-<<<<<<< HEAD
       toast.success(newCompleted ? 'Lesson completed! +10 XP' : 'Progress updated');
       if (newCompleted) {
         setShowXpPopup(true);
         setTimeout(() => setShowXpPopup(false), 2000);
       }
-=======
-      toast.success(newCompleted ? 'Lesson completed! Great progress!' : 'Progress updated');
       // refresh detailed
       try {
         const dRes = await api.get(`/progress/detailed?courseId=${course.id}`);
@@ -375,7 +368,6 @@ export default function CourseView() {
         const mRes = await api.get(`/progress/modules?courseId=${course.id}`);
         if (mRes.data.data) setModuleProgress(mRes.data.data);
       } catch {}
->>>>>>> 83a2bd0 (feat: Practical Learning Hub + env validation + local dev)
       if (newCompleted && autoPlayNext && currentLessonIndex < totalLessons - 1) {
         setTimeout(() => goToLesson(currentLessonIndex + 1), 800);
       }
@@ -547,16 +539,12 @@ export default function CourseView() {
           >
             <PlayCircle className="w-3 h-3" /> Auto
           </button>
-<<<<<<< HEAD
-          <Badge className="bg-blue-500/20 text-blue-400 text-xs">{progressPercent}% complete</Badge>
+          <Badge className="bg-blue-500/20 text-blue-400 text-xs hidden sm:inline-flex">{progressPercent}% complete</Badge>
           {course?.id && (
             <Link to={`/student/skill-tree/${course.id}`} className="flex items-center gap-1 text-[10px] font-medium px-2 py-1 rounded-lg bg-purple-500/20 text-purple-400 hover:bg-purple-500/30 transition-colors">
               <GitBranch className="w-3 h-3" /> Skill Tree
             </Link>
           )}
-=======
-          <Badge className="bg-blue-500/20 text-blue-400 text-xs hidden sm:inline-flex">{progressPercent}% complete</Badge>
->>>>>>> 83a2bd0 (feat: Practical Learning Hub + env validation + local dev)
           <button onClick={() => setSidebarOpen(!sidebarOpen)} className="text-gray-400 hover:text-white lg:hidden">
             <BookOpen className="w-5 h-5" />
           </button>
@@ -757,17 +745,10 @@ export default function CourseView() {
           </div>
 
           <div className="flex-1 flex flex-col overflow-hidden">
-<<<<<<< HEAD
-            <div className="bg-gray-900 border-b border-gray-800 flex px-4 shrink-0 overflow-x-auto scrollbar-hide">
-              {TAB_CONFIG.map(tab => (
-                <button key={tab.key} onClick={() => setActiveTab(tab.key)}
-                  className={`flex items-center gap-1.5 px-4 py-2.5 text-xs font-medium border-b-2 transition-colors whitespace-nowrap flex-shrink-0 ${activeTab === tab.key ? 'text-blue-400 border-blue-500' : 'text-gray-400 border-transparent hover:text-gray-300'}`}
-=======
             <div className="bg-gray-900 border-b border-gray-800 flex px-2 sm:px-4 shrink-0 overflow-x-auto scrollbar-hide">
               {TAB_CONFIG.map(tab => (
                 <button key={tab.key} onClick={() => setActiveTab(tab.key)}
                   className={`flex items-center gap-1.5 px-3 sm:px-4 py-2.5 text-xs font-medium border-b-2 whitespace-nowrap transition-colors ${activeTab === tab.key ? 'text-blue-400 border-blue-500 bg-blue-500/5' : 'text-gray-400 border-transparent hover:text-gray-300'}`}
->>>>>>> 83a2bd0 (feat: Practical Learning Hub + env validation + local dev)
                 >
                   <tab.icon className="w-3.5 h-3.5" /> {tab.label}
                   {tab.key === 'challenge' && challenges.length > 0 && <span className="ml-1 w-1.5 h-1.5 rounded-full bg-emerald-500" />}
@@ -820,20 +801,16 @@ export default function CourseView() {
               )}
 
               {activeTab === 'quiz' && (
-<<<<<<< HEAD
                 <div className="space-y-3">
                   <HeartsBar hearts={5} maxHearts={5} nextHeartIn={null} />
-                  {lessonQuiz ? <LessonQuiz quiz={lessonQuiz} /> : <p className="text-gray-400 text-sm">No quiz available for this lesson.</p>}
+                  {lessonQuiz ? <LessonQuiz quiz={lessonQuiz} /> : (
+                    <div className="text-center py-8">
+                      <HelpCircle className="w-10 h-10 text-gray-600 mx-auto mb-3" />
+                      <p className="text-gray-400 text-sm">No quiz for this lesson.</p>
+                      <p className="text-gray-500 text-xs mt-1">Quizzes appear where assessment is needed in your practical path.</p>
+                    </div>
+                  )}
                 </div>
-=======
-                lessonQuiz ? <LessonQuiz quiz={lessonQuiz} /> : (
-                  <div className="text-center py-8">
-                    <HelpCircle className="w-10 h-10 text-gray-600 mx-auto mb-3" />
-                    <p className="text-gray-400 text-sm">No quiz for this lesson.</p>
-                    <p className="text-gray-500 text-xs mt-1">Quizzes appear where assessment is needed in your practical path.</p>
-                  </div>
-                )
->>>>>>> 83a2bd0 (feat: Practical Learning Hub + env validation + local dev)
               )}
 
               {activeTab === 'resources' && (
@@ -1094,14 +1071,9 @@ export default function CourseView() {
             <Button variant="outline" size="sm" onClick={() => goToLesson(currentLessonIndex - 1)} disabled={currentLessonIndex === 0}>
               <ChevronLeft className="w-4 h-4 mr-1" /> Previous
             </Button>
-<<<<<<< HEAD
-            <div className="flex items-center gap-2 flex-1 justify-center min-w-[150px] sm:flex-none">
-              <span className="text-xs text-gray-400">{currentLessonIndex + 1} / {totalLessons}</span>
-=======
             <div className="flex items-center gap-2">
               <span className="text-xs text-gray-400 hidden sm:inline">{currentLessonIndex + 1} / {totalLessons} • {currentModule?.title}</span>
               <span className="text-xs text-gray-400 sm:hidden">{currentLessonIndex + 1}/{totalLessons}</span>
->>>>>>> 83a2bd0 (feat: Practical Learning Hub + env validation + local dev)
               <Button variant={lessonProgress[currentLesson?.id || ''] ? 'secondary' : 'primary'} size="sm" onClick={markCompleted} disabled={!currentLesson}
                 className={lessonProgress[currentLesson?.id || ''] ? 'bg-emerald-600 hover:bg-emerald-700' : ''}>
                 {lessonProgress[currentLesson?.id || ''] ? <><CheckCircle className="w-4 h-4 mr-1" /> Completed</> : <><CheckCircle className="w-4 h-4 mr-1" /> Mark Complete</>}

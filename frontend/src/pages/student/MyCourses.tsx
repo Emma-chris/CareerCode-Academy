@@ -222,22 +222,6 @@ export default function MyCourses() {
   ];
 
   return (
-<<<<<<< HEAD
-    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
-      <SEO title="My Courses" />
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-8">
-        <div>
-          <h1 className="text-2xl sm:text-3xl font-bold">My Courses</h1>
-          <p className="text-gray-400 mt-1">
-            {enrollments.length > 0
-              ? `You are enrolled in ${enrollments.length} course${enrollments.length > 1 ? 's' : ''}.`
-              : 'Start learning today!'}
-          </p>
-        </div>
-        <Link to="/courses" className="w-full sm:w-auto">
-          <Button variant="outline" size="sm" icon={<Plus className="w-4 h-4" />} className="w-full sm:w-auto">Add Course</Button>
-        </Link>
-=======
     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-6">
       <SEO title="My Learning | CareerCode Academy" description="Continue your practical learning journey - courses, practice exercises, and real-world projects." />
 
@@ -280,7 +264,6 @@ export default function MyCourses() {
             )}
           </div>
         </div>
->>>>>>> 83a2bd0 (feat: Practical Learning Hub + env validation + local dev)
       </div>
 
       {/* Continue Learning Banner - Spec §18 */}
