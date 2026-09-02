@@ -1,0 +1,8 @@
+Update this repository from GitHub.
+
+Tasks:
+1. Check the current branch.
+2. Fetch the latest changes from the remote repository.
+3. Pull the latest commits from origin/main.
+4. Resolve any simple merge conflicts if possible.
+5. Show me a summary of updated files.
