@@ -161,7 +161,7 @@ router.get('/users', async (req: Request, res: Response, next: NextFunction) => 
     const role = req.query.role as string | undefined;
     const search = req.query.search as string | undefined;
 
-    let sql = `SELECT u.id, u.name, u.email, u.role, u.avatar, u.bio, u.is_verified, u.is_suspended, u.created_at, u.last_login,
+    let sql = `SELECT u.id, u.name, u.email, u.role, u.avatar, u.bio, u.is_verified, u.is_suspended, u.created_at, u.last_login, u.allowed_dashboards,
       (SELECT COUNT(*) FROM enrollments WHERE user_id = u.id)::int as enrolled_courses_count,
       (SELECT COUNT(*) FROM enrollments WHERE user_id = u.id AND completed = true)::int as completed_courses_count
       FROM users u WHERE 1=1`;
@@ -1228,13 +1228,16 @@ router.get('/settings', async (req: AuthRequest, res: Response, next: NextFuncti
 // PUT /admin/settings
 router.put('/settings', async (req: AuthRequest, res: Response, next: NextFunction) => {
   try {
-    const { key, value } = req.body;
+    const { key, value, category } = req.body;
+    if (!key || value === undefined) return res.status(400).json({ success: false, message: 'key and value required' });
+    const cat = category || 'general';
     const { rows } = await query(
-      `INSERT INTO system_settings (key, value) VALUES ($1, $2)
-       ON CONFLICT (key) DO UPDATE SET value = $2
+      `INSERT INTO system_settings (key, value, category) VALUES ($1, $2, $3)
+       ON CONFLICT (key) DO UPDATE SET value = $2, category = COALESCE($3, system_settings.category), updated_at = NOW()
        RETURNING *`,
-      [key, value]
+      [key, String(value), cat]
     );
+    await logAudit({ adminId: req.user!.userId, action: 'update_setting', resourceType: 'system_setting', resourceId: key as any, details: `${key}=${String(value).slice(0,100)}`, ipAddress: req.ip });
     res.json({ success: true, data: rows[0] });
   } catch (error) {
     next(error);
@@ -1431,8 +1434,8 @@ router.post('/settings/upload-branding', uploadSingle('file', 'branding'), async
 router.get('/admins', authorize('super_admin'), async (req: AuthRequest, res: Response, next: NextFunction) => {
   try {
     const { rows } = await query(`
-      SELECT id, name, email, role, avatar, created_at, last_login,
-        (SELECT COUNT(*) FROM courses WHERE creator_id = u.id)::int as course_count
+      SELECT id, name, email, role, avatar, created_at, last_login, allowed_dashboards,
+        (SELECT COUNT(*) FROM courses WHERE instructor_id = u.id)::int as course_count
       FROM users u
       WHERE role IN ('admin', 'super_admin')
       ORDER BY role DESC, created_at ASC
@@ -1482,6 +1485,59 @@ router.put('/users/:id/demote-admin', authorize('super_admin'), async (req: Auth
     await query(`UPDATE users SET role = 'student' WHERE id = $1`, [id]);
     await logAudit({ adminId: req.user!.userId, action: 'demote_admin', resourceType: 'user', resourceId: id, ipAddress: req.ip });
     res.json({ success: true, message: 'Admin demoted to student' });
+  } catch (error) { next(error); }
+});
+
+// ─── RBAC Per-User Dashboard Permissions (super_admin checkbox) ───
+const ALLOWED_DASHBOARDS = [
+  '/admin/dashboard',
+  '/admin/users',
+  '/admin/courses',
+  '/admin/categories',
+  '/admin/course-proposals',
+  '/admin/applications',
+  '/admin/payments',
+  '/admin/exams',
+  '/admin/exams/monitor',
+  '/admin/certificates',
+  '/admin/certificate-templates',
+  '/admin/calendar',
+  '/admin/tickets',
+  '/admin/broadcasts',
+  '/admin/messages',
+  '/admin/community-management',
+  '/admin/reports',
+  '/admin/analytics',
+  '/admin/settings',
+  '/admin/payouts',
+  '/admin/audit-log',
+];
+
+router.get('/users/:id/permissions', authorize('super_admin'), async (req: AuthRequest, res: Response, next: NextFunction) => {
+  try {
+    const { rows } = await query(`SELECT id, name, email, role, allowed_dashboards FROM users WHERE id=$1`, [req.params.id]);
+    if (!rows[0]) return res.status(404).json({ success: false, message: 'User not found' });
+    res.json({ success: true, data: { allowed_dashboards: rows[0].allowed_dashboards, allowedOptions: ALLOWED_DASHBOARDS } });
+  } catch (error) { next(error); }
+});
+
+router.put('/users/:id/permissions', authorize('super_admin'), async (req: AuthRequest, res: Response, next: NextFunction) => {
+  try {
+    const { id } = req.params;
+    let { allowed_dashboards } = req.body as { allowed_dashboards: string[] | null };
+    // allow null to mean full access, or array
+    if (allowed_dashboards !== null && allowed_dashboards !== undefined) {
+      if (!Array.isArray(allowed_dashboards)) return res.status(400).json({ success: false, message: 'allowed_dashboards must be array or null' });
+      const invalid = allowed_dashboards.filter((p: string) => !ALLOWED_DASHBOARDS.includes(p));
+      if (invalid.length) return res.status(400).json({ success: false, message: `Invalid dashboards: ${invalid.join(', ')}` });
+    }
+    const target = await query(`SELECT id, role FROM users WHERE id=$1`, [id]);
+    if (target.rows.length === 0) return res.status(404).json({ success: false, message: 'User not found' });
+    // Only admins can have dashboard restrictions; students/instructors ignore but allow
+    const val = allowed_dashboards === null ? null : allowed_dashboards;
+    const { rows } = await query(`UPDATE users SET allowed_dashboards=$1, updated_at=NOW() WHERE id=$2 RETURNING id, allowed_dashboards`, [val as any, id]);
+    await logAudit({ adminId: req.user!.userId, action: 'update_permissions', resourceType: 'user', resourceId: id, details: `allowed_dashboards=${JSON.stringify(val)}`, ipAddress: req.ip });
+    res.json({ success: true, data: rows[0] });
   } catch (error) { next(error); }
 });
 

@@ -335,6 +335,8 @@ interface AdminState {
   // Settings
   fetchSettings: () => Promise<void>;
   updateSetting: (key: string, value: string) => Promise<void>;
+  updateUserPermissions: (userId: string, dashboards: string[] | null) => Promise<void>;
+  fetchUserPermissions: (userId: string) => Promise<{ allowed_dashboards: string[] | null; allowedOptions: string[] }>;
 }
 
 export const useAdminStore = create<AdminState>((set, get) => ({
@@ -723,5 +725,12 @@ export const useAdminStore = create<AdminState>((set, get) => ({
   updateSetting: async (key: string, value: string) => {
     await api.put('/admin/settings', { key, value });
     get().fetchSettings();
+  },
+  updateUserPermissions: async (userId: string, dashboards: string[] | null) => {
+    await api.put(`/admin/users/${userId}/permissions`, { allowed_dashboards: dashboards });
+  },
+  fetchUserPermissions: async (userId: string) => {
+    const { data } = await api.get(`/admin/users/${userId}/permissions`);
+    return data.data;
   },
 }));

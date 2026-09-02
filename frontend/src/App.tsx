@@ -152,8 +152,8 @@ const AdminMessages = lazy(() => import('@/pages/admin/Messages'));
 const AdminPayouts = lazy(() => import('@/pages/admin/Payouts'));
 const AdminManagement = lazy(() => import('@/pages/admin/AdminManagement'));
 const AdminCalendar = lazy(() => import('@/pages/admin/CalendarManagement'));
-const AdminVideos = lazy(() => import('@/pages/admin/Videos'));
 const AdminCommunityManagement = lazy(() => import('@/pages/admin/CommunityManagement'));
+const AdminCourseDetail = lazy(() => import('@/pages/admin/AdminCourseDetail'));
 
 function GuestRoute({ children }: { children: React.ReactNode }) {
   const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
@@ -310,6 +310,7 @@ function App() {
           <Route path="dashboard" element={<SuspenseWrapper><AdminDashboard /></SuspenseWrapper>} />
           <Route path="users" element={<SuspenseWrapper><AdminUsers /></SuspenseWrapper>} />
           <Route path="courses" element={<SuspenseWrapper><AdminCourses /></SuspenseWrapper>} />
+          <Route path="courses/:id" element={<SuspenseWrapper><AdminCourseDetail /></SuspenseWrapper>} />
           <Route path="course-proposals" element={<SuspenseWrapper><AdminCourseProposals /></SuspenseWrapper>} />
           <Route path="applications" element={<SuspenseWrapper><AdminApplications /></SuspenseWrapper>} />
           <Route path="payments" element={<SuspenseWrapper><AdminPayments /></SuspenseWrapper>} />
@@ -328,7 +329,6 @@ function App() {
           <Route path="community-management" element={<SuspenseWrapper><AdminCommunityManagement /></SuspenseWrapper>} />
           <Route path="analytics" element={<SuspenseWrapper><AdminAnalytics /></SuspenseWrapper>} />
           <Route path="calendar" element={<SuspenseWrapper><AdminCalendar /></SuspenseWrapper>} />
-          <Route path="videos" element={<SuspenseWrapper><AdminVideos /></SuspenseWrapper>} />
           <Route path="settings" element={<SuspenseWrapper><AdminSettings /></SuspenseWrapper>} />
         </Route>
 

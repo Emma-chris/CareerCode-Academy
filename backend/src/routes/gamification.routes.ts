@@ -1,6 +1,8 @@
 import { Router, Response, NextFunction } from 'express';
 import { authenticate, AuthRequest } from '../middleware/auth';
 import * as Gamification from '../models/gamification';
+import { query } from '../config/db';
+import { z } from 'zod';
 
 const router = Router();
 router.use(authenticate);
@@ -54,6 +56,63 @@ router.get('/skill-tree/:courseId', async (req: AuthRequest, res: Response, next
   try {
     const tree = await Gamification.getSkillTree(req.user!.userId, req.params.courseId);
     res.json({ success: true, data: tree });
+  } catch (error) { next(error); }
+});
+
+// GET /gamification/balance - XP balance for redeem
+router.get('/balance', async (req: AuthRequest, res: Response, next: NextFunction) => {
+  try {
+    const balance = await Gamification.getXpBalance(req.user!.userId);
+    res.json({ success: true, data: balance });
+  } catch (error) { next(error); }
+});
+
+// POST /gamification/redeem - redeem XP for discount code
+router.post('/redeem', async (req: AuthRequest, res: Response, next: NextFunction) => {
+  try {
+    const schema = z.object({ xpAmount: z.number().int().min(100) });
+    const parsed = schema.safeParse(req.body);
+    if (!parsed.success) return res.status(400).json({ success: false, message: 'xpAmount required (integer)' });
+    const code = await Gamification.redeemXpForDiscount(req.user!.userId, parsed.data.xpAmount);
+    res.status(201).json({ success: true, data: code });
+  } catch (error: any) {
+    const msg = error?.message || 'Failed to redeem';
+    const status = msg.includes('Insufficient') || msg.includes('Minimum') || msg.includes('steps') || msg.includes('disabled') ? 400 : 500;
+    res.status(status).json({ success: false, message: msg });
+  }
+});
+
+// POST /gamification/validate-discount - preview discount code
+router.post('/validate-discount', async (req: AuthRequest, res: Response, next: NextFunction) => {
+  try {
+    const { code, courseId } = req.body;
+    if (!code) return res.status(400).json({ success: false, message: 'code required' });
+    let coursePrice: number | undefined;
+    if (courseId) {
+      const { rows } = await query('SELECT price FROM courses WHERE id=$1', [courseId]);
+      if (rows[0]) coursePrice = Number(rows[0].price);
+    }
+    const result = await Gamification.validateDiscountCode(code, req.user!.userId, coursePrice);
+    if (!result.valid) return res.status(400).json({ success: false, message: result.reason });
+    res.json({ success: true, data: { discount: result.discount, row: result.row } });
+  } catch (error) { next(error); }
+});
+
+// GET /gamification/discount-codes - my codes
+router.get('/discount-codes', async (req: AuthRequest, res: Response, next: NextFunction) => {
+  try {
+    const codes = await Gamification.getUserDiscountCodes(req.user!.userId);
+    res.json({ success: true, data: codes });
+  } catch (error) { next(error); }
+});
+
+// GET /gamification/xp-history-full - includes total balance
+router.get('/xp-history-full', async (req: AuthRequest, res: Response, next: NextFunction) => {
+  try {
+    const balance = await Gamification.getXpBalance(req.user!.userId);
+    const breakdown = await Gamification.getXpBreakdown(req.user!.userId);
+    const { rows } = await query(`SELECT * FROM xp_history WHERE user_id=$1 ORDER BY created_at DESC LIMIT 50`, [req.user!.userId]);
+    res.json({ success: true, data: { balance, breakdown, history: rows } });
   } catch (error) { next(error); }
 });
 

@@ -24,6 +24,7 @@ export interface User {
   reset_token_expiry: Date | null;
   setup_token: string | null;
   setup_token_expires: Date | null;
+  allowed_dashboards?: string[] | null;
   created_at: Date;
   updated_at: Date;
 }
@@ -72,7 +73,7 @@ export async function createUser(input: CreateUserInput): Promise<User> {
 
 export async function getAllUsers(limit: number = 50, offset: number = 0): Promise<User[]> {
   const { rows } = await query<User>(
-    `SELECT id, name, email, role, avatar, bio, headline, location, website, github, twitter, linkedin, expertise, is_verified, created_at, updated_at FROM users ORDER BY created_at DESC LIMIT $1 OFFSET $2`,
+    `SELECT id, name, email, role, avatar, bio, headline, location, website, github, twitter, linkedin, expertise, is_verified, is_suspended, allowed_dashboards, created_at, updated_at FROM users ORDER BY created_at DESC LIMIT $1 OFFSET $2`,
     [limit, offset]
   );
   return rows;
@@ -80,7 +81,7 @@ export async function getAllUsers(limit: number = 50, offset: number = 0): Promi
 
 export async function getUserById(id: string): Promise<User | null> {
   const { rows } = await query<User>(
-    `SELECT id, name, email, role, avatar, bio, headline, location, website, github, twitter, linkedin, expertise, is_verified, created_at, updated_at FROM users WHERE id = $1`,
+    `SELECT id, name, email, role, avatar, bio, headline, location, website, github, twitter, linkedin, expertise, is_verified, is_suspended, allowed_dashboards, created_at, updated_at FROM users WHERE id = $1`,
     [id]
   );
   return rows[0] || null;

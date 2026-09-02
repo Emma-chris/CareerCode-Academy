@@ -14,6 +14,7 @@ export interface User {
   github?: string | null;
   twitter?: string | null;
   isVerified?: boolean;
+  allowedDashboards?: string[] | null;
   createdAt?: Date;
   updatedAt?: Date;
 }
@@ -61,6 +62,7 @@ export const useAuthStore = create<AuthState>()(
               avatar: userData.avatar,
               bio: userData.bio,
               isVerified: userData.is_verified,
+              allowedDashboards: userData.allowed_dashboards ?? null,
               createdAt: userData.created_at,
               updatedAt: userData.updated_at,
             },
@@ -84,6 +86,7 @@ export const useAuthStore = create<AuthState>()(
               role: userData.role,
               avatar: userData.avatar,
               isVerified: userData.isVerified,
+              allowedDashboards: userData.allowed_dashboards ?? userData.allowedDashboards ?? null,
             },
             token: userData.token,
             refreshToken: userData.refreshToken,
@@ -145,6 +148,7 @@ export const useAuthStore = create<AuthState>()(
               avatar: userData.avatar,
               bio: userData.bio,
               isVerified: userData.is_verified,
+              allowedDashboards: userData.allowed_dashboards ?? get().user?.allowedDashboards ?? null,
               createdAt: userData.created_at,
               updatedAt: userData.updated_at,
             },
@@ -167,6 +171,7 @@ export const useAuthStore = create<AuthState>()(
               avatar: userData.avatar,
               bio: userData.bio,
               isVerified: userData.is_verified,
+              allowedDashboards: userData.allowed_dashboards ?? null,
               createdAt: userData.created_at,
               updatedAt: userData.updated_at,
             },
@@ -192,6 +197,7 @@ export const useAuthStore = create<AuthState>()(
               avatar: userData.avatar,
               bio: userData.bio,
               isVerified: userData.is_verified,
+              allowedDashboards: userData.allowed_dashboards ?? null,
               createdAt: userData.created_at,
               updatedAt: userData.updated_at,
             },

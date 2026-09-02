@@ -2,6 +2,7 @@ import { Request, Response, NextFunction } from 'express';
 import { verifyToken, TokenPayload } from '../utils/helpers';
 import { UnauthorizedError, ForbiddenError } from '../utils/errors';
 import * as UserModel from '../models/user';
+import { query } from '../config/db';
 
 export interface AuthRequest extends Request {
   user?: TokenPayload;
@@ -65,6 +66,22 @@ export function authorize(...roles: string[]) {
       return next(new ForbiddenError('You do not have permission to perform this action'));
     }
     next();
+  };
+}
+
+export function checkDashboardPermission(requiredPath: string) {
+  return async (req: AuthRequest, _res: Response, next: NextFunction): Promise<void> => {
+    try {
+      if (!req.user) return next(new UnauthorizedError('Not authenticated'));
+      if (req.user.role === 'super_admin') return next();
+      const { rows } = await query(`SELECT allowed_dashboards, role FROM users WHERE id=$1`, [req.user!.userId]);
+      const userRow: any = rows[0];
+      if (!userRow) return next(new UnauthorizedError('User not found'));
+      const allowed: string[] | null = userRow.allowed_dashboards;
+      if (allowed === null || allowed === undefined) return next();
+      if (Array.isArray(allowed) && allowed.includes(requiredPath)) return next();
+      return next(new ForbiddenError(`Access denied to ${requiredPath}. Contact super_admin.`));
+    } catch (e) { next(e); }
   };
 }
 

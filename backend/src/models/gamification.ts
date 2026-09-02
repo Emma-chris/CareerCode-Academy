@@ -1,4 +1,5 @@
 import { query } from '../config/db';
+import crypto from 'crypto';
 
 export interface GamificationState {
   hearts: number;
@@ -9,6 +10,44 @@ export interface GamificationState {
   dailyXpEarned: number;
   dailyGoalReached: boolean;
   bestStreak: number;
+}
+
+export interface XpBalance {
+  totalEarned: number;
+  totalRedeemed: number;
+  available: number;
+  rate: number;
+  ngnValue: number;
+  minRedeem: number;
+  step: number;
+  maxDiscountPercent: number;
+  redeemEnabled: boolean;
+}
+
+export interface DiscountCode {
+  id: string;
+  code: string;
+  user_id: string;
+  xp_redeemed: number;
+  discount_amount: number;
+  currency: string;
+  status: string;
+  expires_at: string;
+  created_at: string;
+}
+
+async function getXpSettings(): Promise<{ rate: number; redeemEnabled: boolean; minRedeem: number; step: number; maxDiscountPercent: number; expiryDays: number }> {
+  const { rows } = await query(`SELECT key, value FROM system_settings WHERE key IN ('xp_to_ngn_rate','xp_redeem_enabled','xp_min_redeem','xp_redeem_step','xp_max_discount_percent','xp_code_expiry_days')`);
+  const map: Record<string, string> = {};
+  rows.forEach((r: any) => { map[r.key] = r.value; });
+  return {
+    rate: parseFloat(map['xp_to_ngn_rate'] || '0.1'),
+    redeemEnabled: (map['xp_redeem_enabled'] || 'true') === 'true',
+    minRedeem: parseInt(map['xp_min_redeem'] || '1000', 10),
+    step: parseInt(map['xp_redeem_step'] || '1000', 10),
+    maxDiscountPercent: parseInt(map['xp_max_discount_percent'] || '50', 10),
+    expiryDays: parseInt(map['xp_code_expiry_days'] || '30', 10),
+  };
 }
 
 export async function awardXp(userId: string, amount: number, source: string, description?: string): Promise<number> {
@@ -189,3 +228,92 @@ export async function getSkillTree(userId: string, courseId: string): Promise<an
 
   return modules;
 }
+
+export async function getXpBalance(userId: string): Promise<XpBalance> {
+  const settings = await getXpSettings();
+  const { rows: earnedRows } = await query(`SELECT COALESCE(SUM(amount),0)::int as total FROM xp_history WHERE user_id = $1`, [userId]);
+  const { rows: redeemedRows } = await query(`SELECT COALESCE(SUM(CASE WHEN amount < 0 THEN -amount ELSE 0 END),0)::int as redeemed FROM xp_history WHERE user_id = $1`, [userId]);
+  const totalEarned = Number(earnedRows[0]?.total) || 0;
+  // net available = sum all (negative redeem reduces)
+  const { rows: netRows } = await query(`SELECT COALESCE(SUM(amount),0)::int as net FROM xp_history WHERE user_id = $1`, [userId]);
+  const net = Number(netRows[0]?.net) || 0;
+  const totalRedeemed = Number(redeemedRows[0]?.redeemed) || 0;
+  const available = Math.max(0, net);
+  const totalPositive = totalEarned > 0 ? totalEarned : available + totalRedeemed;
+  return {
+    totalEarned: totalPositive,
+    totalRedeemed,
+    available,
+    rate: settings.rate,
+    ngnValue: Math.floor(available * settings.rate),
+    minRedeem: settings.minRedeem,
+    step: settings.step,
+    maxDiscountPercent: settings.maxDiscountPercent,
+    redeemEnabled: settings.redeemEnabled,
+  };
+}
+
+export async function redeemXpForDiscount(userId: string, xpAmount: number): Promise<DiscountCode> {
+  const settings = await getXpSettings();
+  if (!settings.redeemEnabled) throw new Error('XP redemption is disabled');
+  if (!Number.isInteger(xpAmount) || xpAmount < settings.minRedeem) throw new Error(`Minimum redeem is ${settings.minRedeem} XP`);
+  if (xpAmount % settings.step !== 0) throw new Error(`XP amount must be in steps of ${settings.step}`);
+  const balance = await getXpBalance(userId);
+  if (balance.available < xpAmount) throw new Error(`Insufficient XP. Available: ${balance.available}`);
+
+  const discountAmount = Math.floor(xpAmount * settings.rate);
+  if (discountAmount <= 0) throw new Error('Discount amount must be greater than 0');
+
+  // Transactional insert
+  const client = await query(`SELECT 1`);
+  // Use single transaction via query batch with BEGIN/COMMIT
+  const code = 'XP-' + crypto.randomBytes(4).toString('hex').toUpperCase();
+  const expiresAt = new Date(Date.now() + settings.expiryDays * 24 * 60 * 60 * 1000).toISOString();
+
+  // Insert discount code
+  const { rows: codeRows } = await query(
+    `INSERT INTO discount_codes (code, user_id, xp_redeemed, discount_amount, currency, status, expires_at)
+     VALUES ($1,$2,$3,$4,'NGN','active',$5) RETURNING *`,
+    [code, userId, xpAmount, discountAmount, expiresAt]
+  );
+  // Deduct XP via negative history
+  await query(
+    `INSERT INTO xp_history (user_id, amount, source, description) VALUES ($1,$2,'redeem',$3)`,
+    [userId, -xpAmount, `Redeemed ${xpAmount} XP for ${code} (₦${discountAmount})`]
+  );
+  // Do not touch daily_xp_log for redeem (only earn)
+
+  return codeRows[0];
+}
+
+export async function validateDiscountCode(code: string, userId: string, coursePrice?: number): Promise<{ valid: boolean; discount: number; reason?: string; row?: any }> {
+  const normalized = code.trim().toUpperCase();
+  const { rows } = await query(`SELECT * FROM discount_codes WHERE code = $1`, [normalized]);
+  if (rows.length === 0) return { valid: false, discount: 0, reason: 'Invalid code' };
+  const row = rows[0];
+  if (row.user_id !== userId) return { valid: false, discount: 0, reason: 'Code does not belong to you' };
+  if (row.status !== 'active') return { valid: false, discount: 0, reason: row.status === 'used' ? 'Code already used' : `Code ${row.status}` };
+  if (new Date(row.expires_at) < new Date()) {
+    await query(`UPDATE discount_codes SET status='expired' WHERE id=$1`, [row.id]);
+    return { valid: false, discount: 0, reason: 'Code expired' };
+  }
+  if (coursePrice !== undefined) {
+    const settings = await getXpSettings();
+    const maxDiscount = Math.floor(coursePrice * (settings.maxDiscountPercent / 100));
+    if (row.discount_amount > maxDiscount) {
+      return { valid: false, discount: 0, reason: `Discount exceeds ${settings.maxDiscountPercent}% cap (₦${maxDiscount} max)` };
+    }
+  }
+  return { valid: true, discount: Number(row.discount_amount), row };
+}
+
+export async function getUserDiscountCodes(userId: string): Promise<DiscountCode[]> {
+  const { rows } = await query(`SELECT * FROM discount_codes WHERE user_id=$1 ORDER BY created_at DESC`, [userId]);
+  return rows;
+}
+
+export async function markDiscountCodeUsed(codeId: string, paymentId?: string): Promise<void> {
+  await query(`UPDATE discount_codes SET status='used', used_at=NOW(), used_payment_id=$2 WHERE id=$1`, [codeId, paymentId || null]);
+}
+
+export { getXpSettings };

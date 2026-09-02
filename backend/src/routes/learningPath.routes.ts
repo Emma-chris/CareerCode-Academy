@@ -6,6 +6,16 @@ import { NotFoundError, ConflictError } from '../utils/errors';
 
 const router = Router();
 
+// GET /learning-paths/grouped — grouped by category with zones (hide empty)
+router.get('/grouped', async (_req, res: Response, next: NextFunction) => {
+  try {
+    const grouped = await LearningPathModel.getGroupedByCategory();
+    res.json({ success: true, data: grouped });
+  } catch (error) {
+    next(error);
+  }
+});
+
 // GET /learning-paths — List all paths
 router.get('/', async (_req, res: Response, next: NextFunction) => {
   try {
@@ -16,71 +26,7 @@ router.get('/', async (_req, res: Response, next: NextFunction) => {
   }
 });
 
-// GET /learning-paths/:slug — Get a single path
-router.get('/:slug', async (req, res: Response, next: NextFunction) => {
-  try {
-    const path = await LearningPathModel.getLearningPathBySlug(req.params.slug);
-    if (!path) {
-      return res.status(404).json({ success: false, message: 'Learning path not found' });
-    }
-
-    // Also get courses in this path
-    const coursesRes = await query(`
-      SELECT c.id, c.title, c.slug, c.thumbnail, c.duration, c.level, c.price,
-             lpc.order_index,
-             u.name as instructor_name
-      FROM learning_path_courses lpc
-      JOIN courses c ON lpc.course_id = c.id
-      JOIN users u ON c.instructor_id = u.id
-      WHERE lpc.path_id = $1
-      ORDER BY lpc.order_index ASC
-    `, [path.id]);
-
-    res.json({
-      success: true,
-      data: {
-        ...path,
-        courses: coursesRes.rows,
-      },
-    });
-  } catch (error) {
-    next(error);
-  }
-});
-
-// POST /learning-paths/:slug/enroll — Enroll in a learning path
-router.post(
-  '/:slug/enroll',
-  authenticate,
-  async (req: AuthRequest, res: Response, next: NextFunction) => {
-    try {
-      const userId = req.user!.userId;
-      const path = await LearningPathModel.getLearningPathBySlug(req.params.slug);
-      if (!path) throw new NotFoundError('Learning path');
-
-      // Check if already enrolled
-      const existingRes = await query(
-        'SELECT id FROM learning_path_enrollments WHERE user_id = $1 AND path_id = $2',
-        [userId, path.id]
-      );
-      if (existingRes.rows.length > 0) {
-        throw new ConflictError('Already enrolled in this learning path');
-      }
-
-      const { rows } = await query(`
-        INSERT INTO learning_path_enrollments (user_id, path_id)
-        VALUES ($1, $2)
-        RETURNING *
-      `, [userId, path.id]);
-
-      res.status(201).json({ success: true, data: rows[0] });
-    } catch (error) {
-      next(error);
-    }
-  }
-);
-
-// GET /learning-paths/my/enrollments — Get user's enrolled paths with progress
+// GET /learning-paths/my/enrollments — Get user's enrolled paths with progress (before :slug)
 router.get(
   '/my/enrollments',
   authenticate,
@@ -130,6 +76,68 @@ router.get(
       }));
 
       res.json({ success: true, data: enriched });
+    } catch (error) {
+      next(error);
+    }
+  }
+);
+
+// GET /learning-paths/:slug — Get a single path
+router.get('/:slug', async (req, res: Response, next: NextFunction) => {
+  try {
+    const path = await LearningPathModel.getLearningPathBySlug(req.params.slug);
+    if (!path) {
+      return res.status(404).json({ success: false, message: 'Learning path not found' });
+    }
+
+    const coursesRes = await query(`
+      SELECT c.id, c.title, c.slug, c.thumbnail, c.duration, c.level, c.price,
+             lpc.order_index,
+             u.name as instructor_name
+      FROM learning_path_courses lpc
+      JOIN courses c ON lpc.course_id = c.id
+      JOIN users u ON c.instructor_id = u.id
+      WHERE lpc.path_id = $1
+      ORDER BY lpc.order_index ASC
+    `, [path.id]);
+
+    res.json({
+      success: true,
+      data: {
+        ...path,
+        courses: coursesRes.rows,
+      },
+    });
+  } catch (error) {
+    next(error);
+  }
+});
+
+// POST /learning-paths/:slug/enroll — Enroll in a learning path
+router.post(
+  '/:slug/enroll',
+  authenticate,
+  async (req: AuthRequest, res: Response, next: NextFunction) => {
+    try {
+      const userId = req.user!.userId;
+      const path = await LearningPathModel.getLearningPathBySlug(req.params.slug);
+      if (!path) throw new NotFoundError('Learning path');
+
+      const existingRes = await query(
+        'SELECT id FROM learning_path_enrollments WHERE user_id = $1 AND path_id = $2',
+        [userId, path.id]
+      );
+      if (existingRes.rows.length > 0) {
+        throw new ConflictError('Already enrolled in this learning path');
+      }
+
+      const { rows } = await query(`
+        INSERT INTO learning_path_enrollments (user_id, path_id)
+        VALUES ($1, $2)
+        RETURNING *
+      `, [userId, path.id]);
+
+      res.status(201).json({ success: true, data: rows[0] });
     } catch (error) {
       next(error);
     }

@@ -279,18 +279,83 @@ export default function AdminSettings() {
             </GlassCard>
           )}
 
-          {activeSection !== 'general' && activeSection !== 'security' && activeSection !== 'branding' && (
+          {activeSection === 'payments' && (
             <GlassCard className="p-6">
-              <div className="text-center py-12">
-                <div className="w-16 h-16 rounded-2xl bg-primary-500/10 flex items-center justify-center mx-auto mb-4">
-                  {activeSection === 'email' && <Mail className="w-8 h-8 text-primary-500" />}
-                  {activeSection === 'payments' && <CreditCard className="w-8 h-8 text-primary-500" />}
-                  {activeSection === 'notifications' && <Bell className="w-8 h-8 text-primary-500" />}
+              <h2 className="text-lg font-semibold mb-1">Payments & XP Business Model</h2>
+              <p className="text-sm text-gray-500 mb-6">Configure commission and XP → NGN conversion. <span className="font-medium">1000 XP = 100 NGN default (rate 0.1).</span> All values are live — Save Changes to persist.</p>
+              <div className="space-y-5">
+                <div className="p-4 rounded-xl border border-amber-500/20 bg-amber-500/5">
+                  <h3 className="text-sm font-semibold text-amber-700 dark:text-amber-400 mb-1">XP → NGN Business Model</h3>
+                  <p className="text-xs text-gray-500">Admin-customizable. Students redeem XP for discount codes applied at checkout.</p>
                 </div>
-                <h3 className="text-lg font-semibold mb-2 capitalize">{activeSection} Settings</h3>
-                <p className="text-gray-500 text-sm max-w-md mx-auto">
-                  Configure your {activeSection} preferences here. More options coming soon.
-                </p>
+                <Input label="XP to NGN Rate (NGN per 1 XP)" type="number" step="0.01" value={getSetting('xp_to_ngn_rate', '0.1')} onChange={(e) => handleChange('xp_to_ngn_rate', e.target.value)} />
+                <p className="text-xs text-gray-400 -mt-3">e.g., 0.1 = 1000 XP → ₦100. Example: {getSetting('xp_min_redeem','1000')} XP → ₦{Math.floor(parseInt(getSetting('xp_min_redeem','1000')) * parseFloat(getSetting('xp_to_ngn_rate','0.1')) || 0)}</p>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <Input label="Minimum Redeem (XP)" type="number" value={getSetting('xp_min_redeem', '1000')} onChange={(e) => handleChange('xp_min_redeem', e.target.value)} />
+                  <Input label="Redeem Step (XP increments)" type="number" value={getSetting('xp_redeem_step', '1000')} onChange={(e) => handleChange('xp_redeem_step', e.target.value)} />
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <Input label="Max Discount % per Course" type="number" value={getSetting('xp_max_discount_percent', '50')} onChange={(e) => handleChange('xp_max_discount_percent', e.target.value)} />
+                  <Input label="Discount Code Expiry (days)" type="number" value={getSetting('xp_code_expiry_days', '30')} onChange={(e) => handleChange('xp_code_expiry_days', e.target.value)} />
+                </div>
+                <label className="flex items-center gap-3 p-4 rounded-xl border border-gray-200 dark:border-gray-800 cursor-pointer">
+                  <input type="checkbox" checked={getSetting('xp_redeem_enabled', 'true') === 'true'} onChange={(e) => handleChange('xp_redeem_enabled', e.target.checked ? 'true' : 'false')} className="rounded text-primary-500" />
+                  <div>
+                    <div className="text-sm font-medium">Enable XP Redemption</div>
+                    <div className="text-xs text-gray-500">Allow students to redeem XP for discount codes at checkout</div>
+                  </div>
+                </label>
+
+                <div className="pt-4 border-t border-gray-200 dark:border-gray-800 space-y-4">
+                  <h3 className="text-sm font-semibold">General Payments</h3>
+                  <Input label="Platform Commission Rate (%)" type="number" value={getSetting('commission_rate', '30')} onChange={(e) => handleChange('commission_rate', e.target.value)} />
+                  <Input label="Paystack Public Key" value={getSetting('paystack_public_key', '')} onChange={(e) => handleChange('paystack_public_key', e.target.value)} />
+                  <Input label="Flutterwave Public Key" value={getSetting('flutterwave_public_key', '')} onChange={(e) => handleChange('flutterwave_public_key', e.target.value)} />
+                </div>
+              </div>
+            </GlassCard>
+          )}
+
+          {activeSection === 'email' && (
+            <GlassCard className="p-6">
+              <h2 className="text-lg font-semibold mb-6">Email Settings</h2>
+              <div className="space-y-4">
+                <Input label="SMTP Host" value={getSetting('smtp_host', '')} onChange={(e) => handleChange('smtp_host', e.target.value)} placeholder="smtp.gmail.com" icon={<Mail className="w-4 h-4" />} />
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <Input label="SMTP Port" type="number" value={getSetting('smtp_port', '587')} onChange={(e) => handleChange('smtp_port', e.target.value)} />
+                  <Input label="SMTP User" value={getSetting('smtp_user', '')} onChange={(e) => handleChange('smtp_user', e.target.value)} />
+                </div>
+                <Input label="SMTP Password" type="password" value={getSetting('smtp_pass', '')} onChange={(e) => handleChange('smtp_pass', e.target.value)} />
+                <Input label="From Email" type="email" value={getSetting('email_from', getSetting('support_email','hello@careercode.academy'))} onChange={(e) => handleChange('email_from', e.target.value)} />
+                <div className="flex items-center gap-2 p-3 rounded-xl border border-gray-200 dark:border-gray-800">
+                  <input type="checkbox" checked={getSetting('email_notifications_enabled','true')==='true'} onChange={(e)=>handleChange('email_notifications_enabled', e.target.checked?'true':'false')} className="rounded text-primary-500" />
+                  <span className="text-sm font-medium">Enable Email Notifications</span>
+                </div>
+              </div>
+            </GlassCard>
+          )}
+
+          {activeSection === 'notifications' && (
+            <GlassCard className="p-6">
+              <h2 className="text-lg font-semibold mb-6">Notification Settings</h2>
+              <div className="space-y-4">
+                <label className="flex items-center justify-between p-4 rounded-xl border border-gray-200 dark:border-gray-800 cursor-pointer">
+                  <div>
+                    <div className="text-sm font-medium">Broadcasts Enabled</div>
+                    <div className="text-xs text-gray-500">Allow admin broadcasts to students/instructors</div>
+                  </div>
+                  <input type="checkbox" checked={getSetting('broadcasts_enabled','true')==='true'} onChange={(e)=>handleChange('broadcasts_enabled', e.target.checked?'true':'false')} className="rounded text-primary-500" />
+                </label>
+                <label className="flex items-center justify-between p-4 rounded-xl border border-gray-200 dark:border-gray-800 cursor-pointer">
+                  <div>
+                    <div className="text-sm font-medium">Push Notifications</div>
+                    <div className="text-xs text-gray-500">Enable browser push for new enrollments, certificates</div>
+                  </div>
+                  <input type="checkbox" checked={getSetting('push_enabled','true')==='true'} onChange={(e)=>handleChange('push_enabled', e.target.checked?'true':'false')} className="rounded text-primary-500" />
+                </label>
+                <Input label="Notification Retention (days)" type="number" value={getSetting('notification_retention_days','30')} onChange={(e)=>handleChange('notification_retention_days', e.target.value)} />
+                <Input label="Admin Alert Email" type="email" value={getSetting('admin_alert_email', getSetting('support_email',''))} onChange={(e)=>handleChange('admin_alert_email', e.target.value)} />
               </div>
             </GlassCard>
           )}

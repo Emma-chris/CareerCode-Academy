@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Outlet, Navigate, Link } from 'react-router-dom';
+import { Outlet, Navigate, Link, useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useAuthStore } from '@/store/authStore';
 import { Navbar } from './Navbar';
@@ -58,6 +58,7 @@ export function DashboardLayout({ requiredRole }: DashboardLayoutProps) {
   }
 
   const role = user?.role || 'student';
+  const location = useLocation();
   const hasAccess = !requiredRole ||
     role === requiredRole ||
     (requiredRole === 'admin' && adminRoles.includes(role));
@@ -70,6 +71,22 @@ export function DashboardLayout({ requiredRole }: DashboardLayoutProps) {
       super_admin: '/admin/dashboard',
     };
     return <Navigate to={redirectMap[role] || '/student/dashboard'} replace />;
+  }
+
+  // RBAC: admin per-dashboard restriction (super_admin bypass)
+  if (role === 'admin' && user?.allowedDashboards !== null && user?.allowedDashboards !== undefined && Array.isArray(user.allowedDashboards)) {
+    const allowed = user.allowedDashboards as string[];
+    const currentPath = location.pathname;
+    const isAllowed = allowed.some(p => currentPath === p || currentPath.startsWith(p + '/'));
+    if (!isAllowed && currentPath.startsWith('/admin')) {
+      return (
+        <div className="min-h-[60vh] flex flex-col items-center justify-center text-center p-8">
+          <h2 className="text-xl font-semibold mb-2">Access Restricted</h2>
+          <p className="text-gray-500 max-w-md">You don't have permission to access <code className="bg-gray-100 dark:bg-gray-800 px-1 py-0.5 rounded text-sm">{currentPath}</code>. Contact a super admin.</p>
+          <Link to="/admin/dashboard" className="mt-4 inline-flex items-center px-4 py-2 rounded-xl bg-primary-500 text-white text-sm">Back to Dashboard</Link>
+        </div>
+      );
+    }
   }
 
   const roleLabel = role === 'super_admin' ? 'Admin' : role.charAt(0).toUpperCase() + role.slice(1);

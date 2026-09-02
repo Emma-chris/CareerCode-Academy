@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import {
   Search, CheckCircle, XCircle, Archive, Star, Trash2, Eye, AlertCircle,
   Loader2, ChevronDown, ChevronUp, Send, Clock, FileText, X, Plus, Edit3,
-  Code, BookOpen,
+  Code, BookOpen, FolderOpen,
 } from 'lucide-react';
 import { GlassCard } from '@/components/ui/GlassCard';
 import { Badge } from '@/components/ui/Badge';
@@ -12,18 +12,23 @@ import { Input } from '@/components/ui/Input';
 import { useAdminStore } from '@/store/adminStore';
 import { optimizeImageUrl } from '@/lib/cloudinary';
 import api from '@/lib/axios';
+import { useNavigate } from 'react-router-dom';
+import { useAuthStore } from '@/store/authStore';
 
 const TABS = ['all', 'draft', 'pending_review', 'published', 'rejected', 'archived'];
 const CATEGORIES = ['all', 'Web Development', 'Data Science', 'Design', 'Mobile', 'DevOps', 'AI/ML', 'Cloud', 'Cybersecurity'];
 
 export default function AdminCourses() {
   const { courses, isLoading, error, fetchCourses, createCourse, updateCourse, approveCourse, rejectCourse, archiveCourse, featureCourse, deleteCourse } = useAdminStore();
+  const navigate = useNavigate();
+  const { user } = useAuthStore();
   const [tab, setTab] = useState('all');
   const [search, setSearch] = useState('');
   const [category, setCategory] = useState('all');
   const [sortField, setSortField] = useState('created_at');
   const [sortDir, setSortDir] = useState<'asc' | 'desc'>('desc');
   const [actionLoading, setActionLoading] = useState<string | null>(null);
+  const [draftCollapsed, setDraftCollapsed] = useState(false);
   const [reviewModal, setReviewModal] = useState<{ courseId: string; action: 'approve' | 'reject' } | null>(null);
   const [reviewNotes, setReviewNotes] = useState('');
 
@@ -371,114 +376,90 @@ export default function AdminCourses() {
         </select>
       </div>
 
-      <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
-        {isLoading && courses.length === 0 && (
-          <div className="md:col-span-3 text-center py-16 text-gray-400">
-            <Loader2 className="w-8 h-8 animate-spin mx-auto mb-3" />
-            Loading courses...
-          </div>
-        )}
-        {!isLoading && sorted.length === 0 && (
-          <div className="md:col-span-3 text-center py-16 text-gray-400">No courses found.</div>
-        )}
-        {sorted.map((course) => (
-          <motion.div key={course._id} layout initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
-            <GlassCard className="p-0 overflow-hidden" hover>
-              {course.thumbnail && (
-                <div className="relative">
-                  <img src={optimizeImageUrl(course.thumbnail, 400, 200)} alt={course.title} className="w-full h-36 object-cover" />
-                  {course.is_featured && (
-                    <div className="absolute top-2 right-2 bg-amber-400 text-white text-xs px-2 py-0.5 rounded-full flex items-center gap-1">
-                      <Star className="w-3 h-3 fill-white" /> Featured
-                    </div>
-                  )}
-                </div>
-              )}
-              <div className="p-4">
-                <div className="flex items-center justify-between mb-2">
-                  <div className="flex items-center gap-1.5">
-                    {statusIcon(course.status)}
-                    {statusBadge(course.status)}
-                  </div>
-                  {!course.thumbnail && course.is_featured && (
-                    <Badge variant="default"><Star className="w-3 h-3 mr-0.5 inline fill-amber-400 text-amber-400" /> Featured</Badge>
-                  )}
-                </div>
-                <h3 className="font-semibold text-sm leading-snug mb-1 line-clamp-2">{course.title}</h3>
-                <p className="text-xs text-gray-400 mb-1">{course.instructor?.name} · {course.category}</p>
-                <p className="text-xs text-gray-400 dark:text-gray-300 mb-3 line-clamp-2">{course.description}</p>
-                <div className="flex items-center gap-2 text-xs text-gray-400 mb-3">
-                  <span>{course.enrollmentCount || 0} enrolled</span>
-                  <span>·</span>
-                  <span>${course.price || 0}</span>
-                  <span>·</span>
-                  <span className="capitalize">{course.level}</span>
-                </div>
-                {course.review_notes && (
-                  <div className="mb-3 p-2 rounded-lg bg-amber-50 dark:bg-amber-900/10 border border-amber-200 dark:border-amber-900/30 text-xs text-amber-700 dark:text-amber-400">
-                    <span className="font-semibold">Review notes: </span>{course.review_notes}
+      {/* Draft Folder — per admin */}
+      {(() => {
+        const isSuper = user?.role === 'super_admin';
+        const drafts = courses.filter((c: any) => c.status === 'draft' && (isSuper ? true : (c.instructor_id === user?.id || c.instructor?.id === user?.id || c.instructor_id === (user as any)?.userId)))
+          .filter((c: any) => category === 'all' || c.category === category)
+          .filter((c: any) => !search || c.title?.toLowerCase().includes(search.toLowerCase()) || c.instructor?.name?.toLowerCase().includes(search.toLowerCase()));
+        const mainCourses = sorted.filter((c: any) => !drafts.some((d: any) => (d._id||d.id) === (c._id||c.id)));
+        const showDraftFolder = tab === 'all' || tab === 'draft';
+        return (
+          <>
+            {showDraftFolder && drafts.length > 0 && (
+              <div className="mb-6">
+                <button onClick={() => setDraftCollapsed(!draftCollapsed)} className="w-full flex items-center gap-2 p-3 rounded-xl bg-amber-50 dark:bg-amber-900/10 border border-amber-200 dark:border-amber-900/30 hover:bg-amber-100 dark:hover:bg-amber-900/20 transition-colors">
+                  <FolderOpen className="w-5 h-5 text-amber-600" />
+                  <span className="font-semibold text-sm text-amber-800 dark:text-amber-300">Draft</span>
+                  <Badge variant="default" className="bg-amber-500 text-white">{drafts.length}</Badge>
+                  <span className="text-xs text-amber-600 dark:text-amber-400 ml-1">per admin — only your drafts</span>
+                  <span className="ml-auto">{draftCollapsed ? <ChevronDown className="w-4 h-4 text-amber-600" /> : <ChevronUp className="w-4 h-4 text-amber-600" />}</span>
+                </button>
+                {!draftCollapsed && (
+                  <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4 mt-3">
+                    {drafts.map((course: any) => (
+                      <motion.div key={course._id||course.id} layout initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} onClick={() => navigate(`/admin/courses/${course._id||course.id}`)} className="cursor-pointer">
+                        <GlassCard className="p-0 overflow-hidden hover:shadow-lg transition-shadow border-amber-200 dark:border-amber-900/30" hover>
+                          {course.thumbnail && (
+                            <div className="relative">
+                              <img src={optimizeImageUrl(course.thumbnail, 400, 200)} alt={course.title} className="w-full h-36 object-cover" />
+                              <div className="absolute top-2 left-2 bg-amber-500 text-white text-xs px-2 py-0.5 rounded-full">Draft</div>
+                            </div>
+                          )}
+                          <div className="p-4">
+                            <h3 className="font-semibold text-sm leading-snug mb-1 line-clamp-2">{course.title}</h3>
+                            <p className="text-xs text-gray-400 mb-1">{course.instructor?.name} · {course.category}</p>
+                            <p className="text-xs text-gray-500 line-clamp-2">{course.description}</p>
+                          </div>
+                        </GlassCard>
+                      </motion.div>
+                    ))}
                   </div>
                 )}
-                <div className="flex gap-1.5 flex-wrap">
-                  <Button size="sm" variant="outline" onClick={() => openCourseModal(course)}>
-                    <Edit3 className="w-3 h-3" />
-                  </Button>
-                  <Button size="sm" variant="outline" onClick={() => window.open(`/courses/${course._id}`, '_blank')}>
-                    <Eye className="w-3 h-3" />
-                  </Button>
-                  {nextStatus(course.status).map((ns) => {
-                    if (ns === 'published') {
-                      return (
-                        <Button key={ns} size="sm" variant="primary" onClick={() => handleAction('approve', course._id)} disabled={actionLoading === course._id}>
-                          {actionLoading === course._id ? <Loader2 className="w-3 h-3 animate-spin" /> : <CheckCircle className="w-3 h-3" />} Publish
-                        </Button>
-                      );
-                    }
-                    if (ns === 'rejected') {
-                      return (
-                        <Button key={ns} size="sm" variant="danger" onClick={() => handleAction('reject', course._id)} disabled={actionLoading === course._id}>
-                          <XCircle className="w-3 h-3" /> Reject
-                        </Button>
-                      );
-                    }
-                    if (ns === 'pending_review') {
-                      return (
-                        <Button key={ns} size="sm" variant="outline" onClick={() => handleAction('submit-review', course._id)} disabled={actionLoading === course._id}>
-                          <Send className="w-3 h-3" /> Submit
-                        </Button>
-                      );
-                    }
-                    if (ns === 'draft') {
-                      return (
-                        <Button key={ns} size="sm" variant="outline" onClick={() => handleAction('revert-draft', course._id)} disabled={actionLoading === course._id}>
-                          <FileText className="w-3 h-3" /> Draft
-                        </Button>
-                      );
-                    }
-                    if (ns === 'archived') {
-                      return (
-                        <Button key={ns} size="sm" variant="ghost" onClick={() => handleAction('archive', course._id)} disabled={actionLoading === course._id}>
-                          <Archive className="w-3 h-3" /> Archive
-                        </Button>
-                      );
-                    }
-                    return null;
-                  })}
-                  <Button size="sm" variant="ghost" onClick={() => openChallengeManager(course._id, course.title)} title="Manage Challenges">
-                    <Code className="w-3 h-3 text-purple-500" />
-                  </Button>
-                  <Button size="sm" variant="ghost" onClick={() => handleAction('feature', course._id)} disabled={actionLoading === course._id}>
-                    <Star className={`w-3 h-3 ${course.is_featured ? 'fill-amber-400 text-amber-400' : ''}`} />
-                  </Button>
-                  <Button size="sm" variant="ghost" onClick={() => handleAction('delete', course._id)} disabled={actionLoading === course._id}>
-                    <Trash2 className="w-3 h-3 text-danger-500" />
-                  </Button>
-                </div>
               </div>
-            </GlassCard>
-          </motion.div>
-        ))}
-      </div>
+            )}
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {isLoading && courses.length === 0 && (
+                <div className="md:col-span-3 text-center py-16 text-gray-400">
+                  <Loader2 className="w-8 h-8 animate-spin mx-auto mb-3" />
+                  Loading courses...
+                </div>
+              )}
+              {!isLoading && mainCourses.length === 0 && (tab !== 'draft' || drafts.length===0) && (
+                <div className="md:col-span-3 text-center py-16 text-gray-400">No courses found.</div>
+              )}
+              {mainCourses.map((course: any) => (
+                <motion.div key={course._id||course.id} layout initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} onClick={() => navigate(`/admin/courses/${course._id||course.id}`)} className="cursor-pointer">
+                  <GlassCard className="p-0 overflow-hidden hover:shadow-lg transition-shadow" hover>
+                    {course.thumbnail && (
+                      <div className="relative">
+                        <img src={optimizeImageUrl(course.thumbnail, 400, 200)} alt={course.title} className="w-full h-36 object-cover" />
+                        {course.is_featured && (
+                          <div className="absolute top-2 right-2 bg-amber-400 text-white text-xs px-2 py-0.5 rounded-full flex items-center gap-1">
+                            <Star className="w-3 h-3 fill-white" /> Featured
+                          </div>
+                        )}
+                      </div>
+                    )}
+                    <div className="p-4">
+                      <div className="flex items-center gap-1.5 mb-2">
+                        {statusIcon(course.status)}
+                        {statusBadge(course.status)}
+                      </div>
+                      <h3 className="font-semibold text-sm leading-snug mb-1 line-clamp-2">{course.title}</h3>
+                      <p className="text-xs text-gray-400 mb-1">{course.instructor?.name} · {course.category}</p>
+                      <p className="text-xs text-gray-400 dark:text-gray-300 mb-3 line-clamp-2">{course.description}</p>
+                      <div className="flex items-center gap-2 text-xs text-gray-400">
+                        <span>{course.enrollmentCount || 0} enrolled</span><span>·</span><span>${course.price || 0}</span><span>·</span><span className="capitalize">{course.level}</span>
+                      </div>
+                    </div>
+                  </GlassCard>
+                </motion.div>
+              ))}
+            </div>
+          </>
+        );
+      })()}
 
       <AnimatePresence>
         {reviewModal && (

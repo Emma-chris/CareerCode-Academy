@@ -22,12 +22,12 @@ export interface CreatePaymentInput {
   reference: string;
 }
 
-export async function createPayment(input: CreatePaymentInput): Promise<Payment> {
+export async function createPayment(input: CreatePaymentInput & { discount_code_id?: string | null; xp_discount?: number; amount_before_discount?: number }): Promise<Payment> {
   const { rows } = await query<Payment>(
-    `INSERT INTO payments (user_id, course_id, amount, currency, provider, reference)
-     VALUES ($1, $2, $3, $4, $5, $6)
-     RETURNING *`,
-    [input.user_id, input.course_id, input.amount, input.currency || 'NGN', input.provider, input.reference]
+    `INSERT INTO payments (user_id, course_id, amount, currency, provider, reference, discount_code_id, xp_discount, amount_before_discount)
+      VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
+      RETURNING *`,
+    [input.user_id, input.course_id, input.amount, input.currency || 'NGN', input.provider, input.reference, input.discount_code_id || null, input.xp_discount || 0, input.amount_before_discount || null]
   );
   return rows[0];
 }

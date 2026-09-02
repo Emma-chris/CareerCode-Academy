@@ -10,6 +10,7 @@ import * as UserModel from '../models/user';
 import { NotFoundError, ConflictError } from '../utils/errors';
 import { emitDashboardUpdate, emitStudentUpdate } from '../config/socket';
 import { query } from '../config/db';
+import * as Gamification from '../models/gamification';
 
 const router = Router();
 
@@ -17,6 +18,7 @@ const initializePaymentSchema = z.object({
   courseId: z.string().uuid(),
   provider: z.enum(['flutterwave', 'paystack']),
   currency: z.string().length(3).optional().default('NGN'),
+  discountCode: z.string().optional(),
 });
 
 // POST /payments/initialize
@@ -26,7 +28,7 @@ router.post(
   validate(initializePaymentSchema),
   async (req: AuthRequest, res: Response, next: NextFunction) => {
     try {
-      const { courseId, provider, currency } = req.body;
+      const { courseId, provider, currency, discountCode } = req.body;
       const userId = req.user!.userId;
 
       const user = await UserModel.getUserById(userId);
@@ -38,12 +40,27 @@ router.post(
       }
 
       const discount = course.discount_percentage || 0;
-      const effectivePrice = course.price * (1 - discount / 100);
+      const priceAfterCourseDiscount = course.price * (1 - discount / 100);
+      let xpDiscount = 0;
+      let discountCodeRow: any = null;
+      const amountBeforeDiscount = priceAfterCourseDiscount;
+      if (discountCode) {
+        const validation = await Gamification.validateDiscountCode(discountCode, userId, priceAfterCourseDiscount);
+        if (!validation.valid) {
+          return res.status(400).json({ success: false, message: validation.reason });
+        }
+        xpDiscount = validation.discount;
+        discountCodeRow = validation.row;
+      }
+      const effectivePrice = Math.max(0, priceAfterCourseDiscount - xpDiscount);
 
       if (effectivePrice <= 0) {
         const existingEnrollment = await EnrollmentModel.getEnrollment(userId, courseId);
         if (!existingEnrollment) {
           await EnrollmentModel.createEnrollment({ user_id: userId, course_id: courseId });
+        }
+        if (discountCodeRow) {
+          await Gamification.markDiscountCodeUsed(discountCodeRow.id, undefined);
         }
         emitDashboardUpdate();
         emitStudentUpdate(userId);
@@ -52,7 +69,7 @@ router.post(
           data: {
             amount: 0,
             course_slug: course.slug,
-            message: 'Enrolled successfully (100% discount applied)',
+            message: discountCodeRow ? `Enrolled successfully (XP discount ₦${xpDiscount} applied)` : 'Enrolled successfully (100% discount applied)',
           }
         });
       }
@@ -79,6 +96,9 @@ router.post(
         currency,
         provider,
         reference,
+        discount_code_id: discountCodeRow?.id || null,
+        xp_discount: xpDiscount,
+        amount_before_discount: amountBeforeDiscount,
       });
 
       let paymentData: any = {
@@ -194,6 +214,12 @@ async function verifyPaymentByReference(reference: string) {
 
     if (verified) {
       await PaymentModel.updatePaymentStatus(reference, 'completed', { verified: true });
+      // mark discount code used if any
+      try {
+        const { rows: payRows } = await query(`SELECT discount_code_id FROM payments WHERE reference=$1`, [reference]);
+        const dcId = (payRows[0] as any)?.discount_code_id || (payment as any).discount_code_id;
+        if (dcId) await Gamification.markDiscountCodeUsed(dcId, (payment as any).id);
+      } catch {}
       const existing = await EnrollmentModel.getEnrollment(payment.user_id, payment.course_id);
       if (!existing) {
         await EnrollmentModel.createEnrollment({
@@ -338,6 +364,11 @@ router.post(
       await PaymentModel.updatePaymentStatus(reference, paymentStatus as any, req.body);
 
       if (paymentStatus === 'completed') {
+        try {
+          const { rows: payRows } = await query(`SELECT discount_code_id FROM payments WHERE reference=$1`, [reference]);
+          const dcId = (payRows[0] as any)?.discount_code_id || (payment as any).discount_code_id;
+          if (dcId) await Gamification.markDiscountCodeUsed(dcId, (payment as any).id);
+        } catch {}
         const existingEnrollment = await EnrollmentModel.getEnrollment(payment.user_id, payment.course_id);
         if (!existingEnrollment) {
           await EnrollmentModel.createEnrollment({
@@ -353,6 +384,26 @@ router.post(
     } catch (error) {
       res.status(500).json({ success: false, message: 'Webhook processing failed' });
     }
+  }
+);
+
+// POST /payments/validate-discount - preview discount code (without initializing payment)
+router.post(
+  '/validate-discount',
+  authenticate,
+  async (req: AuthRequest, res: Response, next: NextFunction) => {
+    try {
+      const { code, courseId } = req.body;
+      if (!code) return res.status(400).json({ success: false, message: 'code required' });
+      let coursePrice: number | undefined;
+      if (courseId) {
+        const c = await CourseModel.getCourseById(courseId);
+        if (c) coursePrice = Number(c.price) * (1 - (Number(c.discount_percentage) || 0) / 100);
+      }
+      const validation = await Gamification.validateDiscountCode(code, req.user!.userId, coursePrice);
+      if (!validation.valid) return res.status(400).json({ success: false, message: validation.reason });
+      res.json({ success: true, data: { discount: validation.discount, xpRedeemed: validation.row.xp_redeemed, expires_at: validation.row.expires_at } });
+    } catch (error) { next(error); }
   }
 );
 

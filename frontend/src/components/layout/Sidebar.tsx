@@ -21,7 +21,6 @@ import {
   Map,
   Target,
   User,
-  Film,
   Plus,
   FileQuestion,
   MessageCircle,
@@ -82,7 +81,6 @@ const roleSidebarLinks: Record<string, { label: string; path: string; icon: any 
     { label: 'Users', path: '/admin/users', icon: Users },
     { label: 'Courses', path: '/admin/courses', icon: GraduationCap },
     { label: 'Categories', path: '/admin/categories', icon: Hash },
-    { label: 'Videos', path: '/admin/videos', icon: Film },
     { label: 'Course Proposals', path: '/admin/course-proposals', icon: BookOpen },
     { label: 'Applications', path: '/admin/applications', icon: ClipboardList },
     { label: 'Payments', path: '/admin/payments', icon: LayoutDashboard },
@@ -105,7 +103,6 @@ const roleSidebarLinks: Record<string, { label: string; path: string; icon: any 
     { label: 'Users', path: '/admin/users', icon: Users },
     { label: 'Courses', path: '/admin/courses', icon: BookOpen },
     { label: 'Categories', path: '/admin/categories', icon: GitBranch },
-    { label: 'Videos', path: '/admin/videos', icon: Film },
     { label: 'Course Proposals', path: '/admin/course-proposals', icon: BookOpen },
     { label: 'Applications', path: '/admin/applications', icon: ClipboardList },
     { label: 'Payments', path: '/admin/payments', icon: LayoutDashboard },
@@ -136,17 +133,28 @@ export function Sidebar({ isOpen, onToggle }: SidebarProps) {
   const baseLinks = roleSidebarLinks[role] || roleSidebarLinks.student;
   const links = useMemo(() => {
     if (role !== 'admin' && role !== 'super_admin') return baseLinks;
+    // RBAC filter for admin (super_admin bypass)
+    let filtered = baseLinks;
+    if (role === 'admin' && user?.allowedDashboards !== undefined && user?.allowedDashboards !== null) {
+      const allowed = user.allowedDashboards as string[] | null;
+      if (Array.isArray(allowed)) {
+        filtered = baseLinks.filter(l => allowed.includes(l.path));
+        // always keep dashboard? if allowed doesn't include dashboard but includes others, still show - respect strict list
+        if (filtered.length === 0 && allowed.length > 0) filtered = baseLinks.filter(l => allowed.includes(l.path));
+      }
+    }
     const adminManagement = { label: 'Admin Management', path: '/admin/admin-management', icon: ShieldAlert };
     if (role === 'super_admin') {
-      const idx = baseLinks.findIndex(l => l.path === '/admin/settings');
+      const idx = filtered.findIndex(l => l.path === '/admin/settings');
       if (idx >= 0) {
-        const copy = [...baseLinks];
+        const copy = [...filtered];
         copy.splice(idx, 0, adminManagement);
         return copy;
       }
+      return [...filtered, adminManagement];
     }
-    return baseLinks;
-  }, [role, baseLinks]);
+    return filtered;
+  }, [role, baseLinks, user?.allowedDashboards]);
 
   useEffect(() => {
     if (role !== 'student') return;

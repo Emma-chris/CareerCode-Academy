@@ -153,3 +153,65 @@ export async function getLearningPathBySlug(slug: string): Promise<any | null> {
   );
   return rows[0] || null;
 }
+
+export async function getGroupedByCategory(): Promise<any[]> {
+  const { rows: cats } = await query(
+    `SELECT DISTINCT category FROM courses WHERE published = true ORDER BY category ASC`
+  );
+  const levels = ['beginner', 'intermediate', 'advanced'];
+  const result: any[] = [];
+  for (const r of cats) {
+    const category: string = r.category;
+    const zones: Record<string, any> = {};
+    let hasAny = false;
+    for (const level of levels) {
+      const slug = pathSlug(category, level);
+      const { rows: pathRows } = await query(`SELECT * FROM learning_paths WHERE slug = $1`, [slug]);
+      const path = pathRows[0] || null;
+      const { rows: courseRows } = await query(
+        `SELECT c.id, c.title, c.slug, c.thumbnail, c.duration, c.level, c.price,
+                u.name as instructor_name
+         FROM learning_path_courses lpc
+         JOIN courses c ON lpc.course_id = c.id
+         JOIN users u ON c.instructor_id = u.id
+         WHERE lpc.path_id = $1
+         ORDER BY lpc.order_index ASC`,
+        [path?.id || '00000000-0000-0000-0000-000000000000']
+      );
+      // If path doesn't exist, courseRows will be empty; treat as empty zone -> hide
+      const countRes = await query(
+        `SELECT COUNT(*)::int as cnt, COALESCE(SUM(duration),0)::int as dur
+         FROM courses WHERE category=$1 AND level=$2 AND published=true`, [category, level]
+      );
+      const cnt = Number(countRes.rows[0]?.cnt) || 0;
+      if (cnt > 0 && path) {
+        const { rows: statsRows } = await query(
+          `SELECT COUNT(DISTINCT e.user_id)::int as students
+           FROM enrollments e
+           JOIN learning_path_courses lpc2 ON e.course_id = lpc2.course_id
+           WHERE lpc2.path_id=$1`, [path.id]
+        );
+        zones[level] = {
+          path,
+          courses: courseRows,
+          courses_count: cnt,
+          total_duration: Number(countRes.rows[0]?.dur) || 0,
+          students_count: Number((statsRows[0] as any)?.students) || 0,
+          color: path.color,
+          icon: path.icon,
+        };
+        hasAny = true;
+      } else {
+        zones[level] = null; // hide empty zone
+      }
+    }
+    if (hasAny) {
+      result.push({
+        category,
+        categorySlug: category.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, ''),
+        zones
+      });
+    }
+  }
+  return result;
+}

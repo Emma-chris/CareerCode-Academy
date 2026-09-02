@@ -178,6 +178,8 @@ router.post(
           role: user.role,
           avatar: user.avatar,
           isVerified: user.is_verified,
+          allowed_dashboards: (user as any).allowed_dashboards ?? null,
+          allowedDashboards: (user as any).allowed_dashboards ?? null,
           token,
           refreshToken,
         },

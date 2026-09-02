@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Shield, ShieldAlert, UserPlus, Search, ArrowUpDown, Crown } from 'lucide-react';
+import { Shield, ShieldAlert, UserPlus, Search, Crown, Settings, LayoutDashboard } from 'lucide-react';
 import { GlassCard } from '@/components/ui/GlassCard';
 import { Badge } from '@/components/ui/Badge';
 import { Button } from '@/components/ui/Button';
@@ -19,7 +19,32 @@ interface AdminUser {
   created_at: string;
   last_login: string | null;
   course_count: number;
+  allowed_dashboards?: string[] | null;
 }
+
+const ALLOWED_DASHBOARDS: { path: string; label: string }[] = [
+  { path: '/admin/dashboard', label: 'Dashboard' },
+  { path: '/admin/users', label: 'Users' },
+  { path: '/admin/courses', label: 'Courses' },
+  { path: '/admin/categories', label: 'Categories' },
+  { path: '/admin/course-proposals', label: 'Course Proposals' },
+  { path: '/admin/applications', label: 'Applications' },
+  { path: '/admin/payments', label: 'Payments' },
+  { path: '/admin/exams', label: 'Exams' },
+  { path: '/admin/exams/monitor', label: 'Exam Monitor' },
+  { path: '/admin/certificates', label: 'Certificates' },
+  { path: '/admin/certificate-templates', label: 'Cert. Templates' },
+  { path: '/admin/calendar', label: 'Calendar' },
+  { path: '/admin/tickets', label: 'Support Tickets' },
+  { path: '/admin/broadcasts', label: 'Notifications' },
+  { path: '/admin/messages', label: 'Messages' },
+  { path: '/admin/community-management', label: 'Community' },
+  { path: '/admin/reports', label: 'Reports' },
+  { path: '/admin/analytics', label: 'Analytics' },
+  { path: '/admin/settings', label: 'Settings' },
+  { path: '/admin/payouts', label: 'Payouts' },
+  { path: '/admin/audit-log', label: 'Audit Log' },
+];
 
 export default function AdminManagement() {
   const { user } = useAuthStore();
@@ -30,6 +55,10 @@ export default function AdminManagement() {
   const [promoteEmail, setPromoteEmail] = useState('');
   const [promoting, setPromoting] = useState(false);
   const [demoting, setDemoting] = useState<number | null>(null);
+  const [permModalAdmin, setPermModalAdmin] = useState<AdminUser | null>(null);
+  const [permSelection, setPermSelection] = useState<string[]>([]);
+  const [permSaving, setPermSaving] = useState(false);
+  const [permFullAccess, setPermFullAccess] = useState(false);
 
   async function fetchAdmins() {
     setLoading(true);
@@ -76,6 +105,36 @@ export default function AdminManagement() {
       toast.error(err?.response?.data?.message || 'Failed to demote');
     } finally {
       setDemoting(null);
+    }
+  };
+
+  const openPermModal = (admin: AdminUser) => {
+    const allowed = admin.allowed_dashboards;
+    if (allowed === null || allowed === undefined) {
+      setPermFullAccess(true);
+      setPermSelection(ALLOWED_DASHBOARDS.map(d => d.path));
+    } else {
+      setPermFullAccess(false);
+      setPermSelection(allowed);
+    }
+    setPermModalAdmin(admin);
+  };
+
+  const handleSavePermissions = async () => {
+    if (!permModalAdmin) return;
+    setPermSaving(true);
+    try {
+      const payload = permFullAccess ? null : permSelection;
+      const { data } = await api.put(`/admin/users/${permModalAdmin.id}/permissions`, { allowed_dashboards: payload });
+      if (data.success) {
+        toast.success('Permissions updated');
+        setPermModalAdmin(null);
+        fetchAdmins();
+      }
+    } catch (err: any) {
+      toast.error(err?.response?.data?.message || 'Failed to update permissions');
+    } finally {
+      setPermSaving(false);
     }
   };
 
@@ -148,7 +207,7 @@ export default function AdminManagement() {
                 <th className="text-left px-4 py-3 font-medium text-gray-500">Role</th>
                 <th className="text-left px-4 py-3 font-medium text-gray-500 hidden sm:table-cell">Email</th>
                 <th className="text-left px-4 py-3 font-medium text-gray-500 hidden md:table-cell">Courses</th>
-                <th className="text-left px-4 py-3 font-medium text-gray-500 hidden lg:table-cell">Created</th>
+                <th className="text-left px-4 py-3 font-medium text-gray-500 hidden lg:table-cell">Access</th>
                 <th className="text-right px-4 py-3 font-medium text-gray-500">Actions</th>
               </tr>
             </thead>
@@ -186,21 +245,43 @@ export default function AdminManagement() {
                   </td>
                   <td className="px-4 py-3 text-gray-500 hidden sm:table-cell">{admin.email}</td>
                   <td className="px-4 py-3 text-gray-500 hidden md:table-cell">{admin.course_count}</td>
-                  <td className="px-4 py-3 text-gray-500 hidden lg:table-cell">{new Date(admin.created_at).toLocaleDateString()}</td>
+                  <td className="px-4 py-3 hidden lg:table-cell">
+                    {admin.role === 'super_admin' ? (
+                      <span className="text-xs text-amber-600 font-medium">All Access</span>
+                    ) : admin.allowed_dashboards === null || admin.allowed_dashboards === undefined ? (
+                      <span className="text-xs text-emerald-600 font-medium">Full Access</span>
+                    ) : admin.allowed_dashboards.length === 0 ? (
+                      <span className="text-xs text-red-500">No Access</span>
+                    ) : (
+                      <span className="text-xs text-gray-500">{admin.allowed_dashboards.length} dashboards</span>
+                    )}
+                  </td>
                   <td className="px-4 py-3 text-right">
-                    {isSuperAdmin && admin.role === 'admin' && String(admin.id) !== String(user?.id) && (
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        onClick={() => handleDemote(admin.id, admin.name)}
-                        disabled={demoting === admin.id}
-                      >
-                        {demoting === admin.id ? 'Demoting...' : 'Demote'}
-                      </Button>
-                    )}
-                    {String(admin.id) === String(user?.id) && (
-                      <span className="text-xs text-gray-500 italic">You</span>
-                    )}
+                    <div className="flex items-center justify-end gap-2">
+                      {isSuperAdmin && admin.role === 'admin' && (
+                        <Button
+                          size="sm"
+                          variant="ghost"
+                          onClick={() => openPermModal(admin)}
+                          title="Edit dashboard permissions"
+                        >
+                          <Settings className="w-3.5 h-3.5 mr-1" /> Permissions
+                        </Button>
+                      )}
+                      {isSuperAdmin && admin.role === 'admin' && String(admin.id) !== String(user?.id) && (
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          onClick={() => handleDemote(admin.id, admin.name)}
+                          disabled={demoting === admin.id}
+                        >
+                          {demoting === admin.id ? 'Demoting...' : 'Demote'}
+                        </Button>
+                      )}
+                      {String(admin.id) === String(user?.id) && (
+                        <span className="text-xs text-gray-500 italic">You</span>
+                      )}
+                    </div>
                   </td>
                 </motion.tr>
               ))}
@@ -213,6 +294,78 @@ export default function AdminManagement() {
           </table>
         </div>
       </GlassCard>
+
+      {/* Permissions Modal (super_admin checkbox per dashboard) */}
+      {permModalAdmin && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
+          <motion.div
+            initial={{ scale: 0.95, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            className="bg-white dark:bg-gray-900 rounded-2xl p-6 w-full max-w-2xl max-h-[90vh] overflow-y-auto shadow-2xl"
+          >
+            <h2 className="text-lg font-bold flex items-center gap-2">
+              <LayoutDashboard className="w-5 h-5 text-primary-500" /> Dashboard Permissions
+            </h2>
+            <p className="text-sm text-gray-500 mb-4">Control which admin dashboards <strong>{permModalAdmin.name}</strong> can access. (super_admin only)</p>
+
+            <label className="flex items-center gap-2 p-3 rounded-xl border border-primary-500/20 bg-primary-500/5 mb-4 cursor-pointer">
+              <input
+                type="checkbox"
+                checked={permFullAccess}
+                onChange={(e) => {
+                  const v = e.target.checked;
+                  setPermFullAccess(v);
+                  if (v) setPermSelection(ALLOWED_DASHBOARDS.map(d => d.path));
+                }}
+                className="rounded text-primary-500"
+              />
+              <span className="text-sm font-medium">Full Access (all dashboards)</span>
+              <span className="text-xs text-gray-500 ml-auto">When checked, admin sees all dashboards (stored as NULL).</span>
+            </label>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+              {ALLOWED_DASHBOARDS.map(d => (
+                <label
+                  key={d.path}
+                  className={`flex items-center gap-3 p-3 rounded-xl border cursor-pointer transition-colors ${permSelection.includes(d.path) ? 'border-primary-500/30 bg-primary-500/5' : 'border-gray-200 dark:border-gray-800 hover:bg-gray-50 dark:hover:bg-gray-800/50'}`}
+                >
+                  <input
+                    type="checkbox"
+                    checked={permSelection.includes(d.path)}
+                    disabled={permFullAccess}
+                    onChange={(e) => {
+                      if (permFullAccess) return;
+                      if (e.target.checked) setPermSelection(prev => [...prev, d.path]);
+                      else setPermSelection(prev => prev.filter(p => p !== d.path));
+                    }}
+                    className="rounded text-primary-500"
+                  />
+                  <span className="text-sm">{d.label}</span>
+                  <span className="text-[10px] text-gray-400 ml-auto truncate">{d.path}</span>
+                </label>
+              ))}
+            </div>
+
+            <div className="flex items-center justify-between mt-6">
+              <button
+                onClick={() => {
+                  setPermSelection([]);
+                  setPermFullAccess(false);
+                }}
+                className="text-sm text-gray-500 hover:text-gray-700"
+              >
+                Clear All
+              </button>
+              <div className="flex items-center gap-3">
+                <Button variant="outline" onClick={() => setPermModalAdmin(null)}>Cancel</Button>
+                <Button variant="primary" onClick={handleSavePermissions} disabled={permSaving}>
+                  {permSaving ? 'Saving...' : `Save (${permFullAccess ? 'Full' : permSelection.length})`}
+                </Button>
+              </div>
+            </div>
+          </motion.div>
+        </div>
+      )}
 
       {/* Promote Modal */}
       {showPromoteModal && (
