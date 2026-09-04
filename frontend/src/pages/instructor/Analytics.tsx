@@ -17,54 +17,8 @@ import { useInstructorStore } from '@/store/instructorStore';
 import SEO from '@/components/seo/SEO';
 import { StatsSkeleton, ChartSkeleton } from '@/components/student/SkeletonLoader';
 
-const enrollmentTrendData = [
-  { month: '2025-01', students: 180 }, { month: '2025-02', students: 220 },
-  { month: '2025-03', students: 310 }, { month: '2025-04', students: 290 },
-  { month: '2025-05', students: 380 }, { month: '2025-06', students: 420 },
-];
-
-const completionByCourseData = [
-  { course: 'React Fundamentals', rate: 82 }, { course: 'Node.js Mastery', rate: 68 },
-  { course: 'TypeScript Deep Dive', rate: 74 }, { course: 'Full Stack Project', rate: 59 },
-  { course: 'CSS & Design Systems', rate: 91 }, { course: 'Python for Data', rate: 63 },
-];
-
-const watchTimeTrendData = [
-  { month: '2025-01', hours: 420 }, { month: '2025-02', hours: 510 },
-  { month: '2025-03', hours: 680 }, { month: '2025-04', hours: 590 },
-  { month: '2025-05', hours: 720 }, { month: '2025-06', hours: 850 },
-];
-
-const mostViewedLessonsData = [
-  { lesson: 'Introduction to React Hooks', views: 1240 },
-  { lesson: 'State Management with Redux', views: 980 },
-  { lesson: 'REST API Design Patterns', views: 870 },
-  { lesson: 'Authentication & Authorization', views: 760 },
-  { lesson: 'Database Modeling', views: 690 },
-];
-
-const leastViewedLessonsData = [
-  { lesson: 'Advanced Webpack Config', views: 120 },
-  { lesson: 'Docker Compose Networks', views: 145 },
-  { lesson: 'GraphQL Subscriptions', views: 180 },
-  { lesson: 'CI/CD Pipeline Setup', views: 210 },
-  { lesson: 'Performance Profiling', views: 260 },
-];
-
-const monthlyRevenueData = [
-  { month: '2025-01', revenue: 12400 }, { month: '2025-02', revenue: 16200 },
-  { month: '2025-03', revenue: 19800 }, { month: '2025-04', revenue: 17500 },
-  { month: '2025-05', revenue: 22400 }, { month: '2025-06', revenue: 25600 },
-];
-
-const revenueByCourseData = [
-  { course: 'React Fundamentals', revenue: 12450 },
-  { course: 'Node.js Mastery', revenue: 9820 },
-  { course: 'TypeScript Deep Dive', revenue: 8750 },
-  { course: 'Full Stack Project', revenue: 7210 },
-  { course: 'CSS & Design Systems', revenue: 6540 },
-  { course: 'Python for Data', revenue: 5230 },
-];
+// Real data from backend — no mockups
+// Charts now use analytics from store; empty arrays show proper empty states
 
 const CustomTooltip = ({ active, payload, label }: any) => {
   if (active && payload && payload.length) {
@@ -136,6 +90,26 @@ export default function InstructorAnalytics() {
     );
   }
 
+  // Derived real data — replaces previous mockups
+  const enrollmentTrendData = analytics?.enrollmentTrend || analytics?.enrollmentTrendData || [];
+  const completionByCourseData = analytics?.completionByCourse || analytics?.completionByCourseData || [];
+  const watchTimeTrendData = analytics?.watchTimeTrend || analytics?.watchTimeTrendData || [];
+  const mostViewedLessonsData = analytics?.mostViewedLessons || analytics?.mostViewedLessonsData || [];
+  const leastViewedLessonsData = analytics?.leastViewedLessons || analytics?.leastViewedLessonsData || [];
+  const monthlyRevenueData = analytics?.monthlyRevenue || analytics?.monthlyRevenueData || [];
+  const revenueByCourseData = analytics?.revenueByCourse || analytics?.revenueByCourseData || [];
+
+  const totalEnrollments = analytics?.totalEnrollments ?? analytics?.totalStudents ?? 0;
+  const activeLearners = analytics?.activeLearners ?? 0;
+  const completionRate = analytics?.completionRate ?? 0;
+  const dropOffRate = analytics?.dropOffRate ?? 0;
+  const totalWatchTime = analytics?.totalWatchTime ?? 0;
+  const avgEngagement = analytics?.avgEngagement ?? 0;
+  const totalLessons = analytics?.totalLessons ?? 0;
+  const monthlyRevenue = analytics?.monthlyRevenueTotal ?? analytics?.totalRevenue ?? 0;
+  const revenuePerStudent = totalEnrollments ? Math.round((analytics?.totalRevenue || 0) / totalEnrollments) : 0;
+  const avgCoursePrice = analytics?.avgCoursePrice ?? 0;
+
   const container = {
     hidden: { opacity: 0 },
     show: { opacity: 1, transition: { staggerChildren: 0.03 } },
@@ -186,7 +160,7 @@ export default function InstructorAnalytics() {
                     <Users className="w-5 h-5 text-purple-500" />
                   </div>
                 </div>
-                <div className="text-2xl font-bold">1,247</div>
+                <div className="text-2xl font-bold">{totalEnrollments.toLocaleString()}</div>
                 <div className="text-sm text-gray-500">Total Enrollments</div>
               </GlassCard>
               <GlassCard className="p-4 sm:p-5" hover={false}>
@@ -195,7 +169,7 @@ export default function InstructorAnalytics() {
                     <UserCheck className="w-5 h-5 text-green-500" />
                   </div>
                 </div>
-                <div className="text-2xl font-bold">892</div>
+                <div className="text-2xl font-bold">{activeLearners.toLocaleString()}</div>
                 <div className="text-sm text-gray-500">Active Learners</div>
               </GlassCard>
               <GlassCard className="p-4 sm:p-5" hover={false}>
@@ -204,7 +178,7 @@ export default function InstructorAnalytics() {
                     <Target className="w-5 h-5 text-blue-500" />
                   </div>
                 </div>
-                <div className="text-2xl font-bold">68%</div>
+                <div className="text-2xl font-bold">{completionRate}%</div>
                 <div className="text-sm text-gray-500">Completion Rate</div>
               </GlassCard>
               <GlassCard className="p-4 sm:p-5" hover={false}>
@@ -213,7 +187,7 @@ export default function InstructorAnalytics() {
                     <UserX className="w-5 h-5 text-red-500" />
                   </div>
                 </div>
-                <div className="text-2xl font-bold">32%</div>
+                <div className="text-2xl font-bold">{dropOffRate}%</div>
                 <div className="text-sm text-gray-500">Drop-off Rate</div>
               </GlassCard>
             </div>
@@ -285,7 +259,7 @@ export default function InstructorAnalytics() {
                     <Clock className="w-5 h-5 text-blue-500" />
                   </div>
                 </div>
-                <div className="text-2xl font-bold">3,420</div>
+                <div className="text-2xl font-bold">{totalWatchTime.toLocaleString()}</div>
                 <div className="text-sm text-gray-500">Total Watch Time (hours)</div>
               </GlassCard>
               <GlassCard className="p-4 sm:p-5" hover={false}>
@@ -294,7 +268,7 @@ export default function InstructorAnalytics() {
                     <Activity className="w-5 h-5 text-emerald-500" />
                   </div>
                 </div>
-                <div className="text-2xl font-bold">78%</div>
+                <div className="text-2xl font-bold">{avgEngagement}%</div>
                 <div className="text-sm text-gray-500">Avg Lesson Engagement</div>
               </GlassCard>
               <GlassCard className="p-4 sm:p-5" hover={false}>
@@ -303,7 +277,7 @@ export default function InstructorAnalytics() {
                     <PlayCircle className="w-5 h-5 text-amber-500" />
                   </div>
                 </div>
-                <div className="text-2xl font-bold">156</div>
+                <div className="text-2xl font-bold">{totalLessons.toLocaleString()}</div>
                 <div className="text-sm text-gray-500">Total Lessons</div>
               </GlassCard>
             </div>
@@ -396,7 +370,7 @@ export default function InstructorAnalytics() {
                     <DollarSign className="w-5 h-5 text-green-500" />
                   </div>
                 </div>
-                <div className="text-2xl font-bold">$24,560</div>
+                <div className="text-2xl font-bold">{new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(monthlyRevenue)}</div>
                 <div className="text-sm text-gray-500">Monthly Revenue</div>
               </GlassCard>
               <GlassCard className="p-4 sm:p-5" hover={false}>
@@ -405,7 +379,7 @@ export default function InstructorAnalytics() {
                     <GraduationCap className="w-5 h-5 text-purple-500" />
                   </div>
                 </div>
-                <div className="text-2xl font-bold">$197</div>
+                <div className="text-2xl font-bold">{new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(revenuePerStudent)}</div>
                 <div className="text-sm text-gray-500">Revenue per Student</div>
               </GlassCard>
               <GlassCard className="p-4 sm:p-5" hover={false}>
@@ -414,7 +388,7 @@ export default function InstructorAnalytics() {
                     <BarChart3 className="w-5 h-5 text-cyan-500" />
                   </div>
                 </div>
-                <div className="text-2xl font-bold">$49.99</div>
+                <div className="text-2xl font-bold">{new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(avgCoursePrice)}</div>
                 <div className="text-sm text-gray-500">Avg Course Price</div>
               </GlassCard>
             </div>

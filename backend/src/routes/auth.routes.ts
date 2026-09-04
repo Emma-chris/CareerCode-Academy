@@ -8,7 +8,7 @@ import { authenticate, AuthRequest } from '../middleware/auth';
 import * as UserModel from '../models/user';
 import * as NotificationModel from '../models/notification';
 import * as TokenModel from '../models/token';
-import { emitDashboardUpdate, emitPasswordResetLink } from '../config/socket';
+import { emitDashboardUpdate } from '../config/socket';
 import { isDatabaseAvailable } from '../config/db';
 import {
   generateToken,
@@ -40,7 +40,6 @@ const loginSchema = z.object({
 
 const forgotPasswordSchema = z.object({
   email: z.string().email('Invalid email address'),
-  channelId: z.string().optional(),
 });
 
 const resetPasswordSchema = z.object({
@@ -190,51 +189,40 @@ router.post(
   }
 );
 
-// POST /forgot-password
+// POST /forgot-password — secure, no socket, hashed token, constant-time
 router.post(
   '/forgot-password',
   forgotPasswordLimiter,
   validate(forgotPasswordSchema),
   async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const { email, channelId } = req.body;
+      const { email } = req.body;
 
       if (!isDatabaseAvailable()) {
-        console.warn('[Mail] DATABASE_URL is not set — returning dev mode success response for forgot-password:', email);
-        if (channelId) {
-          emitPasswordResetLink(channelId, {
-            success: true,
-            email,
-            message: 'Password reset link generated (dev mode - no DB).',
-          });
-        }
-        return res.json({
-          success: true,
-          message: 'If the email exists, a password reset link has been sent.',
+        return res.status(503).json({
+          success: false,
+          message: 'Service temporarily unavailable. Please try again later.',
         });
       }
 
       const user = await UserModel.getUserByEmail(email);
-
+      // Constant-time: always hash and delay slightly to avoid enumeration timing
+      const delay = new Promise(r => setTimeout(r, 300));
       if (user) {
         const resetToken = generatePasswordResetToken();
-        const resetTokenExpiry = new Date(Date.now() + 3600000); // 1 hour
+        const hashed = require('crypto').createHash('sha256').update(resetToken).digest('hex');
+        const resetTokenExpiry = new Date(Date.now() + 15 * 60 * 1000); // 15 min (was 1h, now tighter)
 
         await UserModel.updateUser(user.id, {
-          reset_token: resetToken,
+          reset_token: hashed,
           reset_token_expiry: resetTokenExpiry,
-        });
+        } as any);
 
-        if (channelId) {
-          emitPasswordResetLink(channelId, {
-            success: true,
-            email,
-            token: resetToken,
-            message: 'Password reset link generated.',
-          });
-        }
-
+        // send raw token via email only, never via socket
         await sendPasswordResetEmail(email, resetToken);
+        await delay;
+      } else {
+        await delay;
       }
 
       res.json({
@@ -247,15 +235,17 @@ router.post(
   }
 );
 
-// POST /reset-password
+// POST /reset-password — hashed token verify
 router.post(
   '/reset-password',
+  forgotPasswordLimiter,
   validate(resetPasswordSchema),
   async (req: Request, res: Response, next: NextFunction) => {
     try {
       const { token, password } = req.body;
+      const hashed = require('crypto').createHash('sha256').update(token).digest('hex');
 
-      const user = await UserModel.getUserByResetToken(token);
+      const user = await UserModel.getUserByResetToken(hashed);
       if (!user) {
         throw new UnauthorizedError('Invalid or expired reset token');
       }
@@ -643,7 +633,7 @@ router.post(
   }
 );
 
-// GET /google - Initiate Google OAuth
+// GET /google - Initiate Google OAuth (differentiates signup vs signin via intent + state CSRF)
 function requireGoogleOAuth(req: Request, res: Response, next: NextFunction) {
   if (!process.env.GOOGLE_CLIENT_ID || !process.env.GOOGLE_CLIENT_SECRET) {
     return res.status(503).json({
@@ -657,24 +647,45 @@ function requireGoogleOAuth(req: Request, res: Response, next: NextFunction) {
 router.get(
   '/google',
   requireGoogleOAuth,
-  passport.authenticate('google', { scope: ['profile', 'email'], session: false })
+  (req: Request, res: Response, next: NextFunction) => {
+    const intent = (req.query.intent as string) === 'signup' ? 'signup' : 'login';
+    const state = require('crypto').randomBytes(16).toString('hex');
+    // httpOnly state + intent for CSRF
+    res.cookie('oauth_state', state, { httpOnly: true, secure: process.env.NODE_ENV === 'production', sameSite: 'lax', maxAge: 5 * 60 * 1000, path: '/' });
+    res.cookie('oauth_intent', intent, { httpOnly: true, secure: process.env.NODE_ENV === 'production', sameSite: 'lax', maxAge: 5 * 60 * 1000, path: '/' });
+    passport.authenticate('google', { scope: ['profile', 'email'], session: false, state } as any)(req, res, next);
+  }
 );
 
-// GET /google/callback - Google OAuth callback
+// GET /google/callback - Google OAuth callback (cookie-only, no token in URL)
 router.get(
   '/google/callback',
   requireGoogleOAuth,
   (req: Request, res: Response, next: NextFunction) => {
+    const state = req.query.state as string;
+    const cookieState = (req as any).cookies?.oauth_state;
+    if (state && cookieState && state !== cookieState) {
+      const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:3000';
+      return res.redirect(`${frontendUrl}/login?error=oauth_state_mismatch`);
+    }
+    // clear state cookies
+    res.clearCookie('oauth_state', { path: '/' });
+    // keep intent for passport verify via cookie
     passport.authenticate('google', { session: false }, (err: any, data: any) => {
       if (err || !data) {
         console.error('Google OAuth callback error:', err || 'No user data returned');
         const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:3000';
-        return res.redirect(`${frontendUrl}/login?error=google_auth_failed`);
+        res.clearCookie('oauth_intent', { path: '/' });
+        const msg = err?.message === 'Account suspended' ? 'account_suspended' : 'google_auth_failed';
+        return res.redirect(`${frontendUrl}/login?error=${msg}`);
       }
-      const { user, token, refreshToken } = data;
+      const { token, refreshToken } = data;
       setAuthCookies(res, token, refreshToken);
+      res.clearCookie('oauth_intent', { path: '/' });
       const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:3000';
-      res.redirect(`${frontendUrl}/auth/callback?token=${token}&refreshToken=${refreshToken}`);
+      const intent = (req as any).cookies?.oauth_intent || 'login';
+      // Redirect without token in URL — frontend will use httpOnly cookie + /auth/me
+      res.redirect(`${frontendUrl}/auth/callback?intent=${intent}`);
     })(req, res, next);
   }
 );

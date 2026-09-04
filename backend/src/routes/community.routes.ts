@@ -113,9 +113,13 @@ router.get('/channels/:id', authenticate, async (req: AuthRequest, res: Response
 
 router.put('/channels/:id', authenticate, async (req: AuthRequest, res: Response, next: NextFunction) => {
   try {
-    const member = await Community.isChannelMember(req.params.id, req.user!.userId);
-    if (!member || !['owner', 'moderator'].includes(member.role)) {
-      throw new ForbiddenError('Only channel owners and moderators can edit channels');
+    // Admin/super_admin can rename any channel
+    const fullUserForEdit = await (await import('../models/user')).getUserById(req.user!.userId);
+    if (!fullUserForEdit || !['admin', 'super_admin'].includes(fullUserForEdit.role)) {
+      const member = await Community.isChannelMember(req.params.id, req.user!.userId);
+      if (!member || !['owner', 'moderator'].includes(member.role)) {
+        throw new ForbiddenError('Only channel owners and moderators can edit channels');
+      }
     }
 
     const channel = await Community.updateChannel(req.params.id, req.body);

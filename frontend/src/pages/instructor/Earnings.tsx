@@ -24,45 +24,8 @@ const statusBadge: Record<string, 'warning' | 'success' | 'danger' | 'primary'> 
   processing: 'primary',
 };
 
-const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-
-const sampleMonthlyRevenue = months.map((m, i) => ({
-  month: m,
-  revenue: Math.floor(Math.random() * 8000) + 2000,
-  expenses: Math.floor(Math.random() * 2000) + 500,
-}));
-
-const sampleCourseRevenue = [
-  { course: 'React Masterclass', revenue: 12400, students: 340 },
-  { course: 'Node.js API Design', revenue: 9800, students: 210 },
-  { course: 'TypeScript Deep Dive', revenue: 7200, students: 180 },
-  { course: 'CSS Animations', revenue: 5400, students: 140 },
-  { course: 'Python for Data Science', revenue: 4100, students: 95 },
-];
-
-const sampleProgramRevenue = [
-  { program: 'Web Development', revenue: 28500 },
-  { program: 'Data Science', revenue: 15200 },
-  { program: 'Mobile Development', revenue: 12300 },
-  { program: 'DevOps', revenue: 8700 },
-  { program: 'AI & ML', revenue: 6400 },
-];
-
-const sampleYearlyRevenue = [
-  { year: '2022', revenue: 32000 },
-  { year: '2023', revenue: 54000 },
-  { year: '2024', revenue: 78000 },
-  { year: '2025', revenue: 92000 },
-  { year: '2026', revenue: 42000 },
-];
-
-const sampleWithdrawals = [
-  { id: '1', date: '2026-06-15', amount: 2500, status: 'completed', method: 'Bank Transfer' },
-  { id: '2', date: '2026-05-01', amount: 1800, status: 'completed', method: 'PayPal' },
-  { id: '3', date: '2026-03-20', amount: 3200, status: 'completed', method: 'Bank Transfer' },
-  { id: '4', date: '2026-02-10', amount: 1500, status: 'processing', method: 'Mobile Money' },
-  { id: '5', date: '2026-01-05', amount: 2000, status: 'completed', method: 'Bank Transfer' },
-];
+// No mockups — all data comes from backend /instructor/earnings & /instructor/withdrawals
+// Empty states handled below
 
 export default function Earnings() {
   const { fetchEarnings, fetchWithdrawalHistory } = useInstructorStore();
@@ -97,56 +60,40 @@ export default function Earnings() {
     {
       icon: DollarSign,
       label: 'Total Revenue',
-      value: `$${(earnings?.totalRevenue ?? 48650).toLocaleString()}`,
+      value: `$${(earnings?.totalRevenue ?? 0).toLocaleString()}`,
       color: 'text-green-500',
       bg: 'bg-green-500/10',
     },
     {
       icon: TrendingUp,
       label: 'This Month',
-      value: `$${(earnings?.thisMonth ?? 4200).toLocaleString()}`,
+      value: `$${(earnings?.thisMonth ?? 0).toLocaleString()}`,
       color: 'text-blue-500',
       bg: 'bg-blue-500/10',
     },
     {
       icon: Clock,
       label: 'Pending Payouts',
-      value: `$${(earnings?.pendingPayouts ?? 3200).toLocaleString()}`,
+      value: `$${(earnings?.pendingPayouts ?? 0).toLocaleString()}`,
       color: 'text-amber-500',
       bg: 'bg-amber-500/10',
     },
     {
       icon: Wallet,
       label: 'Total Withdrawn',
-      value: `$${(earnings?.totalWithdrawn ?? 21500).toLocaleString()}`,
+      value: `$${(earnings?.totalWithdrawn ?? 0).toLocaleString()}`,
       color: 'text-purple-500',
       bg: 'bg-purple-500/10',
     },
   ];
 
-  const monthlyRevenueData = earnings?.monthlyRevenue?.length
-    ? earnings.monthlyRevenue
-    : sampleMonthlyRevenue;
+  const monthlyRevenueData = earnings?.monthlyRevenue || [];
+  const courseRevenueData = earnings?.courseRevenue || [];
+  const programRevenueData = earnings?.programRevenue || [];
+  const yearlyRevenueData = earnings?.yearlyRevenue || [];
+  const withdrawalData = (earnings?.withdrawals?.length ? earnings.withdrawals : withdrawals) || [];
 
-  const courseRevenueData = earnings?.courseRevenue?.length
-    ? earnings.courseRevenue
-    : sampleCourseRevenue;
-
-  const programRevenueData = earnings?.programRevenue?.length
-    ? earnings.programRevenue
-    : sampleProgramRevenue;
-
-  const yearlyRevenueData = earnings?.yearlyRevenue?.length
-    ? earnings.yearlyRevenue
-    : sampleYearlyRevenue;
-
-  const withdrawalData = earnings?.withdrawals?.length
-    ? earnings.withdrawals
-    : withdrawals.length
-      ? withdrawals
-      : sampleWithdrawals;
-
-  const currentBalance = earnings?.availableBalance ?? 12350;
+  const currentBalance = earnings?.availableBalance ?? 0;
   const minPayoutThreshold = earnings?.minPayoutThreshold ?? 50;
 
   if (isLoading) {

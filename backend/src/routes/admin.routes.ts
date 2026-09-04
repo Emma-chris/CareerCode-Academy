@@ -1230,6 +1230,28 @@ router.put('/settings', async (req: AuthRequest, res: Response, next: NextFuncti
   try {
     const { key, value, category } = req.body;
     if (!key || value === undefined) return res.status(400).json({ success: false, message: 'key and value required' });
+    // Dynamic currency validation (admin-only, list enforced)
+    if (key === 'platform_currency') {
+      const { isSupportedCurrency, SUPPORTED_CURRENCIES } = await import('../utils/currency');
+      const upper = String(value).toUpperCase();
+      if (!isSupportedCurrency(upper)) {
+        return res.status(400).json({ success: false, message: `Invalid currency. Allowed: ${Object.keys(SUPPORTED_CURRENCIES).join(', ')}` });
+      }
+      // auto-update locale & symbol
+      const info: any = (SUPPORTED_CURRENCIES as any)[upper];
+      await query(`INSERT INTO system_settings (key, value, category) VALUES ('platform_currency_locale', $1, 'payments') ON CONFLICT (key) DO UPDATE SET value=$1, updated_at=NOW()`, [info.locale]);
+      await query(`INSERT INTO system_settings (key, value, category) VALUES ('platform_currency_symbol', $1, 'payments') ON CONFLICT (key) DO UPDATE SET value=$1, updated_at=NOW()`, [info.symbol]);
+      // normalize value to upper
+      const cat2 = category || 'payments';
+      const { rows } = await query(
+        `INSERT INTO system_settings (key, value, category) VALUES ($1, $2, $3)
+         ON CONFLICT (key) DO UPDATE SET value = $2, category = COALESCE($3, system_settings.category), updated_at = NOW()
+         RETURNING *`,
+        [key, upper, cat2]
+      );
+      await logAudit({ adminId: req.user!.userId, action: 'update_setting', resourceType: 'system_setting', resourceId: key as any, details: `${key}=${upper}`, ipAddress: req.ip });
+      return res.json({ success: true, data: rows[0] });
+    }
     const cat = category || 'general';
     const { rows } = await query(
       `INSERT INTO system_settings (key, value, category) VALUES ($1, $2, $3)

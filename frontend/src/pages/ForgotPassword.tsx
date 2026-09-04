@@ -1,6 +1,5 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import { io, Socket } from 'socket.io-client';
+import React, { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   Mail,
@@ -15,8 +14,6 @@ import {
   Sparkles,
   Clock,
   Send,
-  Zap,
-  ArrowRight,
 } from 'lucide-react';
 import { GlassCard } from '@/components/ui/GlassCard';
 import { Button } from '@/components/ui/Button';
@@ -29,47 +26,12 @@ import SEO from '@/components/seo/SEO';
 const RESEND_COOLDOWN = 60; // 60 seconds
 
 export default function ForgotPassword() {
-  const navigate = useNavigate();
   const [email, setEmail] = useState('');
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [isResending, setIsResending] = useState(false);
   const [sent, setSent] = useState(false);
   const [countdown, setCountdown] = useState(0);
-  const [liveLink, setLiveLink] = useState<string | null>(null);
-  const [socketConnected, setSocketConnected] = useState(false);
-  const socketRef = useRef<Socket | null>(null);
-  const [channelId] = useState(() =>
-    typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function'
-      ? crypto.randomUUID()
-      : `rc-${Date.now()}-${Math.random().toString(36).slice(2)}`
-  );
-
-  // Live socket connection for instant reset-link delivery
-  useEffect(() => {
-    const baseUrl = import.meta.env.VITE_API_URL?.replace('/api/v1', '') || '';
-    const socket = io(`${baseUrl}/reset-password`, { transports: ['websocket', 'polling'] });
-    socketRef.current = socket;
-
-    socket.on('connect', () => {
-      setSocketConnected(true);
-      socket.emit('join_reset_channel', channelId);
-    });
-    socket.on('disconnect', () => setSocketConnected(false));
-
-    socket.on('password_reset:link', (data: { success?: boolean; email?: string; token?: string; message?: string }) => {
-      if (data?.token) {
-        setLiveLink(data.token);
-        toast.success('Reset link received live — continue below.');
-      }
-    });
-
-    return () => {
-      socket.disconnect();
-      socketRef.current = null;
-      setSocketConnected(false);
-    };
-  }, [channelId]);
 
   // Timer countdown handler
   useEffect(() => {
@@ -107,7 +69,7 @@ export default function ForgotPassword() {
     setIsLoading(true);
 
     try {
-      await api.post('/auth/forgot-password', { email: email.trim(), channelId });
+      await api.post('/auth/forgot-password', { email: email.trim() });
       setSent(true);
       setCountdown(RESEND_COOLDOWN);
       toast.success('Password reset link sent! Check your inbox.');
@@ -130,7 +92,7 @@ export default function ForgotPassword() {
 
     setIsResending(true);
     try {
-      await api.post('/auth/forgot-password', { email: email.trim(), channelId });
+      await api.post('/auth/forgot-password', { email: email.trim() });
       setCountdown(RESEND_COOLDOWN);
       toast.success('Reset email resent successfully!');
     } catch (err: unknown) {
@@ -179,12 +141,6 @@ export default function ForgotPassword() {
             <Badge variant="primary" className="mb-3 inline-flex items-center gap-1.5 px-3 py-1 text-xs">
               <ShieldCheck className="w-3.5 h-3.5" />
               Account Recovery
-              {socketConnected && (
-                <span className="ml-1 inline-flex items-center gap-1 text-emerald-500">
-                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-                  Live
-                </span>
-              )}
             </Badge>
 
             <h1 className="text-3xl font-extrabold tracking-tight text-gray-900 dark:text-white sm:text-4xl mb-2">
@@ -223,36 +179,6 @@ export default function ForgotPassword() {
                     </div>
                   </div>
 
-                  {/* Live reset link (pushed via socket) */}
-                  {liveLink && (
-                    <motion.div
-                      initial={{ opacity: 0, y: 10 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      className="flex flex-col sm:flex-row items-center justify-between gap-3 p-4 rounded-2xl bg-emerald-500/10 border border-emerald-500/30"
-                    >
-                      <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 rounded-xl bg-emerald-500/20 border border-emerald-500/30 flex items-center justify-center shrink-0">
-                          <Zap className="w-5 h-5 text-emerald-500 animate-pulse" />
-                        </div>
-                        <div>
-                          <h4 className="font-semibold text-sm text-gray-900 dark:text-white">
-                            Reset link received live!
-                          </h4>
-                          <p className="text-xs text-gray-600 dark:text-gray-300">
-                            Delivered in real time — no inbox refresh needed.
-                          </p>
-                        </div>
-                      </div>
-                      <Button
-                        type="button"
-                        onClick={() => navigate(`/reset-password/${liveLink}`)}
-                        className="shrink-0 inline-flex items-center gap-1.5"
-                      >
-                        Reset Now <ArrowRight className="w-4 h-4" />
-                      </Button>
-                    </motion.div>
-                  )}
-
                   {/* Instructions */}
                   <div className="space-y-3 text-sm text-gray-600 dark:text-gray-300 bg-gray-50 dark:bg-gray-900/50 p-4 rounded-xl border border-gray-200/60 dark:border-gray-800">
                     <div className="flex items-start gap-2.5">
@@ -261,7 +187,7 @@ export default function ForgotPassword() {
                     </div>
                     <div className="flex items-start gap-2.5">
                       <Clock className="w-4 h-4 text-amber-500 shrink-0 mt-0.5" />
-                      <span>The reset link will expire in <strong>60 minutes</strong>.</span>
+                      <span>The reset link will expire in <strong>15 minutes</strong>.</span>
                     </div>
                     <div className="flex items-start gap-2.5">
                       <HelpCircle className="w-4 h-4 text-indigo-500 shrink-0 mt-0.5" />

@@ -11,13 +11,14 @@ import { NotFoundError, ConflictError } from '../utils/errors';
 import { emitDashboardUpdate, emitStudentUpdate } from '../config/socket';
 import { query } from '../config/db';
 import * as Gamification from '../models/gamification';
+import { isSupportedCurrency, getCurrencyInfo } from '../utils/currency';
 
 const router = Router();
 
 const initializePaymentSchema = z.object({
   courseId: z.string().uuid(),
   provider: z.enum(['flutterwave', 'paystack']),
-  currency: z.string().length(3).optional().default('NGN'),
+  currency: z.string().length(3).optional(),
   discountCode: z.string().optional(),
 });
 
@@ -28,8 +29,24 @@ router.post(
   validate(initializePaymentSchema),
   async (req: AuthRequest, res: Response, next: NextFunction) => {
     try {
-      const { courseId, provider, currency, discountCode } = req.body;
+      let { courseId, provider, currency, discountCode } = req.body;
       const userId = req.user!.userId;
+      // Dynamic currency from DB if not provided — admin-only via system_settings.platform_currency
+      if (!currency) {
+        try {
+          const { rows } = await query(`SELECT value FROM system_settings WHERE key='platform_currency'`);
+          currency = rows[0]?.value || 'NGN';
+        } catch { currency = 'NGN'; }
+      }
+      currency = currency.toUpperCase();
+      if (!isSupportedCurrency(currency)) {
+        return res.status(400).json({ success: false, message: `Unsupported currency ${currency}. Supported: ${Object.keys((await import('../utils/currency')).SUPPORTED_CURRENCIES).join(', ')}` });
+      }
+      const currencyInfo = getCurrencyInfo(currency);
+      // Validate provider supports currency
+      if (!(currencyInfo.gateways as readonly string[]).includes(provider)) {
+        return res.status(400).json({ success: false, message: `${provider} does not support ${currency}. Supported: ${(currencyInfo.gateways as string[]).join(', ')}` });
+      }
 
       const user = await UserModel.getUserById(userId);
       if (!user) throw new NotFoundError('User');
@@ -69,7 +86,7 @@ router.post(
           data: {
             amount: 0,
             course_slug: course.slug,
-            message: discountCodeRow ? `Enrolled successfully (XP discount ₦${xpDiscount} applied)` : 'Enrolled successfully (100% discount applied)',
+            message: discountCodeRow ? `Enrolled successfully (XP discount ${currencyInfo.symbol}${xpDiscount} applied)` : 'Enrolled successfully (100% discount applied)',
           }
         });
       }

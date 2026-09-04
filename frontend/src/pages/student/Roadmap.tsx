@@ -67,12 +67,20 @@ export default function StudentRoadmap() {
 
   useEffect(() => { setStoredGoal(weeklyGoal); }, [weeklyGoal]);
 
+  const schoolCareers: Record<string, { careers: string[]; placement: string; salary: string }> = {
+    'School of Software Development': { careers: ['Frontend Developer', 'Backend Developer', 'Full-Stack Engineer'], placement: '92%', salary: '$95K' },
+    'School of Data & Artificial Intelligence': { careers: ['Data Scientist', 'ML Engineer', 'Data Analyst'], placement: '94%', salary: '$110K' },
+    'School of Design & Creative Technology': { careers: ['UI/UX Designer', 'Product Designer', 'Visual Designer'], placement: '88%', salary: '$85K' },
+    'School of Business & Digital Careers': { careers: ['Product Manager', 'Business Analyst', 'Tech Consultant'], placement: '90%', salary: '$90K' },
+    'School of Career Readiness': { careers: ['Career Coach', 'Talent Specialist', 'HR Coordinator'], placement: '95%', salary: '$75K' },
+  };
+
   useEffect(() => {
     (async () => {
       try {
         const [dashRes, groupedRes, balanceRes, codesRes] = await Promise.all([
           api.get('/student/dashboard'),
-          api.get('/learning-paths/grouped').catch(() => ({ data: { data: [] } })),
+          api.get('/learning-paths/grouped-by-school').catch(() => api.get('/learning-paths/grouped').catch(() => ({ data: { data: [] } }))),
           api.get('/gamification/balance').catch(() => ({ data: { data: null } })),
           api.get('/gamification/discount-codes').catch(() => ({ data: { data: [] } })),
         ]);
@@ -146,7 +154,7 @@ export default function StudentRoadmap() {
     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-8">
       <div>
         <h1 className="text-2xl sm:text-3xl font-bold flex items-center gap-2"><Flag className="w-6 h-6 text-primary-500" /> Career Roadmap</h1>
-        <p className="text-gray-500 mt-1">Gamified journey: categories → zones. Empty zones are hidden. XP becomes discount.</p>
+        <p className="text-gray-500 mt-1">Gamified journey by <span className="font-medium text-gray-700 dark:text-gray-300">Our Schools</span> — Beginner → Intermediate → Advanced (empty zones hidden).</p>
       </div>
 
       {/* XP Wallet + Redeem */}
@@ -202,18 +210,27 @@ export default function StudentRoadmap() {
         </GlassCard>
       )}
 
-      {/* Gamified Category Roadmaps */}
+      {/* Gamified School Roadmaps — Our Schools */}
       <div>
-        <h2 className="text-lg font-semibold mb-4 flex items-center gap-2"><Rocket className="w-5 h-5 text-purple-500" /> Category Roadmaps • Zones</h2>
+        <h2 className="text-lg font-semibold mb-4 flex items-center gap-2"><Rocket className="w-5 h-5 text-purple-500" /> School Roadmaps • Zones (Our Schools)</h2>
         {grouped.length === 0 ? (
-          <GlassCard className="p-8 text-center" hover={false}><p className="text-gray-500">No roadmap data yet. Enroll in courses to build your path.</p></GlassCard>
+          <GlassCard className="p-8 text-center" hover={false}><p className="text-gray-500">No roadmap data yet.</p><p className="text-xs text-gray-400 mt-1">Schools exist — publish courses with level & program to generate Beginner → Advanced zones.</p></GlassCard>
         ) : (
           <div className="space-y-6">
-            {grouped.map((group:any)=>(
-              <GlassCard key={group.category} className="p-0 overflow-hidden" hover={false}>
-                <div className="p-4 border-b border-gray-100 dark:border-gray-800 flex items-center justify-between">
-                  <h3 className="font-bold">{group.category}</h3>
-                  <span className="text-xs text-gray-500">{Object.values(group.zones).filter(Boolean).length} zones • empty hidden</span>
+            {grouped.map((group:any)=>{
+              const school = group.school || { name: group.category, slug: group.categorySlug, program_count: 0 };
+              const sc = schoolCareers[school.name] || { careers: ['Developer'], placement: '90%', salary: '$85K' };
+              return (
+              <GlassCard key={school.slug || group.category} className="p-0 overflow-hidden" hover={false}>
+                <div className="p-4 border-b border-gray-100 dark:border-gray-800">
+                  <div className="flex flex-wrap items-start justify-between gap-3">
+                    <div>
+                      <h3 className="font-bold flex items-center gap-2">{school.name} <span className="text-xs font-normal px-2 py-0.5 rounded-full bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300">{school.program_count || 0} programs • {sc.placement} placement</span></h3>
+                      <div className="flex flex-wrap gap-1 mt-1">{sc.careers.map((c:string)=><span key={c} className="text-[11px] px-2 py-0.5 rounded-full bg-primary-500/10 text-primary-500 border border-primary-500/20">{c}</span>)}</div>
+                    </div>
+                    <div className="flex flex-col items-end gap-1"><span className="text-xs px-2 py-1 rounded-full bg-gray-100 dark:bg-gray-800">{sc.salary} avg</span><Link to={`/schools/${school.slug}`} className="text-xs text-primary-500 hover:underline">Explore Programs →</Link></div>
+                  </div>
+                  <div className="text-[11px] text-gray-400 mt-2">{Object.values(group.zones).filter(Boolean).length} zones • empty hidden • Beginner → Intermediate → Advanced</div>
                 </div>
                 <div className="p-4">
                   <div className="relative">
@@ -249,7 +266,8 @@ export default function StudentRoadmap() {
                   </div>
                 </div>
               </GlassCard>
-            ))}
+              );
+            })}
           </div>
         )}
       </div>

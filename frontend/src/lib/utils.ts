@@ -12,11 +12,27 @@ export function formatDate(date: string | Date): string {
   }).format(new Date(date));
 }
 
-export function formatCurrency(amount: number): string {
-  return new Intl.NumberFormat('en-US', {
-    style: 'currency',
-    currency: 'USD',
-  }).format(amount);
+export function formatCurrency(amount: number, currency?: string, locale?: string): string {
+  // Dynamic if currency provided, else try to use platform currency from localStorage fallback
+  let cur = currency || 'NGN';
+  let loc = locale;
+  try {
+    const stored = localStorage.getItem('platform_currency');
+    if (!currency && stored) cur = stored;
+    const storedLocale = localStorage.getItem('platform_currency_locale');
+    if (!locale && storedLocale) loc = storedLocale;
+  } catch {}
+  // Map to known locales if needed
+  const currencyLocales: Record<string, string> = { NGN: 'en-NG', USD: 'en-US', GHS: 'en-GH', KES: 'en-KE', ZAR: 'en-ZA', GBP: 'en-GB', EUR: 'de-DE', UGX: 'en-UG', TZS: 'en-TZ', RWF: 'rw-RW', XAF: 'fr-CM', XOF: 'fr-SN', CAD: 'en-CA', AUD: 'en-AU' };
+  if (!loc) loc = currencyLocales[cur] || 'en-NG';
+  try {
+    return new Intl.NumberFormat(loc, {
+      style: 'currency',
+      currency: cur,
+    }).format(amount);
+  } catch {
+    return `${amount.toLocaleString()}`;
+  }
 }
 
 export function formatDuration(minutes: number): string {

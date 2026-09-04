@@ -66,10 +66,43 @@ export default function InstructorDiscussions() {
     }
   };
 
+  const [replies, setReplies] = useState<any[]>([]);
+  const [repliesLoading, setRepliesLoading] = useState(false);
+
+  useEffect(() => {
+    if (!selectedDiscussion) return;
+    (async () => {
+      setRepliesLoading(true);
+      try {
+        const { data } = await (await import('@/lib/axios')).default.get(`/discussions/${selectedDiscussion.id}`);
+        // backend returns discussion with replies? try both
+        const disc = data.data || data;
+        if (disc.replies) setReplies(disc.replies);
+        else {
+          const { data: rData } = await (await import('@/lib/axios')).default.get(`/discussions/${selectedDiscussion.id}/replies`).catch(() => ({ data: { data: [] } }));
+          setReplies(rData.data || rData || []);
+        }
+      } catch {
+        setReplies([]);
+      } finally {
+        setRepliesLoading(false);
+      }
+    })();
+  }, [selectedDiscussion]);
+
   const handleSendReply = async () => {
-    if (!replyText.trim()) return;
-    toast.success('Reply posted');
-    setReplyText('');
+    if (!replyText.trim() || !selectedDiscussion) return;
+    try {
+      await (await import('@/lib/axios')).default.post(`/discussions/${selectedDiscussion.id}/replies`, { content: replyText.trim() });
+      toast.success('Reply posted');
+      setReplyText('');
+      // reload replies
+      const { data } = await (await import('@/lib/axios')).default.get(`/discussions/${selectedDiscussion.id}`);
+      const disc = data.data || data;
+      if (disc.replies) setReplies(disc.replies);
+    } catch {
+      toast.error('Failed to post reply');
+    }
   };
 
   if (isLoading) return <PageSkeleton />;
@@ -202,28 +235,27 @@ export default function InstructorDiscussions() {
 
               <div className="flex-1 overflow-y-auto p-5 space-y-4 min-h-0">
                 <p className="text-xs font-medium text-gray-400 uppercase tracking-wider">
-                  {selectedDiscussion.repliesCount} {selectedDiscussion.repliesCount === 1 ? 'Reply' : 'Replies'}
+                  {replies.length || selectedDiscussion.repliesCount} { (replies.length || selectedDiscussion.repliesCount) === 1 ? 'Reply' : 'Replies'}
                 </p>
-                {Array.from({ length: Math.min(selectedDiscussion.repliesCount, 3) }).map((_, idx) => (
-                  <div key={idx} className="flex items-start gap-3">
-                    <div className="w-8 h-8 rounded-full bg-gradient-to-br from-gray-300 to-gray-400 dark:from-gray-600 dark:to-gray-700 flex items-center justify-center text-white text-xs font-semibold flex-shrink-0">
-                      S
-                    </div>
-                    <div className="flex-1">
-                      <div className="flex items-center gap-2">
-                        <span className="text-sm font-medium">Student Name</span>
-                        <span className="text-xs text-gray-400">{timeAgo(selectedDiscussion.createdAt)}</span>
+                {repliesLoading ? (
+                  <p className="text-sm text-gray-400 text-center py-4">Loading replies...</p>
+                ) : replies.length === 0 ? (
+                  <p className="text-sm text-gray-400 text-center py-4">No replies yet. Be the first to respond.</p>
+                ) : (
+                  replies.map((r: any) => (
+                    <div key={r.id || r._id} className="flex items-start gap-3">
+                      <div className="w-8 h-8 rounded-full bg-gradient-to-br from-primary-500 to-accent-500 flex items-center justify-center text-white text-xs font-semibold flex-shrink-0">
+                        {(r.authorName || r.user_name || 'S').charAt(0).toUpperCase()}
                       </div>
-                      <p className="text-sm text-gray-600 dark:text-gray-400 mt-0.5">
-                        Reply content would appear here.
-                      </p>
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-2">
+                          <span className="text-sm font-medium">{r.authorName || r.user_name || 'User'}</span>
+                          <span className="text-xs text-gray-400">{timeAgo(r.createdAt || r.created_at)}</span>
+                        </div>
+                        <p className="text-sm text-gray-600 dark:text-gray-400 mt-0.5 break-words">{r.content || r.message || ''}</p>
+                      </div>
                     </div>
-                  </div>
-                ))}
-                {selectedDiscussion.repliesCount > 3 && (
-                  <p className="text-xs text-center text-gray-400">
-                    +{selectedDiscussion.repliesCount - 3} more replies
-                  </p>
+                  ))
                 )}
               </div>
 

@@ -56,6 +56,7 @@ import discussionRoutes from './routes/discussion.routes';
 import communityRoutes from './routes/community.routes';
 import calendarRoutes from './routes/calendar.routes';
 import uploadRoutes from './routes/upload.routes';
+import publicRoutes from './routes/public.routes';
 import { query } from './config/db';
 import passport, { configurePassport } from './config/passport';
 
@@ -186,6 +187,7 @@ app.use('/api/v1/community', communityRoutes);
 app.use('/api/v1/calendar', calendarRoutes);
 app.use('/api/v1/showcase-videos', showcaseVideoRoutes);
 app.use('/api/v1/upload', uploadRoutes);
+app.use('/api/v1/public', publicRoutes);
 
 // E2E test helper routes (dev only)
 if (process.env.NODE_ENV === 'development') {

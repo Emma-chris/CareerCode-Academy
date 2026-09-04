@@ -184,6 +184,18 @@ export const useAuthStore = create<AuthState>()(
 
       initialize: async () => {
         if (get().initialized) return;
+        // Skip auth check if no token and not on callback (avoid 401 race)
+        const hasToken = !!get().token;
+        const hasCookie = typeof document !== 'undefined' && document.cookie.includes('token=');
+        const onCallback = typeof window !== 'undefined' && window.location.pathname === '/auth/callback';
+        if (!hasToken && !hasCookie && !onCallback) {
+          set({ initialized: true, isLoading: false, isAuthenticated: false, user: null });
+          return;
+        }
+        if (onCallback) {
+          set({ initialized: true, isLoading: false });
+          return;
+        }
         set({ isLoading: true });
         try {
           const { data } = await api.get('/auth/me');

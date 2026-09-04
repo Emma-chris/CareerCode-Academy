@@ -18,6 +18,8 @@ export interface XpBalance {
   available: number;
   rate: number;
   ngnValue: number;
+  currency?: string;
+  currencySymbol?: string;
   minRedeem: number;
   step: number;
   maxDiscountPercent: number;
@@ -34,6 +36,15 @@ export interface DiscountCode {
   status: string;
   expires_at: string;
   created_at: string;
+}
+
+async function getPlatformCurrency(): Promise<{ code: string; symbol: string; locale: string }> {
+  try {
+    const { rows } = await query(`SELECT key, value FROM system_settings WHERE key IN ('platform_currency','platform_currency_symbol','platform_currency_locale')`);
+    const map: Record<string, string> = {};
+    rows.forEach((r: any) => { map[r.key] = r.value; });
+    return { code: map['platform_currency'] || 'NGN', symbol: map['platform_currency_symbol'] || '₦', locale: map['platform_currency_locale'] || 'en-NG' };
+  } catch { return { code: 'NGN', symbol: '₦', locale: 'en-NG' }; }
 }
 
 async function getXpSettings(): Promise<{ rate: number; redeemEnabled: boolean; minRedeem: number; step: number; maxDiscountPercent: number; expiryDays: number }> {
@@ -231,6 +242,7 @@ export async function getSkillTree(userId: string, courseId: string): Promise<an
 
 export async function getXpBalance(userId: string): Promise<XpBalance> {
   const settings = await getXpSettings();
+  const currency = await getPlatformCurrency();
   const { rows: earnedRows } = await query(`SELECT COALESCE(SUM(amount),0)::int as total FROM xp_history WHERE user_id = $1`, [userId]);
   const { rows: redeemedRows } = await query(`SELECT COALESCE(SUM(CASE WHEN amount < 0 THEN -amount ELSE 0 END),0)::int as redeemed FROM xp_history WHERE user_id = $1`, [userId]);
   const totalEarned = Number(earnedRows[0]?.total) || 0;
@@ -250,7 +262,10 @@ export async function getXpBalance(userId: string): Promise<XpBalance> {
     step: settings.step,
     maxDiscountPercent: settings.maxDiscountPercent,
     redeemEnabled: settings.redeemEnabled,
-  };
+    // also expose platform currency for frontend
+    currency: currency.code,
+    currencySymbol: currency.symbol,
+  } as any;
 }
 
 export async function redeemXpForDiscount(userId: string, xpAmount: number): Promise<DiscountCode> {
@@ -265,21 +280,20 @@ export async function redeemXpForDiscount(userId: string, xpAmount: number): Pro
   if (discountAmount <= 0) throw new Error('Discount amount must be greater than 0');
 
   // Transactional insert
-  const client = await query(`SELECT 1`);
-  // Use single transaction via query batch with BEGIN/COMMIT
+  const currencyInfo = await getPlatformCurrency();
   const code = 'XP-' + crypto.randomBytes(4).toString('hex').toUpperCase();
   const expiresAt = new Date(Date.now() + settings.expiryDays * 24 * 60 * 60 * 1000).toISOString();
 
   // Insert discount code
   const { rows: codeRows } = await query(
     `INSERT INTO discount_codes (code, user_id, xp_redeemed, discount_amount, currency, status, expires_at)
-     VALUES ($1,$2,$3,$4,'NGN','active',$5) RETURNING *`,
-    [code, userId, xpAmount, discountAmount, expiresAt]
+     VALUES ($1,$2,$3,$4,$5,'active',$6) RETURNING *`,
+    [code, userId, xpAmount, discountAmount, currencyInfo.code, expiresAt]
   );
   // Deduct XP via negative history
   await query(
     `INSERT INTO xp_history (user_id, amount, source, description) VALUES ($1,$2,'redeem',$3)`,
-    [userId, -xpAmount, `Redeemed ${xpAmount} XP for ${code} (₦${discountAmount})`]
+    [userId, -xpAmount, `Redeemed ${xpAmount} XP for ${code} (${currencyInfo.symbol}${discountAmount})`]
   );
   // Do not touch daily_xp_log for redeem (only earn)
 
@@ -299,9 +313,10 @@ export async function validateDiscountCode(code: string, userId: string, courseP
   }
   if (coursePrice !== undefined) {
     const settings = await getXpSettings();
+    const currencyInfo = await getPlatformCurrency();
     const maxDiscount = Math.floor(coursePrice * (settings.maxDiscountPercent / 100));
     if (row.discount_amount > maxDiscount) {
-      return { valid: false, discount: 0, reason: `Discount exceeds ${settings.maxDiscountPercent}% cap (₦${maxDiscount} max)` };
+      return { valid: false, discount: 0, reason: `Discount exceeds ${settings.maxDiscountPercent}% cap (${currencyInfo.symbol}${maxDiscount} max)` };
     }
   }
   return { valid: true, discount: Number(row.discount_amount), row };

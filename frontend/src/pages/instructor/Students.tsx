@@ -51,164 +51,11 @@ function timeAgo(dateStr: string): string {
   return `${months}mo ago`;
 }
 
-const sampleStudents: Student[] = [
-  {
-    id: '1',
-    name: 'Sarah Johnson',
-    email: 'sarah.johnson@email.com',
-    avatar: '',
-    course: 'Full-Stack Web Development',
-    courseId: 'course-1',
-    progress: 78,
-    lastActivity: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString(),
-    courses: [
-      { id: 'c1', title: 'HTML & CSS Fundamentals', progress: 100 },
-      { id: 'c2', title: 'JavaScript Mastery', progress: 92 },
-      { id: 'c3', title: 'React & Next.js', progress: 65 },
-      { id: 'c4', title: 'Node.js Backend', progress: 45 },
-    ],
-  },
-  {
-    id: '2',
-    name: 'Michael Chen',
-    email: 'michael.chen@email.com',
-    avatar: '',
-    course: 'Data Science & AI',
-    courseId: 'course-2',
-    progress: 92,
-    lastActivity: new Date(Date.now() - 30 * 60 * 1000).toISOString(),
-    courses: [
-      { id: 'c5', title: 'Python for Data Science', progress: 100 },
-      { id: 'c6', title: 'Machine Learning Basics', progress: 88 },
-      { id: 'c7', title: 'Deep Learning', progress: 75 },
-    ],
-  },
-  {
-    id: '3',
-    name: 'Emily Rodriguez',
-    email: 'emily.r@email.com',
-    avatar: '',
-    course: 'Full-Stack Web Development',
-    courseId: 'course-1',
-    progress: 35,
-    lastActivity: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000).toISOString(),
-    courses: [
-      { id: 'c1', title: 'HTML & CSS Fundamentals', progress: 80 },
-      { id: 'c2', title: 'JavaScript Mastery', progress: 20 },
-      { id: 'c3', title: 'React & Next.js', progress: 0 },
-    ],
-  },
-  {
-    id: '4',
-    name: 'James Wilson',
-    email: 'james.wilson@email.com',
-    avatar: '',
-    course: 'UI/UX Design',
-    courseId: 'course-3',
-    progress: 88,
-    lastActivity: new Date(Date.now() - 12 * 60 * 60 * 1000).toISOString(),
-    courses: [
-      { id: 'c8', title: 'Design Principles', progress: 100 },
-      { id: 'c9', title: 'Figma Masterclass', progress: 85 },
-      { id: 'c10', title: 'User Research', progress: 70 },
-    ],
-  },
-  {
-    id: '5',
-    name: 'Aisha Patel',
-    email: 'aisha.patel@email.com',
-    avatar: '',
-    course: 'Mobile App Development',
-    courseId: 'course-4',
-    progress: 62,
-    lastActivity: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000).toISOString(),
-    courses: [
-      { id: 'c11', title: 'React Native Basics', progress: 90 },
-      { id: 'c12', title: 'iOS Development', progress: 55 },
-      { id: 'c13', title: 'Android Development', progress: 40 },
-    ],
-  },
-  {
-    id: '6',
-    name: 'David Kim',
-    email: 'david.kim@email.com',
-    avatar: '',
-    course: 'Data Science & AI',
-    courseId: 'course-2',
-    progress: 18,
-    lastActivity: new Date(Date.now() - 14 * 24 * 60 * 60 * 1000).toISOString(),
-    courses: [
-      { id: 'c5', title: 'Python for Data Science', progress: 40 },
-      { id: 'c6', title: 'Machine Learning Basics', progress: 5 },
-    ],
-  },
-  {
-    id: '7',
-    name: 'Olivia Thompson',
-    email: 'olivia.t@email.com',
-    avatar: '',
-    course: 'Full-Stack Web Development',
-    courseId: 'course-1',
-    progress: 100,
-    lastActivity: new Date(Date.now() - 60 * 60 * 1000).toISOString(),
-    courses: [
-      { id: 'c1', title: 'HTML & CSS Fundamentals', progress: 100 },
-      { id: 'c2', title: 'JavaScript Mastery', progress: 100 },
-      { id: 'c3', title: 'React & Next.js', progress: 100 },
-      { id: 'c4', title: 'Node.js Backend', progress: 100 },
-    ],
-  },
-  {
-    id: '8',
-    name: 'Daniel Martinez',
-    email: 'daniel.m@email.com',
-    avatar: '',
-    course: 'UI/UX Design',
-    courseId: 'course-3',
-    progress: 45,
-    lastActivity: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString(),
-    courses: [
-      { id: 'c8', title: 'Design Principles', progress: 100 },
-      { id: 'c9', title: 'Figma Masterclass', progress: 30 },
-    ],
-  },
-  {
-    id: '9',
-    name: 'Sophia Lee',
-    email: 'sophia.lee@email.com',
-    avatar: '',
-    course: 'Mobile App Development',
-    courseId: 'course-4',
-    progress: 71,
-    lastActivity: new Date(Date.now() - 4 * 60 * 60 * 1000).toISOString(),
-    courses: [
-      { id: 'c11', title: 'React Native Basics', progress: 95 },
-      { id: 'c12', title: 'iOS Development', progress: 70 },
-      { id: 'c13', title: 'Android Development', progress: 48 },
-    ],
-  },
-  {
-    id: '10',
-    name: 'Ryan Taylor',
-    email: 'ryan.taylor@email.com',
-    avatar: '',
-    course: 'Full-Stack Web Development',
-    courseId: 'course-1',
-    progress: 55,
-    lastActivity: new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString(),
-    courses: [
-      { id: 'c1', title: 'HTML & CSS Fundamentals', progress: 100 },
-      { id: 'c2', title: 'JavaScript Mastery', progress: 60 },
-      { id: 'c3', title: 'React & Next.js', progress: 20 },
-    ],
-  },
-];
-
 export default function InstructorStudents() {
   const { myCourses, fetchMyCourses } = useInstructorStore();
-  const [students] = useState<Student[]>(sampleStudents);
+  const [students, setStudents] = useState<Student[]>([]);
   const [isPageLoading, setIsPageLoading] = useState(true);
-  const [pageError] = useState<string | null>(null);
+  const [pageError, setPageError] = useState<string | null>(null);
   const [search, setSearch] = useState('');
   const [courseFilter, setCourseFilter] = useState('all');
   const [messageModal, setMessageModal] = useState<Student | null>(null);
@@ -217,9 +64,32 @@ export default function InstructorStudents() {
   const [warningStudent, setWarningStudent] = useState<Student | null>(null);
 
   useEffect(() => {
-    const timer = setTimeout(() => setIsPageLoading(false), 800);
-    if (myCourses.length === 0) fetchMyCourses();
-    return () => clearTimeout(timer);
+    (async () => {
+      setIsPageLoading(true);
+      try {
+        const { default: api } = await import('@/lib/axios');
+        const { data } = await api.get('/instructor/students');
+        const mapped: Student[] = (data.data || []).map((s: any) => ({
+          id: s.id,
+          name: s.name,
+          email: s.email,
+          avatar: s.avatar || '',
+          course: s.course_title || s.course || 'Assigned Course',
+          courseId: s.course_id || s.courseId || '',
+          progress: Math.round(s.avg_progress || s.progress || 0),
+          lastActivity: s.last_activity || s.updated_at || s.created_at || new Date().toISOString(),
+          courses: (s.courses || []).map((c: any) => ({ id: c.id || c.course_id, title: c.title || c.course_title, progress: Math.round(c.progress || 0) })),
+        }));
+        setStudents(mapped);
+        setPageError(null);
+      } catch (err: any) {
+        setPageError(err?.response?.data?.message || 'Failed to load students');
+        setStudents([]);
+      } finally {
+        setIsPageLoading(false);
+      }
+      if (myCourses.length === 0) fetchMyCourses();
+    })();
   }, []);
 
   const totalStudents = students.length;

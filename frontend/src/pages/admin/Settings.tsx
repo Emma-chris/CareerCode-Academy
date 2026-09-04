@@ -5,6 +5,7 @@ import { GlassCard } from '@/components/ui/GlassCard';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
 import { useAdminStore } from '@/store/adminStore';
+import { SUPPORTED_CURRENCIES } from '@/lib/currency';
 import api from '@/lib/axios';
 
 const sections = [
@@ -282,14 +283,27 @@ export default function AdminSettings() {
           {activeSection === 'payments' && (
             <GlassCard className="p-6">
               <h2 className="text-lg font-semibold mb-1">Payments & XP Business Model</h2>
-              <p className="text-sm text-gray-500 mb-6">Configure commission and XP → NGN conversion. <span className="font-medium">1000 XP = 100 NGN default (rate 0.1).</span> All values are live — Save Changes to persist.</p>
+              <p className="text-sm text-gray-500 mb-6">Configure platform currency (admin-only) + commission and XP conversion. <span className="font-medium">1000 XP = 100 {getSetting('platform_currency','NGN')} default (rate 0.1).</span> All values are live — Save Changes to persist.</p>
               <div className="space-y-5">
+                <div className="p-4 rounded-xl border border-primary-500/20 bg-primary-500/5">
+                  <h3 className="text-sm font-semibold text-primary-700 dark:text-primary-400 mb-1">Platform Currency (admin-only)</h3>
+                  <p className="text-xs text-gray-500 mb-3">All new payments/courses display in this currency. Existing payments keep original. Admin can choose from list.</p>
+                  <div className="space-y-1.5">
+                    <label className="block text-sm font-medium">Currency</label>
+                    <select value={getSetting('platform_currency','NGN')} onChange={(e)=>handleChange('platform_currency', e.target.value)} className="w-full rounded-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800/50 px-4 py-2.5 text-sm">
+                      {Object.entries(SUPPORTED_CURRENCIES).map(([code, info]: any) => (
+                        <option key={code} value={code}>{code} — {info.name} ({info.symbol}) • {info.locale}</option>
+                      ))}
+                    </select>
+                    <p className="text-xs text-gray-400">Current: {getSetting('platform_currency','NGN')} ({(SUPPORTED_CURRENCIES as any)[getSetting('platform_currency','NGN')]?.symbol || '₦'}) • Locale {(SUPPORTED_CURRENCIES as any)[getSetting('platform_currency','NGN')]?.locale || 'en-NG'} • Supported gateways: {((SUPPORTED_CURRENCIES as any)[getSetting('platform_currency','NGN')]?.gateways || []).join(', ') || 'paystack, flutterwave'}</p>
+                  </div>
+                </div>
                 <div className="p-4 rounded-xl border border-amber-500/20 bg-amber-500/5">
-                  <h3 className="text-sm font-semibold text-amber-700 dark:text-amber-400 mb-1">XP → NGN Business Model</h3>
+                  <h3 className="text-sm font-semibold text-amber-700 dark:text-amber-400 mb-1">XP Business Model</h3>
                   <p className="text-xs text-gray-500">Admin-customizable. Students redeem XP for discount codes applied at checkout.</p>
                 </div>
-                <Input label="XP to NGN Rate (NGN per 1 XP)" type="number" step="0.01" value={getSetting('xp_to_ngn_rate', '0.1')} onChange={(e) => handleChange('xp_to_ngn_rate', e.target.value)} />
-                <p className="text-xs text-gray-400 -mt-3">e.g., 0.1 = 1000 XP → ₦100. Example: {getSetting('xp_min_redeem','1000')} XP → ₦{Math.floor(parseInt(getSetting('xp_min_redeem','1000')) * parseFloat(getSetting('xp_to_ngn_rate','0.1')) || 0)}</p>
+                <Input label={`XP to ${getSetting('platform_currency','NGN')} Rate (${getSetting('platform_currency','NGN')} per 1 XP)`} type="number" step="0.01" value={getSetting('xp_to_ngn_rate', '0.1')} onChange={(e) => handleChange('xp_to_ngn_rate', e.target.value)} />
+                <p className="text-xs text-gray-400 -mt-3">e.g., 0.1 = 1000 XP → {(SUPPORTED_CURRENCIES as any)[getSetting('platform_currency','NGN')]?.symbol || '₦'}100. Example: {getSetting('xp_min_redeem','1000')} XP → {(SUPPORTED_CURRENCIES as any)[getSetting('platform_currency','NGN')]?.symbol || '₦'}{Math.floor(parseInt(getSetting('xp_min_redeem','1000')) * parseFloat(getSetting('xp_to_ngn_rate','0.1')) || 0)}</p>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <Input label="Minimum Redeem (XP)" type="number" value={getSetting('xp_min_redeem', '1000')} onChange={(e) => handleChange('xp_min_redeem', e.target.value)} />

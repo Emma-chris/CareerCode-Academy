@@ -106,6 +106,7 @@ const StudentSkillTree = lazy(() => import('@/pages/student/SkillTree'));
 
 // Instructor pages
 const InstructorDashboard = lazy(() => import('@/pages/instructor/Dashboard'));
+const InstructorCommunities = lazy(() => import('@/pages/instructor/Communities'));
 const InstructorManageCourses = lazy(() => import('@/pages/instructor/ManageCourses'));
 const InstructorCourseEditor = lazy(() => import('@/pages/instructor/CourseEditor'));
 const InstructorAssignments = lazy(() => import('@/pages/instructor/Assignments'));
@@ -178,6 +179,13 @@ function App() {
   const [backendReady, setBackendReady] = useState(false);
 
   useEffect(() => {
+    // Skip initialize on OAuth callback — let SocialCallback handle it via cookie
+    if (window.location.pathname === '/auth/callback') {
+      setBackendReady(true);
+      // still mark initialized to avoid loader, SocialCallback will fetch user
+      useAuthStore.setState({ initialized: true });
+      return;
+    }
     initialize();
   }, [initialize]);
 
@@ -300,6 +308,7 @@ function App() {
           <Route path="mentoring" element={<SuspenseWrapper><InstructorMentorship /></SuspenseWrapper>} />
           <Route path="programs" element={<SuspenseWrapper><InstructorPrograms /></SuspenseWrapper>} />
           <Route path="discussions" element={<SuspenseWrapper><InstructorDiscussions /></SuspenseWrapper>} />
+          <Route path="communities" element={<SuspenseWrapper><InstructorCommunities /></SuspenseWrapper>} />
           <Route path="reviews" element={<SuspenseWrapper><InstructorReviews /></SuspenseWrapper>} />
           <Route path="certificates" element={<SuspenseWrapper><InstructorCertificates /></SuspenseWrapper>} />
           <Route path="resources" element={<SuspenseWrapper><InstructorResources /></SuspenseWrapper>} />

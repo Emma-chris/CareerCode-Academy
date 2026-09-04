@@ -16,6 +16,14 @@ const zoneMeta: Record<string, { label: string; icon: any; color: string; bg: st
   advanced: { label: 'Advanced', icon: Rocket, color: 'from-purple-500 to-pink-600', bg: 'bg-purple-500/10', border: 'border-purple-500/20' },
 };
 
+const schoolCareers: Record<string, { careers: string[]; placement: string; salary: string; duration: string; description: string }> = {
+  'School of Software Development': { careers: ['Frontend Developer', 'Backend Developer', 'Full-Stack Engineer'], placement: '92%', salary: '$95K', duration: '6-12 months', description: 'Focused on preparing students for careers in software engineering and application development.' },
+  'School of Data & Artificial Intelligence': { careers: ['Data Scientist', 'ML Engineer', 'Data Analyst'], placement: '94%', salary: '$110K', duration: '6-12 months', description: 'Focused on data-driven careers and emerging technologies.' },
+  'School of Design & Creative Technology': { careers: ['UI/UX Designer', 'Product Designer', 'Visual Designer'], placement: '88%', salary: '$85K', duration: '6-12 months', description: 'Focused on creating digital experiences and visual communication.' },
+  'School of Business & Digital Careers': { careers: ['Product Manager', 'Business Analyst', 'Tech Consultant'], placement: '90%', salary: '$90K', duration: '6-12 months', description: 'Focused on modern business and digital economy skills.' },
+  'School of Career Readiness': { careers: ['Career Coach', 'Talent Specialist', 'HR Coordinator'], placement: '95%', salary: '$75K', duration: '6-12 months', description: 'Focused on preparing students for employment and professional success.' },
+};
+
 export default function LearningPaths() {
   const navigate = useNavigate();
   const { isAuthenticated } = useAuthStore();
@@ -28,7 +36,7 @@ export default function LearningPaths() {
     async function fetchData() {
       try {
         const [groupedRes, enrolledRes, balanceRes] = await Promise.all([
-          api.get('/learning-paths/grouped').catch(() => ({ data: { data: [] } })),
+          api.get('/learning-paths/grouped-by-school').catch(() => api.get('/learning-paths/grouped').catch(() => ({ data: { data: [] } }))),
           isAuthenticated ? api.get('/learning-paths/my/enrollments').catch(() => ({ data: { data: [] } })) : Promise.resolve({ data: { data: [] } }),
           isAuthenticated ? api.get('/gamification/balance').catch(() => null) : Promise.resolve(null),
         ]);
@@ -76,7 +84,7 @@ export default function LearningPaths() {
           <h1 className="text-2xl sm:text-3xl font-bold flex items-center gap-2">
             <GitBranch className="w-7 h-7 text-primary-500" /> Learning Paths
           </h1>
-          <p className="text-gray-500 mt-1">Structured journeys grouped by category. Zones hide when empty. XP fuels your discount.</p>
+          <p className="text-gray-500 mt-1">Structured journeys by <span className="font-medium text-gray-700 dark:text-gray-300">Our Schools</span> — ascending Beginner → Intermediate → Advanced (empty zones hidden).</p>
         </div>
         {isAuthenticated && xpBalance && (
           <GlassCard className="p-3 flex items-center gap-3" hover={false}>
@@ -129,22 +137,42 @@ export default function LearningPaths() {
       )}
 
       <section>
-        <h2 className="text-lg font-semibold mb-4">Explore by Category • Gamified Roadmap Zones</h2>
+        <h2 className="text-lg font-semibold mb-4">Explore by School • Gamified Roadmap Zones</h2>
         {grouped.length === 0 ? (
           <div className="text-center py-20 text-gray-500">
             <GitBranch className="w-12 h-12 mx-auto mb-3 text-gray-300" />
             <p>No learning paths available yet.</p>
+            <p className="text-xs mt-2">Schools exist (Our Schools) — publish courses with level & program to generate Beginner → Advanced zones.</p>
           </div>
         ) : (
           <div className="space-y-6">
-            {grouped.map((group: any) => (
-              <GlassCard key={group.category} className="p-0 overflow-hidden" hover={false}>
-                <div className="p-5 sm:p-6 border-b border-gray-100 dark:border-gray-800 flex flex-wrap items-center justify-between gap-3">
-                  <div>
-                    <h3 className="text-lg font-bold">{group.category}</h3>
-                    <p className="text-xs text-gray-500">3 zones • empty zones hidden automatically</p>
+            {grouped.map((group: any) => {
+              const school = group.school || { name: group.category, slug: group.categorySlug, description: '', program_count: group.totalCourses || 0, sort_order: 0 };
+              const sc = schoolCareers[school.name] || { careers: ['Software Developer'], placement: '90%', salary: '$85K', duration: '6-12 months', description: school.description || '' };
+              return (
+              <GlassCard key={school.slug || group.category} className="p-0 overflow-hidden" hover={false}>
+                <div className="p-5 sm:p-6 border-b border-gray-100 dark:border-gray-800">
+                  <div className="flex flex-wrap items-start justify-between gap-4">
+                    <div className="flex-1 min-w-[220px]">
+                      <h3 className="text-lg font-bold flex items-center gap-2">{school.name} <Badge variant="default" size="sm">{school.program_count ?? group.totalCourses ?? 0} programs</Badge> <Badge variant="primary" size="sm">{sc.placement} placement</Badge></h3>
+                      <p className="text-sm text-gray-500 mt-1 line-clamp-2">{sc.description}</p>
+                      <div className="flex flex-wrap items-center gap-2 text-xs text-gray-500 mt-2">
+                        <span className="flex items-center gap-1"><Clock className="w-3 h-3" /> Estimated: {sc.duration}</span>
+                        <span className="text-gray-300">·</span>
+                        <span className="flex items-center gap-1 text-amber-600"><Award className="w-3 h-3" /> Avg Salary: {sc.salary}</span>
+                        <span className="text-gray-300">·</span>
+                        <span>{group.totalCourses ?? Object.values(group.zones).filter(Boolean).length} courses</span>
+                      </div>
+                      <div className="flex flex-wrap gap-1.5 mt-2">
+                        {sc.careers.map((c: string) => <span key={c} className="text-[11px] px-2 py-0.5 rounded-full bg-primary-500/10 text-primary-500 border border-primary-500/20">{c}</span>)}
+                      </div>
+                    </div>
+                    <div className="flex flex-col items-end gap-2">
+                      <Badge variant="primary" className="capitalize">{school.slug}</Badge>
+                      <Link to={`/schools/${school.slug}`} className="text-xs text-primary-500 hover:underline">Explore Programs →</Link>
+                    </div>
                   </div>
-                  <Badge variant="primary" className="capitalize">{group.categorySlug}</Badge>
+                  <p className="text-[11px] text-gray-400 mt-2">3 zones ascending Beginner → Intermediate → Advanced • empty zones hidden</p>
                 </div>
 
                 <div className="p-4 sm:p-6 grid md:grid-cols-3 gap-4">
@@ -205,7 +233,8 @@ export default function LearningPaths() {
                 {/* Roadmap line connector (desktop) */}
                 <div className="hidden md:block h-1 mx-6 mb-2 rounded-full bg-gradient-to-r from-emerald-500 via-blue-500 to-purple-500 opacity-20" />
               </GlassCard>
-            ))}
+              );
+            })}
           </div>
         )}
       </section>

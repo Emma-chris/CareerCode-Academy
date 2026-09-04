@@ -6,10 +6,20 @@ import { NotFoundError, ConflictError } from '../utils/errors';
 
 const router = Router();
 
-// GET /learning-paths/grouped — grouped by category with zones (hide empty)
+// GET /learning-paths/grouped — grouped by category with zones (hide empty) [deprecated, use grouped-by-school]
 router.get('/grouped', async (_req, res: Response, next: NextFunction) => {
   try {
     const grouped = await LearningPathModel.getGroupedByCategory();
+    res.json({ success: true, data: grouped });
+  } catch (error) {
+    next(error);
+  }
+});
+
+// GET /learning-paths/grouped-by-school — Schools terminology, ascending beginner→intermediate→advanced, hide empty zones
+router.get('/grouped-by-school', async (_req, res: Response, next: NextFunction) => {
+  try {
+    const grouped = await LearningPathModel.getGroupedBySchool();
     res.json({ success: true, data: grouped });
   } catch (error) {
     next(error);

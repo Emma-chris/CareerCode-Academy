@@ -60,14 +60,16 @@ api.interceptors.response.use(
     return response;
   },
   async (error) => {
-    if (error.response?.status === 401 && !error.config._retry && error.config.url !== '/auth/login' && error.config.url !== '/auth/refresh-token') {
+    const isAuthMe = error.config?.url?.includes('/auth/me');
+    const onCallback = typeof window !== 'undefined' && window.location.pathname === '/auth/callback';
+    if (error.response?.status === 401 && !error.config._retry && error.config.url !== '/auth/login' && error.config.url !== '/auth/refresh-token' && !isAuthMe && !onCallback) {
       error.config._retry = true;
       try {
         const { useAuthStore } = await import('@/store/authStore');
         const refreshToken = useAuthStore.getState().refreshToken;
 
         if (!refreshToken) {
-          useAuthStore.getState().logout();
+          // Do not logout during initial load or callback — just reject, App will handle
           return Promise.reject(error);
         }
 

@@ -69,6 +69,7 @@ const roleSidebarLinks: Record<string, { label: string; path: string; icon: any 
     { label: 'Quizzes & Exams', path: '/instructor/quizzes', icon: FileQuestion },
     { label: 'Live Classes', path: '/instructor/live-classes', icon: Calendar },
     { label: 'Discussions', path: '/instructor/discussions', icon: MessageCircle },
+    { label: 'Communities', path: '/instructor/communities', icon: Users },
     { label: 'Analytics', path: '/instructor/analytics', icon: BarChart3 },
     { label: 'Earnings', path: '/instructor/earnings', icon: DollarSign },
     { label: 'Certificates', path: '/instructor/certificates', icon: Award },

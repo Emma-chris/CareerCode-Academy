@@ -2,7 +2,6 @@ import { Server } from 'socket.io';
 import http from 'http';
 
 let io: Server;
-let resetIo: ReturnType<Server['of']>;
 
 const onlineUsers = new Map<string, { socketId: string; name?: string; role?: string }>();
 
@@ -134,30 +133,7 @@ export function createSocketServer(server: http.Server) {
     });
   });
 
-  resetIo = io.of('/reset-password');
-  resetIo.on('connection', (socket) => {
-    console.log('Reset-password client connected:', socket.id);
-
-    socket.on('join_reset_channel', (channelId: string) => {
-      if (typeof channelId === 'string' && channelId) {
-        socket.join(`reset:${channelId}`);
-        socket.emit('reset_channel_joined', { ok: true, channelId });
-        console.log(`Client ${socket.id} joined reset channel ${channelId}`);
-      }
-    });
-
-    socket.on('disconnect', () => {
-      console.log('Reset-password client disconnected:', socket.id);
-    });
-  });
-
   return io;
-}
-
-export function emitPasswordResetLink(channelId: string, payload: Record<string, any>) {
-  if (resetIo) {
-    resetIo.to(`reset:${channelId}`).emit('password_reset:link', payload);
-  }
 }
 
 export function emitDashboardUpdate() {
