@@ -26,7 +26,8 @@
     "seed:all": "npm run seed --workspace=backend && npm run seed:schools --workspace=backend && npm run seed:admin --workspace=backend"
   },
   "devDependencies": {
-    "concurrently": "^8.2.2"
+    "concurrently": "^8.2.2",
+    "@types/express": "4.17.25"
   },
   "engines": {
     "node": ">=18.0.0",

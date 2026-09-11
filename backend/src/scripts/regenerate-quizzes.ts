@@ -132,7 +132,7 @@ async function main(){
       const batchLessons=lessons.slice(i,i+QUIZ_BATCH);
       const built=buildInsert('quizzes', quizColumns, batch, 'id, lesson_id');
       if(!built) continue;
-      const res=await withRetry(()=>client.query(built.sql, built.params), `insert quizzes batch ${i/QUIZ_BATCH+1}`);
+      const res: any = await withRetry(()=>client.query(built.sql, built.params), `insert quizzes batch ${i/QUIZ_BATCH+1}`);
       // res.rows contains id, lesson_id — use to map
       for(const row of res.rows){
         quizIdByLesson.set(row.lesson_id, row.id);
@@ -166,7 +166,7 @@ async function main(){
       const batch=allQuestions.slice(i,i+Q_BATCH);
       const built=buildInsert('quiz_questions', qCols, batch);
       if(!built) continue;
-      const res=await withRetry(()=>client.query(built.sql, built.params), `insert questions batch ${i/Q_BATCH+1}`);
+      const res: any = await withRetry(()=>client.query(built.sql, built.params), `insert questions batch ${i/Q_BATCH+1}`);
       qInserted+=res.rowCount||batch.length;
       if(((i/Q_BATCH)+1)%5===0 || i+Q_BATCH>=allQuestions.length){
         console.log(`  Questions batch ${Math.floor(i/Q_BATCH)+1}/${Math.ceil(allQuestions.length/Q_BATCH)}: ${res.rowCount} inserted (total ${qInserted})`);

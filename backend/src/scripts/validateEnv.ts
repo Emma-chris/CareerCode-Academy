@@ -46,14 +46,14 @@ function testJwt() {
 
   // Test sign/verify
   try {
-    const token = jwt.sign({ userId: 'test', role: 'student' }, s, { expiresIn: process.env.JWT_EXPIRES_IN || '15m' });
+    const token = jwt.sign({ userId: 'test', role: 'student' }, s, { expiresIn: (process.env.JWT_EXPIRES_IN || '15m') as any });
     const decoded = jwt.verify(token, s) as any;
     if (decoded.userId === 'test') add('JWT sign/verify', 'pass', 'JWT sign & verify works', `exp: ${process.env.JWT_EXPIRES_IN}`);
     else add('JWT sign/verify', 'fail', 'Decoded payload mismatch');
   } catch (e: any) { add('JWT sign/verify', 'fail', e.message); }
 
   try {
-    const rt = jwt.sign({ userId: 'test' }, rs, { expiresIn: process.env.JWT_REFRESH_EXPIRES_IN || '7d' });
+    const rt = jwt.sign({ userId: 'test' }, rs, { expiresIn: (process.env.JWT_REFRESH_EXPIRES_IN || '7d') as any });
     jwt.verify(rt, rs);
     add('JWT_REFRESH sign/verify', 'pass', `Works (${process.env.JWT_REFRESH_EXPIRES_IN})`);
   } catch (e: any) { add('JWT_REFRESH sign/verify', 'fail', e.message); }

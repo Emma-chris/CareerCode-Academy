@@ -45,7 +45,7 @@ router.post(
       const currencyInfo = getCurrencyInfo(currency);
       // Validate provider supports currency
       if (!(currencyInfo.gateways as readonly string[]).includes(provider)) {
-        return res.status(400).json({ success: false, message: `${provider} does not support ${currency}. Supported: ${(currencyInfo.gateways as string[]).join(', ')}` });
+        return res.status(400).json({ success: false, message: `${provider} does not support ${currency}. Supported: ${currencyInfo.gateways.join(', ')}` });
       }
 
       const user = await UserModel.getUserById(userId);
