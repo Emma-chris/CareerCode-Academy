@@ -24,7 +24,7 @@ const pressReleases = [
   {
     title: 'CareerCode Reaches 95% Job Placement Rate, Sets Industry Standard',
     date: 'January 10, 2026',
-    author: 'Dr. Alex Rivera',
+    author: 'Dev Chris',
     category: 'Milestone',
     excerpt: 'CareerCode Academy announced a record 95% job placement rate within six months of graduation, setting a new benchmark for coding bootcamps.',
   },

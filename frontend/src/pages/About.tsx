@@ -8,9 +8,9 @@ import SEO from '@/components/seo/SEO';
 
 const team = [
   {
-    name: 'Dr. Alex Rivera',
+    name: 'Dev Chris',
     role: 'CEO & Co-Founder',
-    image: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=200&h=200&fit=crop&crop=face',
+    image: '/ceo-dev-chris.png',
     bio: 'Former Engineering Director at Google with 15+ years in tech education.',
   },
   {
