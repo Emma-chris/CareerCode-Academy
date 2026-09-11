@@ -6,6 +6,7 @@ import { Badge } from '@/components/ui/Badge';
 import { Button } from '@/components/ui/Button';
 import { usePayoutStore } from '@/store/payoutStore';
 import { PageSkeleton } from '@/components/student/SkeletonLoader';
+import { formatCurrency } from '@/lib/utils';
 import toast from 'react-hot-toast';
 
 export default function InstructorPayouts() {
@@ -201,7 +202,7 @@ export default function InstructorPayouts() {
                     {p.status.charAt(0).toUpperCase() + p.status.slice(1)}
                   </Badge>
                   {p.fee > 0 && (
-                    <div className="text-[10px] text-gray-400 mt-1">Fee: ${parseFloat(p.fee).toFixed(2)}</div>
+                    <div className="text-[10px] text-gray-400 mt-1">Fee: {formatCurrency(parseFloat(p.fee) || 0)}</div>
                   )}
                 </div>
               </div>

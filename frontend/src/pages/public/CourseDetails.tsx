@@ -19,6 +19,7 @@ import {
 } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { optimizeImageUrl } from '@/lib/cloudinary';
+import { formatCurrency } from '@/lib/utils';
 import { api } from '@/lib/axios';
 import SEO from '@/components/seo/SEO';
 import { VideoPlayer } from '@/components/video/VideoPlayer';
@@ -226,8 +227,8 @@ export default function CourseDetails() {
   const schoolSlug = (course as any).school_slug;
 
   const priceDisplay = isFree ? 'Free' : course.discount_percentage > 0
-    ? `$${Number(course.price * (1 - course.discount_percentage / 100)).toFixed(0)}`
-    : `$${Number(course.price).toFixed(0)}`;
+    ? formatCurrency(course.price * (1 - course.discount_percentage / 100))
+    : formatCurrency(course.price);
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-950">
@@ -354,12 +355,12 @@ export default function CourseDetails() {
                       <span className="text-emerald-400">Free</span>
                     ) : course.discount_percentage > 0 ? (
                       <div className="flex items-center gap-3 flex-wrap">
-                        <span className="text-emerald-400">${Number(course.price * (1 - course.discount_percentage / 100)).toFixed(0)}</span>
-                        <span className="text-xl line-through text-gray-500">${Number(course.price).toFixed(0)}</span>
+                        <span className="text-emerald-400">{formatCurrency(course.price * (1 - course.discount_percentage / 100))}</span>
+                        <span className="text-xl line-through text-gray-500">{formatCurrency(course.price)}</span>
                         <span className="text-sm bg-emerald-500/20 text-emerald-400 px-2 py-0.5 rounded-full">-{course.discount_percentage}%</span>
                       </div>
                     ) : (
-                      <>${Number(course.price).toFixed(0)}</>
+                      <>{formatCurrency(course.price)}</>
                     )}
                   </div>
 
@@ -557,7 +558,7 @@ export default function CourseDetails() {
                             </span>
                           </div>
                           <p className="text-xs text-gray-400 mt-0.5">
-                            {Number(rc.price) === 0 ? 'Free' : `$${Number(rc.price).toFixed(0)}`}
+                            {Number(rc.price) === 0 ? 'Free' : formatCurrency(rc.price)}
                           </p>
                         </div>
                       </div>

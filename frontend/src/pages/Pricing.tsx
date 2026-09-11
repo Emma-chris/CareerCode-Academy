@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Check, X, Sparkles, Rocket, Star, ArrowRight } from 'lucide-react';
@@ -53,7 +53,7 @@ const plans = [
       'Custom learning paths',
       'Team analytics dashboard',
       'Dedicated account manager',
-      'Job placement guarantee',
+      'Career pipeline access',
       'Resume & interview prep',
       'API access',
     ],
@@ -71,8 +71,6 @@ const faq = [
 ];
 
 export default function Pricing() {
-  const [yearly, setYearly] = useState(false);
-
   return (
     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
       <SEO title="Pricing" description="Choose the perfect learning plan for your career goals at CareerCode Academy." />
@@ -84,23 +82,8 @@ export default function Pricing() {
               Simple, <span className="gradient-text">Transparent</span> Pricing
             </h1>
             <p className="text-lg text-gray-600 dark:text-gray-400 max-w-2xl mx-auto mb-8">
-              Choose the plan that fits your learning journey. All plans include access to our core platform.
+              Pick a free course to get started. Individual courses are billed per course in your local currency.
             </p>
-
-            <div className="inline-flex items-center gap-3 p-1.5 glass rounded-2xl">
-              <button
-                onClick={() => setYearly(false)}
-                className={cn('px-6 py-2 rounded-xl text-sm font-medium transition-all', !yearly && 'bg-primary-500 text-white shadow-lg shadow-primary-500/25')}
-              >
-                Monthly
-              </button>
-              <button
-                onClick={() => setYearly(true)}
-                className={cn('px-6 py-2 rounded-xl text-sm font-medium transition-all', yearly && 'bg-primary-500 text-white shadow-lg shadow-primary-500/25')}
-              >
-                Yearly <span className="text-accent-500 font-semibold">Save 20%</span>
-              </button>
-            </div>
           </motion.div>
 
           <div className="grid md:grid-cols-3 gap-6 max-w-5xl mx-auto">
@@ -124,13 +107,13 @@ export default function Pricing() {
                     <h3 className="text-xl font-bold mb-2">{plan.name}</h3>
                     <p className="text-sm text-gray-500 mb-4">{plan.description}</p>
                     <div className="flex items-baseline gap-1">
-                      <span className="text-4xl font-bold">${yearly ? Math.round(plan.price * 0.8) : plan.price}</span>
-                      {plan.price > 0 && <span className="text-gray-400 text-sm">{plan.period}</span>}
+                      <span className="text-4xl font-bold">{plan.price === 0 ? 'Free' : '—'}</span>
                     </div>
                     {plan.price === 0 && <span className="text-sm text-gray-400">forever free</span>}
+                    {plan.price > 0 && <span className="text-sm text-gray-400">Pay per course · see course pricing</span>}
                   </div>
 
-                  <Link to={plan.price === 0 ? '/signup' : '/signup?plan=pro'}>
+                  <Link to={plan.price === 0 ? '/signup' : plan.name === 'Enterprise' ? '/contact' : '/signup?plan=pro'}>
                     {plan.popular ? (
                       <NeonButton color="blue" className="w-full mb-6">{plan.cta}</NeonButton>
                     ) : (

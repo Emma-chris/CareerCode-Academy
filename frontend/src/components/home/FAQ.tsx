@@ -17,7 +17,7 @@ const faqs = [
   {
     question: 'Is there a job guarantee?',
     answer:
-      'We offer a 95% job placement rate within 6 months of graduation. Our career services team provides resume reviews, interview preparation, and direct connections with 500+ hiring partners.',
+      'We do not publish placement guarantees. Instead, we build a transparent in-platform career pipeline: track your progress toward specific career outcomes, apply to partnered roles directly from the academy, and publish a public learner profile with your certificates and projects for employers to discover.',
   },
   {
     question: 'What kind of projects will I build?',

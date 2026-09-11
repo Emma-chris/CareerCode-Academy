@@ -12,6 +12,7 @@ import { EmptyState } from '@/components/ui/EmptyState';
 import { SkeletonLine, SkeletonBlock } from '@/components/ui/Skeleton';
 import { BookOpen, Clock, Users, Star, ArrowRight, Target, CheckCircle, ChevronRight, Play } from 'lucide-react';
 import SEO from '@/components/seo/SEO';
+import { formatCurrency } from '@/lib/utils';
 import { VideoPlayer } from '@/components/video/VideoPlayer';
 
 const formatDuration = (minutes: number) => {
@@ -184,7 +185,7 @@ export default function ProgramDetail() {
                               <p className="text-sm text-gray-400 line-clamp-1 mt-0.5">{course.description}</p>
                             </div>
                             <div className="text-right shrink-0">
-                              <p className="text-white font-semibold">{isFree ? 'Free' : `$${Number(course.price).toFixed(0)}`}</p>
+                              <p className="text-white font-semibold">{isFree ? 'Free' : formatCurrency(course.price)}</p>
                             </div>
                           </div>
                           <div className="flex flex-wrap items-center gap-2 sm:gap-4 mt-2 text-xs text-gray-500">

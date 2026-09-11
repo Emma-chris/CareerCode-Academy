@@ -147,7 +147,7 @@ export default function AdminCourseDetail() {
             </div>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-            <Input label="Price ($)" type="number" value={form.price} onChange={e=>setForm({...form, price:e.target.value})} />
+            <Input label="Price" type="number" value={form.price} onChange={e=>setForm({...form, price:e.target.value})} />
             <Input label="Discount %" type="number" value={form.discount_percentage} onChange={e=>setForm({...form, discount_percentage:e.target.value})} />
             <Input label="Duration (min)" type="number" value={form.duration} onChange={e=>setForm({...form, duration:e.target.value})} />
           </div>

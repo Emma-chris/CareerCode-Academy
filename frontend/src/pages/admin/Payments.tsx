@@ -11,6 +11,7 @@ import { GlassCard } from '@/components/ui/GlassCard';
 import { Badge } from '@/components/ui/Badge';
 import { Button } from '@/components/ui/Button';
 import { useAdminStore } from '@/store/adminStore';
+import { formatCurrency } from '@/lib/utils';
 
 const COLORS = ['#6366f1', '#7C3AED', '#06B6D4', '#10B981', '#F59E0B', '#EF4444'];
 
@@ -237,7 +238,7 @@ export default function AdminPayments() {
                     </div>
                   </td>
                   <td className="p-3 text-gray-500 max-w-[200px] truncate">{payment.course?.title || 'N/A'}</td>
-                  <td className="p-3 font-medium">${Number(payment.amount || 0).toFixed(2)}</td>
+                  <td className="p-3 font-medium">{formatCurrency(Number(payment.amount || 0))}</td>
                   <td className="p-3">{statusBadge(payment.status)}</td>
                   <td className="p-3 text-gray-500 text-xs">{new Date(payment.created_at).toLocaleDateString()}</td>
                   <td className="p-3 text-right">

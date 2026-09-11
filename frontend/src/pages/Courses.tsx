@@ -17,7 +17,7 @@ import { EmptyState } from '@/components/ui/EmptyState';
 import { Alert } from '@/components/ui/Alert';
 import { Pagination } from '@/components/ui/Pagination';
 import { useCourseStore } from '@/store/courseStore';
-import { debounce, cn } from '@/lib/utils';
+import { debounce, cn, formatCurrency } from '@/lib/utils';
 import SEO from '@/components/seo/SEO';
 
 const categories = ['All', 'Web Development', 'Data Science', 'Mobile', 'DevOps', 'Security', 'Design', 'AI', 'Programming', 'Computer Science', 'Databases', 'Networking', 'Cloud Computing', 'Software Engineering'];
@@ -296,13 +296,13 @@ export default function Courses() {
                               ) : course.discount_percentage > 0 ? (
                                 <div className="flex items-center gap-2">
                                   <span className="text-lg font-bold text-white">
-                                    ${(course.price * (1 - course.discount_percentage / 100)).toFixed(0)}
+                                    {formatCurrency(course.price * (1 - course.discount_percentage / 100))}
                                   </span>
-                                  <span className="text-sm text-gray-500 line-through">${Number(course.price).toFixed(0)}</span>
-                                  <Badge variant="success" size="sm">Save ${(course.price * course.discount_percentage / 100).toFixed(0)}</Badge>
+                                  <span className="text-sm text-gray-500 line-through">{formatCurrency(course.price)}</span>
+                                  <Badge variant="success" size="sm">Save {formatCurrency(course.price * course.discount_percentage / 100)}</Badge>
                                 </div>
                               ) : (
-                                <span className="text-lg font-bold text-white">${Number(course.price).toFixed(0)}</span>
+                                <span className="text-lg font-bold text-white">{formatCurrency(Number(course.price))}</span>
                               )}
                             </div>
 

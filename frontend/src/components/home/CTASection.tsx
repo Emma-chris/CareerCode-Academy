@@ -6,7 +6,7 @@ import { NeonButton } from '@/components/ui/NeonButton';
 const valueProps = [
   { icon: BookOpen, title: 'Project-Based Learning', desc: 'Build real-world projects for your portfolio' },
   { icon: MessageSquare, title: '1-on-1 Mentorship', desc: 'Get guidance from industry experts' },
-  { icon: Briefcase, title: 'Career Support', desc: 'Resume review, mock interviews, job placement' },
+  { icon: Briefcase, title: 'Career Support', desc: 'In-platform job applications, role matching, and a public portfolio to get discovered' },
 ];
 
 export function CTASection() {

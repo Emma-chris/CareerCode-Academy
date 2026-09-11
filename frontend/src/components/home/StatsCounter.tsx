@@ -1,12 +1,13 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { motion, useInView } from 'framer-motion';
-import { BookOpen, Users, Award, Building2 } from 'lucide-react';
+import { BookOpen, Users, Award, GraduationCap } from 'lucide-react';
+import { api } from '@/lib/axios';
 
-const stats = [
-  { icon: Users, value: 15000, label: 'Students Enrolled', suffix: '+' },
-  { icon: BookOpen, value: 250, label: 'Courses Available', suffix: '+' },
-  { icon: Award, value: 95, label: 'Job Placement Rate', suffix: '%' },
-  { icon: Building2, value: 500, label: 'Hiring Partners', suffix: '+' },
+const defaultStats = [
+  { icon: Users, value: 0, label: 'Students Enrolled', suffix: '' },
+  { icon: BookOpen, value: 0, label: 'Courses Available', suffix: '' },
+  { icon: Award, value: 0, label: 'Certificates Issued', suffix: '' },
+  { icon: GraduationCap, value: 0, label: 'Graduate Alumni', suffix: '' },
 ];
 
 function Counter({ target, suffix = '' }: { target: number; suffix?: string }) {
@@ -40,6 +41,22 @@ function Counter({ target, suffix = '' }: { target: number; suffix?: string }) {
 }
 
 export function StatsCounter() {
+  const [stats, setStats] = useState(defaultStats);
+
+  useEffect(() => {
+    api.get('/public/stats')
+      .then(({ data }) => {
+        const s = data?.data || {};
+        setStats([
+          { icon: Users, value: Number(s.students) || 0, label: 'Students Enrolled', suffix: '' },
+          { icon: BookOpen, value: Number(s.courses) || 0, label: 'Courses Available', suffix: '' },
+          { icon: Award, value: Number(s.certificates) || 0, label: 'Certificates Issued', suffix: '' },
+          { icon: GraduationCap, value: Number(s.alumni) || 0, label: 'Graduate Alumni', suffix: '' },
+        ]);
+      })
+      .catch(() => {/* keep defaults */});
+  }, []);
+
   return (
     <section className="py-16 relative">
       <div className="absolute inset-0 gradient-bg opacity-5" />

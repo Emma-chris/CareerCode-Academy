@@ -6,6 +6,7 @@ import { Input } from '@/components/ui/Input';
 import { Button } from '@/components/ui/Button';
 import { Badge } from '@/components/ui/Badge';
 import api from '@/lib/axios';
+import { formatCurrency } from '@/lib/utils';
 
 interface CourseProposal {
   id: string;
@@ -246,7 +247,7 @@ export default function AdminCourseProposals() {
                     </div>
                     <div>
                       <span className="block text-xs text-gray-500 uppercase font-semibold mb-1">Price</span>
-                      <span className="font-medium">${selectedProposal.recommended_price}</span>
+                      <span className="font-medium">{formatCurrency(Number(selectedProposal.recommended_price) || 0)}</span>
                     </div>
                     <div>
                       <span className="block text-xs text-gray-500 uppercase font-semibold mb-1">Format</span>

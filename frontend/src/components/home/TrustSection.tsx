@@ -121,7 +121,7 @@ export function TrustSection() {
             <div className="hidden sm:block w-px h-10 bg-gray-200 dark:bg-gray-700" />
             <Badge variant="primary" size="lg" className="px-4 py-2">
               <Briefcase className="w-4 h-4" />
-              500+ Hiring Partners
+              In-Platform Career Pipeline
             </Badge>
           </div>
         </motion.div>

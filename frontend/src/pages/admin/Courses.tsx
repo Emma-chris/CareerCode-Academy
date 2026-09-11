@@ -11,6 +11,7 @@ import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
 import { useAdminStore } from '@/store/adminStore';
 import { optimizeImageUrl } from '@/lib/cloudinary';
+import { formatCurrency } from '@/lib/utils';
 import api from '@/lib/axios';
 import { useNavigate } from 'react-router-dom';
 import { useAuthStore } from '@/store/authStore';
@@ -450,7 +451,7 @@ export default function AdminCourses() {
                       <p className="text-xs text-gray-400 mb-1">{course.instructor?.name} · {course.category}</p>
                       <p className="text-xs text-gray-400 dark:text-gray-300 mb-3 line-clamp-2">{course.description}</p>
                       <div className="flex items-center gap-2 text-xs text-gray-400">
-                        <span>{course.enrollmentCount || 0} enrolled</span><span>·</span><span>${course.price || 0}</span><span>·</span><span className="capitalize">{course.level}</span>
+                        <span>{course.enrollmentCount || 0} enrolled</span><span>·</span><span>{formatCurrency(Number(course.price) || 0)}</span><span>·</span><span className="capitalize">{course.level}</span>
                       </div>
                     </div>
                   </GlassCard>
@@ -549,7 +550,7 @@ export default function AdminCourses() {
                 </div>
 
                 <div className="grid grid-cols-2 gap-4">
-                  <Input label="Price ($)" type="number" min={0} value={formData.price} onChange={(e) => setFormData({ ...formData, price: Number(e.target.value) })} />
+                  <Input label="Price" type="number" min={0} value={formData.price} onChange={(e) => setFormData({ ...formData, price: Number(e.target.value) })} />
                   <Input label="Duration (minutes)" type="number" min={1} value={formData.duration} onChange={(e) => setFormData({ ...formData, duration: Number(e.target.value) })} />
                 </div>
 

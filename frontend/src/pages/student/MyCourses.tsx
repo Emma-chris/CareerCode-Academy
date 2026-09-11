@@ -13,6 +13,7 @@ import { Pagination } from '@/components/ui/Pagination';
 import { EmptyState } from '@/components/ui/EmptyState';
 import { BookOpen, Clock, PlayCircle, Search, Layers, Sparkles, GraduationCap, TrendingUp, Award, ArrowRight, Filter } from 'lucide-react';
 import { optimizeImageUrl } from '@/lib/cloudinary';
+import { formatCurrency } from '@/lib/utils';
 import { PageSkeleton } from '@/components/student/SkeletonLoader';
 import { useCourseStore } from '@/store/courseStore';
 import toast from 'react-hot-toast';
@@ -603,7 +604,7 @@ export default function MyCourses() {
                             <p className="text-xs text-gray-500 dark:text-gray-400 line-clamp-2 mb-3 flex-1">{course.description}</p>
                             <div className="flex items-center gap-2 text-xs text-gray-500 dark:text-gray-400 mb-3">
                               <Badge variant="default" size="sm">{course.category}</Badge>
-                              <span className="ml-auto font-semibold">{isFree ? <span className="text-emerald-600">Free</span> : `$${Number(course.price).toFixed(0)}`}</span>
+                              <span className="ml-auto font-semibold">{isFree ? <span className="text-emerald-600">Free</span> : formatCurrency(course.price)}</span>
                             </div>
                             {enrolled ? (
                               <Link to={`/student/courses/${course.slug}`}>

@@ -4,6 +4,7 @@ import { motion } from 'framer-motion';
 import { ArrowRight, Play, Code2, Sparkles, Shield, Zap, Award, Users, BookOpen, Building2, Star, ChevronRight } from 'lucide-react';
 import { NeonButton } from '@/components/ui/NeonButton';
 import { Badge } from '@/components/ui/Badge';
+import { api } from '@/lib/axios';
 
 const typingTexts = [
   'Land Your Dream Job',
@@ -67,6 +68,26 @@ export function Hero() {
   const [textIndex, setTextIndex] = useState(0);
   const [charIndex, setCharIndex] = useState(0);
   const [isDeleting, setIsDeleting] = useState(false);
+  const [stats, setStats] = useState([
+    { number: '0', label: 'Students' },
+    { number: '0', label: 'Courses' },
+    { number: '0', label: 'Certificates Issued' },
+    { number: '0', label: 'Graduate Alumni' },
+  ]);
+
+  useEffect(() => {
+    api.get('/public/stats')
+      .then(({ data }) => {
+        const s = data?.data || {};
+        setStats([
+          { number: String(s.students ?? 0).toLocaleString(), label: 'Students' },
+          { number: String(s.courses ?? 0).toLocaleString(), label: 'Courses' },
+          { number: String(s.certificates ?? 0).toLocaleString(), label: 'Certificates Issued' },
+          { number: String(s.alumni ?? 0).toLocaleString(), label: 'Graduate Alumni' },
+        ]);
+      })
+      .catch(() => {/* keep defaults */});
+  }, []);
 
   useEffect(() => {
     const currentText = typingTexts[textIndex];
@@ -142,7 +163,7 @@ export function Hero() {
           <motion.div variants={itemVariants} className={styles.badgeWrapper}>
             <span className={styles.badge}>
               <Sparkles className={styles.badgeIcon} />
-              Industry-Recognized Curriculum · 95% Placement Rate
+              Industry-Recognized Curriculum
             </span>
           </motion.div>
 
@@ -187,13 +208,7 @@ export function Hero() {
             variants={itemVariants}
             className={styles.statsWrapper}
           >
-            {[
-              { number: '15K+', label: 'Students' },
-              { number: '250+', label: 'Courses' },
-              { number: '95%', label: 'Placement Rate' },
-              { number: '50+', label: 'Instructors' },
-              { number: '4.9', label: 'Avg Rating' },
-            ].map((stat) => (
+            {stats.map((stat) => (
               <div key={stat.label} className="text-center">
                 <div className={styles.statNumber}>
                   {stat.number}
@@ -211,7 +226,7 @@ export function Hero() {
               </Badge>
               <Badge variant="primary" size="sm" className="px-3 py-1">
                 <Users className="w-3 h-3" />
-                500+ Hiring Partners
+                Career Pipeline
               </Badge>
               <Badge variant="default" size="sm" className="px-3 py-1">
                 <Star className="w-3 h-3 text-yellow-500" />
