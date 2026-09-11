@@ -36,17 +36,21 @@ export async function authenticate(req: AuthRequest, _res: Response, next: NextF
     }
 
     const decoded = verifyToken(token);
-    req.user = decoded;
 
-    // Check if user is suspended
+    // DB-backed session check: ensure user still exists, is verified, and is not suspended.
+    // Also pulls a fresh role so role changes take effect immediately instead of on token expiry.
     const user = await UserModel.getUserById(decoded.userId);
     if (!user) {
       throw new UnauthorizedError('User not found');
     }
     if (user.is_suspended) {
-      throw new ForbiddenError('Your account has been suspended');
+      throw new ForbiddenError('Your account has been suspended. Please contact support.');
+    }
+    if (!user.is_verified) {
+      throw new UnauthorizedError('Please verify your email address.');
     }
 
+    req.user = { userId: user.id, role: user.role };
     next();
   } catch (error: any) {
     if (error.name === 'JsonWebTokenError' || error.name === 'TokenExpiredError') {

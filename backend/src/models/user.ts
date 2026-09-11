@@ -59,6 +59,7 @@ export interface UpdateUserInput {
   setup_token_expires?: Date | null;
   password?: string;
   role?: 'student' | 'instructor' | 'admin' | 'super_admin';
+  last_login?: Date | null;
 }
 
 export async function createUser(input: CreateUserInput): Promise<User> {
@@ -81,7 +82,7 @@ export async function getAllUsers(limit: number = 50, offset: number = 0): Promi
 
 export async function getUserById(id: string): Promise<User | null> {
   const { rows } = await query<User>(
-    `SELECT id, name, email, role, avatar, bio, headline, location, website, github, twitter, linkedin, expertise, is_verified, is_suspended, allowed_dashboards, created_at, updated_at FROM users WHERE id = $1`,
+`SELECT id, name, email, role, avatar, bio, headline, location, website, github, twitter, linkedin, expertise, is_verified, is_suspended, allowed_dashboards, created_at, updated_at FROM users WHERE id = $1`,
     [id]
   );
   return rows[0] || null;

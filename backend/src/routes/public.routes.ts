@@ -40,4 +40,25 @@ router.get('/settings', async (_req: Request, res: Response) => {
   }
 });
 
+// GET /public/stats — public, real platform counts (powers honest marketing)
+router.get('/stats', async (_req: Request, res: Response) => {
+  const count = async (sql: string): Promise<number> => {
+    try {
+      const { rows } = await query(sql);
+      return Number(rows[0]?.n) || 0;
+    } catch {
+      return 0;
+    }
+  };
+
+  const [students, courses, certificates, alumni] = await Promise.all([
+    count(`SELECT COUNT(*)::int AS n FROM users WHERE role = 'student'`),
+    count(`SELECT COUNT(*)::int AS n FROM courses WHERE published = true`),
+    count(`SELECT COUNT(*)::int AS n FROM certificates`),
+    count(`SELECT COUNT(*)::int AS n FROM alumni`),
+  ]);
+
+  res.json({ success: true, data: { students, courses, certificates, alumni } });
+});
+
 export default router;

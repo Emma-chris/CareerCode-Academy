@@ -22,7 +22,7 @@ import {
   setAuthCookies,
   clearAuthCookies,
 } from '../utils/helpers';
-import { UnauthorizedError, NotFoundError, ConflictError } from '../utils/errors';
+import { UnauthorizedError, NotFoundError, ConflictError, ForbiddenError } from '../utils/errors';
 
 const router = Router();
 
@@ -154,11 +154,10 @@ router.post(
       }
 
       if (user.is_suspended) {
-        throw new UnauthorizedError('Your account has been suspended. Please contact support.');
+        throw new ForbiddenError('Your account has been suspended. Please contact support.');
       }
 
-      // Update last_login
-      await UserModel.updateUser(user.id, { last_login: new Date() } as any);
+      await UserModel.updateUser(user.id, { last_login: new Date() });
 
       const tokenPayload = { userId: user.id, role: user.role };
       const token = generateToken(tokenPayload);
@@ -485,6 +484,11 @@ router.post(
         throw new UnauthorizedError('User not found');
       }
 
+      if (user.is_suspended) {
+        await TokenModel.deleteAllRefreshTokensForUser(user.id);
+        throw new ForbiddenError('Your account has been suspended. Please contact support.');
+      }
+
       const tokenPayload = { userId: user.id, role: user.role };
       const newToken = generateToken(tokenPayload);
       const newRefreshToken = generateRefreshToken(tokenPayload);
@@ -507,6 +511,15 @@ router.post(
       if (error.name === 'JsonWebTokenError' || error.name === 'TokenExpiredError') {
         next(new UnauthorizedError('Invalid or expired refresh token'));
       } else if (error.code === '23505') {
+        // Refresh token reuse detected — revoke the entire token family for that user
+        let userId: string | undefined;
+        try {
+          const decoded = verifyRefreshToken(req.body.refreshToken || req.cookies?.refreshToken);
+          userId = decoded.userId;
+        } catch { /* ignore parse failures */ }
+        if (userId) {
+          await TokenModel.deleteAllRefreshTokensForUser(userId);
+        }
         next(new UnauthorizedError('Refresh token already used — please re-authenticate'));
       } else {
         next(error);
