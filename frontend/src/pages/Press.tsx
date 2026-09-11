@@ -17,7 +17,7 @@ const pressReleases = [
   {
     title: 'CareerCode Launches New Cybersecurity Bootcamp with Google',
     date: 'February 1, 2026',
-    author: 'David Kim',
+    author: 'Success Chukwu',
     category: 'Partnership',
     excerpt: 'The new Cybersecurity Analyst Bootcamp, developed in collaboration with Google, addresses the growing demand for security professionals.',
   },
@@ -31,7 +31,7 @@ const pressReleases = [
   {
     title: 'CareerCode Academy Named Top 10 EdTech Startup of 2025',
     date: 'December 5, 2025',
-    author: 'Maya Patel',
+    author: 'Ike Wisdom',
     category: 'Awards',
     excerpt: 'CareerCode was recognized as one of the top 10 EdTech startups globally for its innovative approach to technical education.',
   },
@@ -45,7 +45,7 @@ const pressReleases = [
   {
     title: 'New AI Mentor Feature Helps Students Learn to Code Faster',
     date: 'September 8, 2025',
-    author: 'David Kim',
+    author: 'Success Chukwu',
     category: 'Product',
     excerpt: 'CareerCode launched an AI-powered coding mentor that provides real-time feedback and personalized learning recommendations.',
   },

@@ -14,15 +14,15 @@ const team = [
     bio: 'Former Engineering Director at Google with 15+ years in tech education.',
   },
   {
-    name: 'Maya Patel',
+    name: 'Ike Wisdom',
     role: 'CTO & Co-Founder',
-    image: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=200&h=200&fit=crop&crop=face',
+    image: '/wisdom.jpg',
     bio: 'Full-stack developer turned educator. Previously led curriculum at Codecademy.',
   },
   {
-    name: 'David Kim',
+    name: 'Success Chukwu',
     role: 'Head of Curriculum',
-    image: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=200&h=200&fit=crop&crop=face',
+    image: '/success.jpg',
     bio: 'PhD in Computer Science, designed programs for MIT and Stanford Online.',
   },
   {
