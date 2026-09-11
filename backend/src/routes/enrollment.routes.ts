@@ -2,6 +2,7 @@ import { Router, Response, NextFunction } from 'express';
 import { authenticate, AuthRequest } from '../middleware/auth';
 import * as EnrollmentModel from '../models/enrollment';
 import { query } from '../config/db';
+import { celebrateCompletedLearningPaths } from '../models/learningPath';
 import { NotFoundError } from '../utils/errors';
 
 const router = Router();
@@ -118,6 +119,10 @@ router.post(
         completedLessons,
         completed
       );
+
+      if (completed) {
+        await celebrateCompletedLearningPaths(userId);
+      }
 
       res.json({ success: true, data: updated });
     } catch (error) {

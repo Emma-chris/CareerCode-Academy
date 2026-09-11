@@ -3,6 +3,7 @@ import { authenticate, AuthRequest } from '../middleware/auth';
 import { query } from '../config/db';
 import { emitStudentUpdate } from '../config/socket';
 import { awardXp, updateStreak } from '../models/gamification';
+import { celebrateCompletedLearningPaths } from '../models/learningPath';
 
 const router = Router();
 
@@ -172,6 +173,9 @@ router.post(
           // Gamification: award bonus XP for course completion
           await awardXp(userId, 50, 'course_complete', `Completed course: ${courseTitle}`);
         }
+
+        // Recalculate learning path progress; fire celebration for newly completed paths
+        await celebrateCompletedLearningPaths(userId);
       }
 
       res.json({

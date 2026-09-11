@@ -1,7 +1,9 @@
 import { Router, Response, NextFunction } from 'express';
 import { authenticate, AuthRequest } from '../middleware/auth';
 import { query } from '../config/db';
+import { emitDashboardUpdate, emitStudentUpdate } from '../config/socket';
 import * as LearningPathModel from '../models/learningPath';
+import * as EnrollmentModel from '../models/enrollment';
 import { NotFoundError, ConflictError } from '../utils/errors';
 
 const router = Router();
@@ -123,7 +125,8 @@ router.get('/:slug', async (req, res: Response, next: NextFunction) => {
   }
 });
 
-// POST /learning-paths/:slug/enroll — Enroll in a learning path
+// POST /learning-paths/:slug/enroll — Enroll in a learning path.
+// Free courses in the path are enrolled immediately; paid courses require checkout.
 router.post(
   '/:slug/enroll',
   authenticate,
@@ -147,7 +150,65 @@ router.post(
         RETURNING *
       `, [userId, path.id]);
 
-      res.status(201).json({ success: true, data: rows[0] });
+      // Auto-enroll in free courses; flag paid ones for checkout
+      const { rows: courseRows } = await query(`
+        SELECT c.id, c.title, c.slug, c.price, c.instructor_id
+        FROM learning_path_courses lpc
+        JOIN courses c ON lpc.course_id = c.id
+        WHERE lpc.path_id = $1
+        ORDER BY lpc.order_index ASC
+      `, [path.id]);
+
+      const enrolledCourseIds: string[] = [];
+      const paidCourses: any[] = [];
+
+      for (const course of courseRows) {
+        const hasEnrollment = await query(
+          'SELECT id FROM enrollments WHERE user_id = $1 AND course_id = $2',
+          [userId, course.id]
+        );
+
+        if (Number(course.price) > 0) {
+          if (hasEnrollment.rows.length === 0) {
+            paidCourses.push({
+              id: course.id,
+              title: course.title,
+              slug: course.slug,
+              price: Number(course.price),
+            });
+          }
+          continue;
+        }
+
+        if (hasEnrollment.rows.length > 0) {
+          enrolledCourseIds.push(course.id);
+          continue;
+        }
+
+        await EnrollmentModel.createEnrollment({ user_id: userId, course_id: course.id });
+        enrolledCourseIds.push(course.id);
+
+        // Notify instructor
+        await query(
+          `INSERT INTO notifications (user_id, title, message, type)
+           VALUES ($1, 'New Enrollment', $2, 'enrollment')`,
+          [course.instructor_id, `A new student enrolled in "${course.title}"`]
+        );
+      }
+
+      emitDashboardUpdate();
+      emitStudentUpdate(userId);
+
+      res.status(201).json({
+        success: true,
+        data: {
+          ...rows[0],
+          pathTitle: path.title,
+          pathSlug: path.slug,
+          enrolledCourseIds,
+          paidCourses,
+        },
+      });
     } catch (error) {
       next(error);
     }

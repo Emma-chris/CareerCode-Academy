@@ -60,8 +60,16 @@ export default function LearningPaths() {
       return;
     }
     try {
-      await api.post(`/learning-paths/${slug}/enroll`);
-      toast.success('Enrolled in learning path!');
+      const res = await api.post(`/learning-paths/${slug}/enroll`);
+      const { paidCourses = [], enrolledCourseIds = [] } = res.data.data || {};
+      if (enrolledCourseIds.length > 0) {
+        toast.success(`Enrolled! ${enrolledCourseIds.length} free course(s) unlocked.`);
+      } else {
+        toast.success('Enrolled in learning path!');
+      }
+      if (paidCourses.length > 0) {
+        toast(`Complete payment for ${paidCourses.length} paid course(s) to continue.`, { icon: '🔒' });
+      }
       const enrolledRes = await api.get('/learning-paths/my/enrollments');
       setEnrolledPaths(enrolledRes.data.data || []);
     } catch (err: any) {
