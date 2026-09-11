@@ -9,8 +9,9 @@ import { Breadcrumb } from '@/components/ui/Breadcrumb';
 import { EmptyState } from '@/components/ui/EmptyState';
 import { Alert } from '@/components/ui/Alert';
 import { Select } from '@/components/ui/Select';
-import { Building, MapPin, Clock, DollarSign, ExternalLink, GraduationCap, Search } from 'lucide-react';
+import { Building, MapPin, Clock, DollarSign, GraduationCap, Search } from 'lucide-react';
 import SEO from '@/components/seo/SEO';
+import { ApplyModal } from '@/components/career/ApplyModal';
 
 export default function InternshipsPage() {
   const [internships, setInternships] = useState<any[]>([]);
@@ -18,6 +19,7 @@ export default function InternshipsPage() {
   const [error, setError] = useState<string | null>(null);
   const [typeFilter, setTypeFilter] = useState('all');
   const [search, setSearch] = useState('');
+  const [applyTo, setApplyTo] = useState<any>(null);
 
   useEffect(() => {
     (async () => {
@@ -98,11 +100,14 @@ export default function InternshipsPage() {
                       )}
                     </div>
                     <div className="shrink-0 w-full sm:w-auto">
-                      <a href={intern.application_url || '#'} target="_blank" rel="noopener noreferrer" className="inline-flex sm:inline-block">
-                        <Button size="sm" variant="outline" disabled={!intern.application_url} className="w-full sm:w-auto">
-                          <ExternalLink className="w-3.5 h-3.5 mr-1" /> Apply
-                        </Button>
-                      </a>
+                      <Button size="sm" onClick={() => setApplyTo(intern)} className="w-full sm:w-auto">
+                        Apply
+                      </Button>
+                      {intern.application_url && (
+                        <a href={intern.application_url} target="_blank" rel="noopener noreferrer" className="inline-flex w-full sm:w-auto">
+                          <Button size="sm" variant="ghost" className="w-full sm:w-auto mt-1">External</Button>
+                        </a>
+                      )}
                     </div>
                   </div>
                 </GlassCard>
@@ -111,6 +116,8 @@ export default function InternshipsPage() {
           </div>
         )}
       </div>
+
+      <ApplyModal open={!!applyTo} onClose={() => setApplyTo(null)} kind="internship" listing={applyTo || { id: '', title: '' }} />
     </motion.div>
   );
 }

@@ -28,6 +28,8 @@ import {
   DollarSign,
   Star,
   FolderOpen,
+  Briefcase,
+  Zap,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useAuthStore } from '@/store/authStore';
@@ -48,6 +50,9 @@ const roleSidebarLinks: Record<string, { label: string; path: string; icon: any 
     { label: 'Exams', path: '/student/exams', icon: ClipboardList },
     { label: 'Challenges', path: '/student/challenges', icon: ClipboardList },
     { label: 'Certificates', path: '/student/certificates', icon: Award },
+    { label: 'Applications', path: '/student/applications', icon: Briefcase },
+    { label: 'Portfolio', path: '/student/portfolio', icon: FolderOpen },
+    { label: 'Guided Mode', path: '/student/guided', icon: Zap },
     { label: 'Community', path: '/community', icon: Users },
     { label: 'Leaderboard', path: '/student/leaderboard', icon: Trophy },
     { label: 'Mentorship', path: '/student/mentoring', icon: Users },
@@ -83,6 +88,7 @@ const roleSidebarLinks: Record<string, { label: string; path: string; icon: any 
     { label: 'Courses', path: '/admin/courses', icon: GraduationCap },
     { label: 'Categories', path: '/admin/categories', icon: Hash },
     { label: 'Course Proposals', path: '/admin/course-proposals', icon: BookOpen },
+    { label: 'Career Pipeline', path: '/admin/career', icon: Target },
     { label: 'Applications', path: '/admin/applications', icon: ClipboardList },
     { label: 'Payments', path: '/admin/payments', icon: LayoutDashboard },
     { label: 'Exams', path: '/admin/exams', icon: ClipboardList },
@@ -105,6 +111,7 @@ const roleSidebarLinks: Record<string, { label: string; path: string; icon: any 
     { label: 'Courses', path: '/admin/courses', icon: BookOpen },
     { label: 'Categories', path: '/admin/categories', icon: GitBranch },
     { label: 'Course Proposals', path: '/admin/course-proposals', icon: BookOpen },
+    { label: 'Career Pipeline', path: '/admin/career', icon: Target },
     { label: 'Applications', path: '/admin/applications', icon: ClipboardList },
     { label: 'Payments', path: '/admin/payments', icon: LayoutDashboard },
     { label: 'Exams', path: '/admin/exams', icon: ClipboardList },

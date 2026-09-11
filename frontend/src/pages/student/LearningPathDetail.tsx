@@ -1,17 +1,19 @@
 import { useState, useEffect } from 'react';
-import { useParams, Link } from 'react-router-dom';
+import { useParams, useNavigate, Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { GitBranch, BookOpen, Clock, Users, ChevronLeft, CheckCircle, PlayCircle, Lock, ArrowRight } from 'lucide-react';
+import { GitBranch, BookOpen, Clock, Users, ChevronLeft, CheckCircle, PlayCircle, Lock, ArrowRight, Trophy, Zap } from 'lucide-react';
 import { GlassCard } from '@/components/ui/GlassCard';
 import { Badge } from '@/components/ui/Badge';
 import { Button } from '@/components/ui/Button';
 import { PageSkeleton } from '@/components/student/SkeletonLoader';
 import api from '@/lib/axios';
 import { useAuthStore } from '@/store/authStore';
+import { formatCurrency } from '@/lib/utils';
 import toast from 'react-hot-toast';
 
 export default function LearningPathDetail() {
   const { slug } = useParams<{ slug: string }>();
+  const navigate = useNavigate();
   const { isAuthenticated } = useAuthStore();
   const [path, setPath] = useState<any>(null);
   const [enrollment, setEnrollment] = useState<any>(null);
@@ -39,8 +41,18 @@ export default function LearningPathDetail() {
   const handleEnroll = async () => {
     if (!isAuthenticated) return;
     try {
-      await api.post(`/learning-paths/${slug}/enroll`);
-      toast.success('Enrolled in learning path!');
+      const res = await api.post(`/learning-paths/${slug}/enroll`);
+      const { paidCourses = [], enrolledCourseIds = [] } = res.data.data || {};
+      if (enrolledCourseIds.length > 0) {
+        toast.success(`Enrolled in learning path! ${enrolledCourseIds.length} free course(s) unlocked.`);
+      } else {
+        toast.success('Enrolled in learning path!');
+      }
+      if (paidCourses.length > 0) {
+        toast(`Complete payment for ${paidCourses.length} paid course(s) to continue.`, {
+          icon: '🔒',
+        });
+      }
       const enrolledRes = await api.get('/learning-paths/my/enrollments');
       const enrolled = enrolledRes.data.data?.find((e: any) => e.slug === slug);
       setEnrollment(enrolled || null);
@@ -100,13 +112,42 @@ export default function LearningPathDetail() {
             )}
           </div>
 
-          {!enrollment && (
-            <Button variant="primary" onClick={handleEnroll} disabled={!isAuthenticated}>
-              <PlayCircle className="w-4 h-4 mr-2" /> Enroll in Path
-            </Button>
-          )}
+          <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3">
+            {isAuthenticated && (
+              <Button variant="neon" size="sm" onClick={() => navigate(`/student/guided/${path.slug}`)}>
+                <Zap className="w-4 h-4 mr-2" /> {enrollment ? 'Open Guided Mode' : 'Start Guided Mode'}
+              </Button>
+            )}
+            {!enrollment && (
+              <Button variant="primary" onClick={handleEnroll} disabled={!isAuthenticated}>
+                <PlayCircle className="w-4 h-4 mr-2" /> Enroll in Path
+              </Button>
+            )}
+          </div>
         </div>
       </GlassCard>
+
+      {/* Pathway completed celebration */}
+      {enrollment?.completed && (
+        <motion.div initial={{ opacity: 0, scale: 0.98 }} animate={{ opacity: 1, scale: 1 }}>
+          <GlassCard className="p-6 mb-6 border-2 border-success-500/30 bg-gradient-to-br from-emerald-500/10 to-teal-500/5">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+              <div className="flex items-center gap-4">
+                <div className="w-12 h-12 rounded-2xl bg-success-500/20 flex items-center justify-center">
+                  <Trophy className="w-6 h-6 text-success-500" />
+                </div>
+                <div>
+                  <h2 className="text-lg font-bold text-success-600 dark:text-success-400">Pathway Completed!</h2>
+                  <p className="text-sm text-gray-500">You finished every course in the "{path.title}" pathway. Great milestone — 150 XP awarded.</p>
+                </div>
+              </div>
+              <Button size="sm" variant="outline" onClick={() => navigate('/student/certificates')}>
+                View Certificates <ArrowRight className="w-3.5 h-3.5 ml-1" />
+              </Button>
+            </div>
+          </GlassCard>
+        </motion.div>
+      )}
 
       {/* Course List */}
       <h2 className="text-lg font-semibold mb-4">Courses in this Path</h2>
@@ -149,7 +190,7 @@ export default function LearningPathDetail() {
                         {isCompleted && <Badge variant="success" size="sm">Completed</Badge>}
                         {isEnrolled && !isCompleted && <Badge variant="primary" size="sm">{progress}%</Badge>}
                       </div>
-                      <p className="text-xs text-gray-500 mt-0.5">{course.instructor_name} · {course.duration} min · {course.level}</p>
+                      <p className="text-xs text-gray-500 mt-0.5">{course.instructor_name} · {course.duration} min · {course.level}{Number(course.price) > 0 && ` · ${formatCurrency(course.price)}`}</p>
 
                       {isEnrolled && !isCompleted && (
                         <div className="w-full h-1 bg-gray-100 dark:bg-gray-800 rounded-full mt-2 max-w-xs">
@@ -162,6 +203,10 @@ export default function LearningPathDetail() {
                       {isEnrolled ? (
                         <Button size="sm" variant="outline">
                           {isCompleted ? 'Review' : 'Continue'} <ArrowRight className="w-3.5 h-3.5 ml-1" />
+                        </Button>
+                      ) : Number(course.price) > 0 ? (
+                        <Button size="sm" variant="primary" onClick={(e) => { e.preventDefault(); e.stopPropagation(); navigate(`/checkout?courseId=${course.id}`); }}>
+                          <Lock className="w-3.5 h-3.5 mr-1" /> Pay {formatCurrency(course.price)}
                         </Button>
                       ) : (
                         <Button size="sm" variant="outline">

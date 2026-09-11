@@ -70,6 +70,7 @@ const CareerCenter = lazy(() => import('@/pages/public/CareerCenter'));
 const JobBoard = lazy(() => import('@/pages/public/JobBoard'));
 const InternshipsPage = lazy(() => import('@/pages/public/InternshipsPage'));
 const AlumniDirectory = lazy(() => import('@/pages/public/AlumniDirectory'));
+const PublicProfile = lazy(() => import('@/pages/public/PublicProfile'));
 const FAQ = lazy(() => import('@/pages/FAQ'));
 const Careers = lazy(() => import('@/pages/Careers'));
 const Partners = lazy(() => import('@/pages/Partners'));
@@ -103,6 +104,9 @@ const StudentRoadmap = lazy(() => import('@/pages/student/Roadmap'));
 const StudentStudyPlans = lazy(() => import('@/pages/student/StudyPlans'));
 const StudentMentorship = lazy(() => import('@/pages/student/Mentorship'));
 const StudentSkillTree = lazy(() => import('@/pages/student/SkillTree'));
+const StudentApplications = lazy(() => import('@/pages/student/Applications'));
+const StudentPortfolio = lazy(() => import('@/pages/student/Portfolio'));
+const StudentGuidedMode = lazy(() => import('@/pages/student/GuidedMode'));
 
 // Instructor pages
 const InstructorDashboard = lazy(() => import('@/pages/instructor/Dashboard'));
@@ -155,6 +159,7 @@ const AdminManagement = lazy(() => import('@/pages/admin/AdminManagement'));
 const AdminCalendar = lazy(() => import('@/pages/admin/CalendarManagement'));
 const AdminCommunityManagement = lazy(() => import('@/pages/admin/CommunityManagement'));
 const AdminCourseDetail = lazy(() => import('@/pages/admin/AdminCourseDetail'));
+const AdminCareer = lazy(() => import('@/pages/admin/CareerManagement'));
 
 function GuestRoute({ children }: { children: React.ReactNode }) {
   const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
@@ -247,6 +252,7 @@ function App() {
           <Route path="/career/jobs" element={<SuspenseWrapper><JobBoard /></SuspenseWrapper>} />
           <Route path="/career/internships" element={<SuspenseWrapper><InternshipsPage /></SuspenseWrapper>} />
           <Route path="/career/alumni" element={<SuspenseWrapper><AlumniDirectory /></SuspenseWrapper>} />
+          <Route path="/u/:username" element={<SuspenseWrapper><PublicProfile /></SuspenseWrapper>} />
           <Route path="/faq" element={<SuspenseWrapper><FAQ /></SuspenseWrapper>} />
           <Route path="/careers" element={<SuspenseWrapper><Careers /></SuspenseWrapper>} />
           <Route path="/partners" element={<SuspenseWrapper><Partners /></SuspenseWrapper>} />
@@ -282,6 +288,10 @@ function App() {
           <Route path="settings" element={<SuspenseWrapper><StudentSettings /></SuspenseWrapper>} />
           <Route path="mentoring" element={<SuspenseWrapper><StudentMentorship /></SuspenseWrapper>} />
           <Route path="skill-tree/:courseId" element={<SuspenseWrapper><StudentSkillTree /></SuspenseWrapper>} />
+          <Route path="applications" element={<SuspenseWrapper><StudentApplications /></SuspenseWrapper>} />
+          <Route path="portfolio" element={<SuspenseWrapper><StudentPortfolio /></SuspenseWrapper>} />
+          <Route path="guided" element={<SuspenseWrapper><StudentGuidedMode /></SuspenseWrapper>} />
+          <Route path="guided/:slug" element={<SuspenseWrapper><StudentGuidedMode /></SuspenseWrapper>} />
         </Route>
 
         <Route path="/instructor" element={<DashboardLayout requiredRole="instructor" />}>
@@ -338,6 +348,7 @@ function App() {
           <Route path="community-management" element={<SuspenseWrapper><AdminCommunityManagement /></SuspenseWrapper>} />
           <Route path="analytics" element={<SuspenseWrapper><AdminAnalytics /></SuspenseWrapper>} />
           <Route path="calendar" element={<SuspenseWrapper><AdminCalendar /></SuspenseWrapper>} />
+          <Route path="career" element={<SuspenseWrapper><AdminCareer /></SuspenseWrapper>} />
           <Route path="settings" element={<SuspenseWrapper><AdminSettings /></SuspenseWrapper>} />
         </Route>
 

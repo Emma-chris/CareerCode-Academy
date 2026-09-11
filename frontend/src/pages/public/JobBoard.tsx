@@ -9,8 +9,9 @@ import { Breadcrumb } from '@/components/ui/Breadcrumb';
 import { EmptyState } from '@/components/ui/EmptyState';
 import { Select } from '@/components/ui/Select';
 import { Alert } from '@/components/ui/Alert';
-import { Briefcase, MapPin, Clock, DollarSign, ExternalLink, Building, Search } from 'lucide-react';
+import { Briefcase, MapPin, Clock, DollarSign, Building, Search } from 'lucide-react';
 import SEO from '@/components/seo/SEO';
+import { ApplyModal } from '@/components/career/ApplyModal';
 
 const typeLabels: Record<string, string> = {
   'full-time': 'Full-Time',
@@ -34,6 +35,7 @@ export default function JobBoard() {
   const [error, setError] = useState<string | null>(null);
   const [typeFilter, setTypeFilter] = useState('all');
   const [search, setSearch] = useState('');
+  const [applyTo, setApplyTo] = useState<any>(null);
 
   useEffect(() => {
     (async () => {
@@ -126,11 +128,14 @@ export default function JobBoard() {
                       </div>
                     </div>
                     <div className="shrink-0 w-full sm:w-auto">
-                      <a href={job.application_url || '#'} target="_blank" rel="noopener noreferrer" className="inline-flex sm:inline-block">
-                        <Button size="sm" variant="outline" disabled={!job.application_url} className="w-full sm:w-auto">
-                          <ExternalLink className="w-3.5 h-3.5 mr-1" /> Apply
-                        </Button>
-                      </a>
+                      <Button size="sm" onClick={() => setApplyTo(job)} className="w-full sm:w-auto">
+                        Apply
+                      </Button>
+                      {job.application_url && (
+                        <a href={job.application_url} target="_blank" rel="noopener noreferrer" className="inline-flex w-full sm:w-auto">
+                          <Button size="sm" variant="ghost" className="w-full sm:w-auto mt-1">External</Button>
+                        </a>
+                      )}
                     </div>
                   </div>
                 </GlassCard>
@@ -139,6 +144,8 @@ export default function JobBoard() {
           </div>
         )}
       </div>
+
+      <ApplyModal open={!!applyTo} onClose={() => setApplyTo(null)} kind="job" listing={applyTo || { id: '', title: '' }} />
     </motion.div>
   );
 }
