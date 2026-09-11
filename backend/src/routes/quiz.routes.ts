@@ -222,13 +222,24 @@ router.post('/:id/submit', authenticate, async (req: AuthRequest, res: Response,
     const questions = await QuizModel.getQuestionsByQuiz(quizId);
     let score = 0;
     let maxScore = 0;
+    const questionResults: any[] = [];
 
     for (const q of questions) {
       maxScore += q.points;
       const userAnswer = answers?.find((a: any) => a.questionId === q.id);
-      if (userAnswer && userAnswer.answer === q.correct_answer) {
+      const isCorrect = userAnswer?.answer === q.correct_answer;
+      if (isCorrect) {
         score += q.points;
       }
+      questionResults.push({
+        questionId: q.id,
+        question: q.question,
+        options: q.options,
+        userAnswer: userAnswer?.answer || null,
+        correctAnswer: q.correct_answer,
+        isCorrect,
+        points: q.points,
+      });
     }
 
     const finalScore = maxScore > 0 ? Math.round((score / maxScore) * 100) : 0;
@@ -255,6 +266,12 @@ router.post('/:id/submit', authenticate, async (req: AuthRequest, res: Response,
       heartsRemaining = await loseHeart(userId);
     }
 
+    // Count attempts used
+    const { rows: attemptCount } = await query(
+      'SELECT COUNT(*)::int as n FROM quiz_attempts WHERE quiz_id = $1 AND user_id = $2',
+      [quizId, userId]
+    );
+
     res.json({
       success: true,
       data: {
@@ -265,6 +282,10 @@ router.post('/:id/submit', authenticate, async (req: AuthRequest, res: Response,
         correctCount: score / (questions[0]?.points || 1),
         totalQuestions: questions.length,
         heartsRemaining,
+        questionResults,
+        attemptsUsed: attemptCount[0]?.n || 0,
+        maxAttempts: quiz.max_attempts,
+        passingScore: quiz.passing_score,
       },
     });
   } catch (error) {

@@ -17,7 +17,6 @@ import { EmptyState } from '../../components/ui/EmptyState';
 import ChallengeCard from '../../components/student/ChallengeCard';
 import LessonQuiz from '../../components/student/LessonQuiz';
 import VideoPlayer from '../../components/VideoPlayer';
-import { HeartsBar } from '../../components/student/HeartsBar';
 import toast from 'react-hot-toast';
 import {
   PlayCircle, CheckCircle, Lock, ChevronLeft, ChevronRight,
@@ -802,7 +801,6 @@ export default function CourseView() {
 
               {activeTab === 'quiz' && (
                 <div className="space-y-3">
-                  <HeartsBar hearts={5} maxHearts={5} nextHeartIn={null} />
                   {lessonQuiz ? <LessonQuiz quiz={lessonQuiz} /> : (
                     <div className="text-center py-8">
                       <HelpCircle className="w-10 h-10 text-gray-600 mx-auto mb-3" />
