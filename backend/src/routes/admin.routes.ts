@@ -127,7 +127,7 @@ router.get('/dashboard', async (req: Request, res: Response, next: NextFunction)
           draftCourses: parseInt(draftC.rows[0].count, 10),
           activeUsers: parseInt(activeUsers.rows[0].count, 10),
           certificatesIssued: parseInt(certsIssued.rows[0].count, 10),
-          monthlyRevenue: revenueStats.total_revenue,
+          monthlyRevenue: revenueTrend.rows.reduce((acc: number, r: any) => acc + Number(r.revenue), 0),
           trends: {
             totalStudents: calcTrend(totalStudents, parseInt(prev.prev_students || '0')),
             totalInstructors: calcTrend(totalInstructors, parseInt(prev.prev_instructors || '0')),

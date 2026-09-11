@@ -23,21 +23,7 @@ import { useAnalyticsStore } from '@/store/analyticsStore';
 import { useSocket } from '@/hooks/useSocket';
 import { useAnalyticsSocket } from '@/hooks/useAnalyticsSocket';
 import SEO from '@/components/seo/SEO';
-
-const acquisitionData = [
-  { name: 'Organic', value: 45, color: '#6366f1' },
-  { name: 'Direct', value: 25, color: '#10B981' },
-  { name: 'Social', value: 18, color: '#F59E0B' },
-  { name: 'Referral', value: 12, color: '#8B5CF6' },
-];
-
-const funnelData = [
-  { name: 'Visitors', value: 10000, fill: '#6366f1' },
-  { name: 'Signups', value: 2500, fill: '#8B5CF6' },
-  { name: 'Enrollments', value: 800, fill: '#06B6D4' },
-  { name: 'Active', value: 400, fill: '#10B981' },
-  { name: 'Completed', value: 120, fill: '#F59E0B' },
-];
+import { formatCurrency } from '@/lib/utils';
 
 function formatRelativeTime(ms: number): string {
   const seconds = Math.floor((Date.now() - ms) / 1000);
@@ -107,8 +93,8 @@ export default function AdminDashboard() {
   const { socket, onlineCount, onlineUsers } = useSocket();
   useAnalyticsSocket();
   const {
-    overview: analyticsOverview, realtime, conversionFunnel,
-    loading: analyticsLoading, fetchOverview, fetchRealtime, fetchConversionFunnel,
+    overview: analyticsOverview, realtime, conversionFunnel, sourceAnalytics,
+    loading: analyticsLoading, fetchOverview, fetchRealtime, fetchConversionFunnel, fetchSourceAnalytics,
   } = useAnalyticsStore();
   const [showOnlineUsers, setShowOnlineUsers] = useState(false);
   const [showSparklines, setShowSparklines] = useState(true);
@@ -128,6 +114,7 @@ export default function AdminDashboard() {
     fetchOverview('24h');
     fetchRealtime();
     fetchConversionFunnel('24h');
+    fetchSourceAnalytics('24h');
   }, []);
 
   useEffect(() => {
@@ -166,7 +153,7 @@ export default function AdminDashboard() {
 
   const formatValue = (key: string, value: any) => {
     if (key === 'monthlyRevenue' || key === 'totalRevenue') {
-      return `$${(value || 0).toLocaleString()}`;
+      return formatCurrency(Number(value) || 0);
     }
     return (value || 0).toLocaleString();
   };
@@ -175,6 +162,22 @@ export default function AdminDashboard() {
     const refund = refundTrend.find((r: any) => r.date === m.date);
     return { ...m, refunds: refund?.refunds || 0 };
   });
+
+  const funnel = conversionFunnel?.funnel;
+  const funnelBars = funnel ? [
+    { name: 'Visitors', value: funnel.visitors, fill: '#6366f1' },
+    { name: 'Signups', value: funnel.signups, fill: '#8B5CF6' },
+    { name: 'Enrollments', value: funnel.enrollments, fill: '#10B981' },
+  ] : [];
+
+  const sourceColors = ['#6366f1', '#10B981', '#F59E0B', '#8B5CF6', '#EC4899'];
+  const acquisitionData = sourceAnalytics
+    .slice(0, 5)
+    .map((s: any, i: number) => ({
+      name: s.source || 'Direct',
+      value: Math.round(Number(s.percentage) || 0),
+      color: sourceColors[i % sourceColors.length],
+    }));
 
   const container = {
     hidden: { opacity: 0 },
@@ -349,7 +352,7 @@ export default function AdminDashboard() {
                     </div>
                     <div className="flex-1 min-w-0">
                       <div className="text-lg font-bold flex items-center gap-2 tabular-nums">
-                        {payoutSummary ? `${payoutSummary.pendingCount} · $${payoutSummary.pendingAmount.toLocaleString()}` : '0'}
+                        {payoutSummary ? `${payoutSummary.pendingCount} · ${formatCurrency(payoutSummary.pendingAmount)}` : '0'}
                       </div>
                       <div className="text-xs text-gray-400 truncate">Pending Payouts</div>
                     </div>
@@ -390,20 +393,40 @@ export default function AdminDashboard() {
                   Conversion Funnel
                 </h3>
                 <div className="chart-fluid-sm">
-                  <ResponsiveContainer width="100%" height="100%">
-                    <BarChart data={funnelData} layout="vertical" margin={{ top: 5, right: 20, left: 10, bottom: 5 }}>
-                      <CartesianGrid strokeDasharray="3 3" stroke="currentColor" className="text-gray-200 dark:text-gray-800" horizontal={false} />
-                      <XAxis type="number" tick={{ fontSize: 11 }} className="text-gray-500" />
-                      <YAxis type="category" dataKey="name" tick={{ fontSize: 11 }} className="text-gray-500" width={70} />
-                      <Tooltip content={<CustomTooltip />} />
-                      <Bar dataKey="value" name="Users" radius={[0, 6, 6, 0]} barSize={20}>
-                        {funnelData.map((entry, i) => (
-                          <Cell key={i} fill={entry.fill} />
-                        ))}
-                      </Bar>
-                    </BarChart>
-                  </ResponsiveContainer>
+                  {funnelBars.length === 0 || funnelBars.every((b) => b.value === 0) ? (
+                    <EmptyState message="No funnel data in the selected range" />
+                  ) : (
+                    <ResponsiveContainer width="100%" height="100%">
+                      <BarChart data={funnelBars} layout="vertical" margin={{ top: 5, right: 20, left: 10, bottom: 5 }}>
+                        <CartesianGrid strokeDasharray="3 3" stroke="currentColor" className="text-gray-200 dark:text-gray-800" horizontal={false} />
+                        <XAxis type="number" tick={{ fontSize: 11 }} className="text-gray-500" />
+                        <YAxis type="category" dataKey="name" tick={{ fontSize: 11 }} className="text-gray-500" width={90} />
+                        <Tooltip content={<CustomTooltip />} />
+                        <Bar dataKey="value" name="Users" radius={[0, 6, 6, 0]} barSize={20}>
+                          {funnelBars.map((entry, i) => (
+                            <Cell key={i} fill={entry.fill} />
+                          ))}
+                        </Bar>
+                      </BarChart>
+                    </ResponsiveContainer>
+                  )}
                 </div>
+                {funnel && (
+                  <div className="mt-3 grid grid-cols-3 gap-2">
+                    <div className="p-2 rounded-lg bg-primary-500/10 text-center">
+                      <div className="text-sm font-bold text-primary-500 tabular-nums">{funnel.visitorToSignup}%</div>
+                      <div className="text-[10px] text-gray-400">Visitor → Signup</div>
+                    </div>
+                    <div className="p-2 rounded-lg bg-purple-500/10 text-center">
+                      <div className="text-sm font-bold text-purple-500 tabular-nums">{funnel.signupToEnrollment}%</div>
+                      <div className="text-[10px] text-gray-400">Signup → Enroll</div>
+                    </div>
+                    <div className="p-2 rounded-lg bg-success-500/10 text-center">
+                      <div className="text-sm font-bold text-success-500 tabular-nums">{funnel.overallConversion}%</div>
+                      <div className="text-[10px] text-gray-400">Overall</div>
+                    </div>
+                  </div>
+                )}
               </GlassCard>
             </motion.div>
 
@@ -414,29 +437,35 @@ export default function AdminDashboard() {
                   <PieChart className="w-4 h-4 text-purple-500" />
                   Acquisition Sources
                 </h3>
-                <div className="flex items-center gap-4">
-                  <div className="h-40 w-40 flex-shrink-0">
-                    <ResponsiveContainer width="100%" height="100%">
-                      <RePieChart>
-                        <Pie data={acquisitionData} cx="50%" cy="50%" innerRadius={35} outerRadius={60} paddingAngle={3} dataKey="value">
-                          {acquisitionData.map((entry, i) => (
-                            <Cell key={i} fill={entry.color} />
-                          ))}
-                        </Pie>
-                        <Tooltip />
-                      </RePieChart>
-                    </ResponsiveContainer>
+                {acquisitionData.length === 0 || acquisitionData.every((item) => item.value === 0) ? (
+                  <div className="chart-fluid-sm">
+                    <EmptyState message="No acquisition data in the selected range" />
                   </div>
-                  <div className="flex-1 space-y-2">
-                    {acquisitionData.map((item) => (
-                      <div key={item.name} className="flex items-center gap-2 text-xs">
-                        <span className="w-2.5 h-2.5 rounded-full flex-shrink-0" style={{ backgroundColor: item.color }} />
-                        <span className="text-gray-500 flex-1">{item.name}</span>
-                        <span className="font-medium tabular-nums">{item.value}%</span>
-                      </div>
-                    ))}
+                ) : (
+                  <div className="flex items-center gap-4">
+                    <div className="h-40 w-40 flex-shrink-0">
+                      <ResponsiveContainer width="100%" height="100%">
+                        <RePieChart>
+                          <Pie data={acquisitionData} cx="50%" cy="50%" innerRadius={35} outerRadius={60} paddingAngle={3} dataKey="value">
+                            {acquisitionData.map((entry, i) => (
+                              <Cell key={i} fill={entry.color} />
+                            ))}
+                          </Pie>
+                          <Tooltip />
+                        </RePieChart>
+                      </ResponsiveContainer>
+                    </div>
+                    <div className="flex-1 space-y-2">
+                      {acquisitionData.map((item) => (
+                        <div key={item.name} className="flex items-center gap-2 text-xs">
+                          <span className="w-2.5 h-2.5 rounded-full flex-shrink-0" style={{ backgroundColor: item.color }} />
+                          <span className="text-gray-500 flex-1">{item.name}</span>
+                          <span className="font-medium tabular-nums">{item.value}%</span>
+                        </div>
+                      ))}
+                    </div>
                   </div>
-                </div>
+                )}
               </GlassCard>
             </motion.div>
           </div>
