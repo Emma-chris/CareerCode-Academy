@@ -227,6 +227,7 @@ function App() {
           <Route path="/schools/programs/:slug" element={<SuspenseWrapper><ProgramDetail /></SuspenseWrapper>} />
           <Route path="/courses" element={<SuspenseWrapper><Courses /></SuspenseWrapper>} />
           <Route path="/courses/:slug" element={<SuspenseWrapper><CourseDetails /></SuspenseWrapper>} />
+          <Route path="/learning-paths/:slug" element={<SuspenseWrapper><StudentLearningPathDetail variant="public" /></SuspenseWrapper>} />
           <Route path="/blog" element={<SuspenseWrapper><Blog /></SuspenseWrapper>} />
           <Route path="/blog/:slug" element={<SuspenseWrapper><BlogPost /></SuspenseWrapper>} />
           <Route path="/contact" element={<SuspenseWrapper><Contact /></SuspenseWrapper>} />

@@ -405,6 +405,16 @@ export async function getGroupedBySchool(): Promise<any[]> {
           const { rows: newRows } = await query(`SELECT * FROM learning_paths WHERE slug = $1`, [slug]);
           path = newRows[0] || null;
         } catch {}
+      } else if (cnt > 0 && path) {
+        const { rows: linkRows } = await query(
+          `SELECT COUNT(*)::int as n FROM learning_path_courses WHERE path_id = $1`,
+          [path.id]
+        );
+        if (Number(linkRows[0]?.n) === 0) {
+          try {
+            await rebuildSchoolPathCourses(path.id, school.id, level);
+          } catch {}
+        }
       }
       if (cnt > 0 && path) {
         const { rows: courseRows } = await query(

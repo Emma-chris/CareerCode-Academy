@@ -206,7 +206,7 @@ export default function GuidedModePage() {
           <h2 className="text-xl font-bold mb-1">Pathway complete!</h2>
           <p className="text-sm text-gray-400 mb-5">You've finished every day of this learning path in Guided Mode.</p>
           <div className="flex justify-center gap-3">
-            <Button size="sm" onClick={() => navigate(`/learning-paths/${today.path.slug}`)}>View Learning Path</Button>
+            <Button size="sm" onClick={() => navigate(`/student/learning-paths/${today.path.slug}`)}>View Learning Path</Button>
             <Badge variant="success" size="md">Graduate milestone reached</Badge>
           </div>
         </GlassCard>

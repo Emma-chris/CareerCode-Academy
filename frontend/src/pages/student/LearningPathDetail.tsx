@@ -11,7 +11,7 @@ import { useAuthStore } from '@/store/authStore';
 import { formatCurrency } from '@/lib/utils';
 import toast from 'react-hot-toast';
 
-export default function LearningPathDetail() {
+export default function LearningPathDetail({ variant = 'student' }: { variant?: 'public' | 'student' }) {
   const { slug } = useParams<{ slug: string }>();
   const navigate = useNavigate();
   const { isAuthenticated } = useAuthStore();
@@ -69,9 +69,15 @@ export default function LearningPathDetail() {
 
   return (
     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
-      <Link to="/student/learning-paths" className="inline-flex items-center gap-1 text-sm text-gray-500 hover:text-primary-600 mb-4">
-        <ChevronLeft className="w-4 h-4" /> Back to Learning Paths
-      </Link>
+      {variant === 'public' ? (
+        <Link to="/courses" className="inline-flex items-center gap-1 text-sm text-gray-500 hover:text-primary-600 mb-4">
+          <ChevronLeft className="w-4 h-4" /> Back to Courses
+        </Link>
+      ) : (
+        <Link to="/student/learning-paths" className="inline-flex items-center gap-1 text-sm text-gray-500 hover:text-primary-600 mb-4">
+          <ChevronLeft className="w-4 h-4" /> Back to Learning Paths
+        </Link>
+      )}
 
       {/* Header */}
       <GlassCard className="p-6 mb-6 overflow-hidden relative">
