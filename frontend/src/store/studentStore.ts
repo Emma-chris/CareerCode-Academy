@@ -140,7 +140,17 @@ export interface WeeklyActivity {
 export interface SkillGrowth {
   skill: string;
   current: number;
-  previous: number;
+}
+
+export interface HeatmapWeek {
+  week: string;
+  Mon: number;
+  Tue: number;
+  Wed: number;
+  Thu: number;
+  Fri: number;
+  Sat: number;
+  Sun: number;
 }
 
 export interface LearnerJourney {
@@ -151,6 +161,7 @@ export interface LearnerJourney {
   weeklyActivity: WeeklyActivity[];
   monthlyLearning: { month: string; hours: number }[];
   skillGrowth: SkillGrowth[];
+  heatmap: HeatmapWeek[];
   recommendedCourses: RecommendedCourse[];
   badges: Badge[];
 }
@@ -171,6 +182,7 @@ interface StudentState {
   weeklyActivity: WeeklyActivity[];
   monthlyLearning: { month: string; hours: number }[];
   skillGrowth: SkillGrowth[];
+  heatmap: HeatmapWeek[];
   searchResults: any[];
   isSearching: boolean;
   isLoading: boolean;
@@ -213,6 +225,7 @@ export const useStudentStore = create<StudentState>((set, get) => ({
   weeklyActivity: [],
   monthlyLearning: [],
   skillGrowth: [],
+  heatmap: [],
   searchResults: [],
   isSearching: false,
   isLoading: false,
@@ -263,6 +276,7 @@ export const useStudentStore = create<StudentState>((set, get) => ({
         weeklyActivity: data.analytics?.weeklyActivity || [],
         monthlyLearning: data.analytics?.monthlyLearning || [],
         skillGrowth: data.analytics?.skillGrowth || [],
+        heatmap: data.analytics?.heatmap || [],
         isLoading: false,
       });
     } catch (error: any) {

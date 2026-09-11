@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { motion } from 'framer-motion';
 import {
-  BookOpen, CheckCircle, Award, Clock, Flame, Zap, TrendingUp, TrendingDown, Trophy,
+  BookOpen, CheckCircle, Award, Clock, Flame, Zap, Trophy,
 } from 'lucide-react';
 import { GlassCard } from '@/components/ui/GlassCard';
 import { cn } from '@/lib/utils';
@@ -12,7 +12,6 @@ interface StatCardProps {
   value: number;
   color: string;
   bg: string;
-  trend?: number;
   suffix?: string;
   delay?: number;
 }
@@ -44,7 +43,7 @@ function CountUp({ value, suffix = '', duration = 2000 }: { value: number; suffi
   );
 }
 
-function StatCard({ icon: Icon, label, value, color, bg, trend, suffix = '', delay = 0 }: StatCardProps) {
+function StatCard({ icon: Icon, label, value, color, bg, suffix = '', delay = 0 }: StatCardProps) {
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -61,12 +60,6 @@ function StatCard({ icon: Icon, label, value, color, bg, trend, suffix = '', del
               <span className={cn('text-xl font-bold', color)}>
                 <CountUp value={value} suffix={suffix} />
               </span>
-              {trend !== undefined && trend !== 0 && (
-                <span className={cn('flex items-center text-xs font-medium', trend > 0 ? 'text-success-500' : 'text-danger-500')}>
-                  {trend > 0 ? <TrendingUp className="w-3 h-3" /> : <TrendingDown className="w-3 h-3" />}
-                  {Math.abs(trend)}%
-                </span>
-              )}
             </div>
             <div className="text-xs text-gray-500 truncate">{label}</div>
           </div>
@@ -91,13 +84,13 @@ interface StatsCardsProps {
 
 export function StatsCards({ stats }: StatsCardsProps) {
   const cards: StatCardProps[] = [
-    { icon: BookOpen, label: 'Courses Enrolled', value: stats?.enrolledCourses || 0, color: 'text-blue-500', bg: 'bg-blue-500/10', trend: 12, delay: 0.05 },
-    { icon: CheckCircle, label: 'Courses Completed', value: stats?.completedCourses || 0, color: 'text-success-500', bg: 'bg-success-500/10', trend: 8, delay: 0.1 },
-    { icon: Award, label: 'Certificates Earned', value: stats?.certificates || 0, color: 'text-amber-500', bg: 'bg-amber-500/10', trend: 0, delay: 0.15 },
-    { icon: Clock, label: 'Learning Hours', value: stats?.totalLearningHours || 0, color: 'text-purple-500', bg: 'bg-purple-500/10', suffix: 'h', trend: 15, delay: 0.2 },
-    { icon: Flame, label: 'Current Streak', value: stats?.currentStreak || 0, color: 'text-orange-500', bg: 'bg-orange-500/10', suffix: 'd', trend: 5, delay: 0.25 },
+    { icon: BookOpen, label: 'Courses Enrolled', value: stats?.enrolledCourses || 0, color: 'text-blue-500', bg: 'bg-blue-500/10', delay: 0.05 },
+    { icon: CheckCircle, label: 'Courses Completed', value: stats?.completedCourses || 0, color: 'text-success-500', bg: 'bg-success-500/10', delay: 0.1 },
+    { icon: Award, label: 'Certificates Earned', value: stats?.certificates || 0, color: 'text-amber-500', bg: 'bg-amber-500/10', delay: 0.15 },
+    { icon: Clock, label: 'Learning Hours', value: stats?.totalLearningHours || 0, color: 'text-purple-500', bg: 'bg-purple-500/10', suffix: 'h', delay: 0.2 },
+    { icon: Flame, label: 'Current Streak', value: stats?.currentStreak || 0, color: 'text-orange-500', bg: 'bg-orange-500/10', suffix: 'd', delay: 0.25 },
     { icon: Trophy, label: 'Best Streak', value: stats?.bestStreak || 0, color: 'text-amber-400', bg: 'bg-amber-400/10', suffix: 'd', delay: 0.28 },
-    { icon: Zap, label: 'XP Points', value: stats?.xpPoints || 0, color: 'text-yellow-500', bg: 'bg-yellow-500/10', trend: 22, delay: 0.3 },
+    { icon: Zap, label: 'XP Points', value: stats?.xpPoints || 0, color: 'text-yellow-500', bg: 'bg-yellow-500/10', delay: 0.3 },
   ];
 
   return (

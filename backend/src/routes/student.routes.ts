@@ -108,8 +108,7 @@ async function computeAnalytics(userId: string, useCache = true) {
   // Skill growth - progress by course category
   const skillRes = await query(`
     SELECT c.category as skill,
-      ROUND(AVG(e.progress))::int as current,
-      GREATEST(0, ROUND(AVG(e.progress))::int - 15) as previous
+      ROUND(AVG(e.progress))::int as current
     FROM enrollments e
     JOIN courses c ON c.id = e.course_id
     WHERE e.user_id = $1
@@ -121,10 +120,34 @@ async function computeAnalytics(userId: string, useCache = true) {
   const skillGrowth = skillRes.rows.map((r: any) => ({
     skill: r.skill,
     current: r.current,
-    previous: r.previous,
   }));
 
-  const result = { weeklyActivity, monthlyLearning, skillGrowth };
+  // Learning heatmap - real lesson completions over the last 8 weeks
+  const heatmapRes = await query(`
+    SELECT DATE(completed_at) as day, COUNT(*)::int as count
+    FROM lesson_progress
+    WHERE user_id = $1 AND completed = true
+      AND completed_at >= date_trunc('week', NOW()) - INTERVAL '7 weeks'
+      AND completed_at < date_trunc('week', NOW()) + INTERVAL '1 week'
+    GROUP BY DATE(completed_at)
+  `, [userId]);
+
+  const dayMap = new Map<string, number>(heatmapRes.rows.map((r: any) => [r.day.toISOString().slice(0, 10), r.count]));
+  const heatmapDayNames = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+  const now = new Date();
+  const currentWeekStart = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate() - ((now.getUTCDay() + 6) % 7)));
+  const heatmap = [];
+  for (let w = 0; w < 8; w++) {
+    const weekStart = new Date(currentWeekStart.getTime() - (7 - w) * 7 * 24 * 60 * 60 * 1000);
+    const row: any = { week: `W${w + 1}` };
+    for (let d = 0; d < 7; d++) {
+      const day = new Date(weekStart.getTime() + d * 24 * 60 * 60 * 1000);
+      row[heatmapDayNames[d]] = dayMap.get(day.toISOString().slice(0, 10)) || 0;
+    }
+    heatmap.push(row);
+  }
+
+  const result = { weeklyActivity, monthlyLearning, skillGrowth, heatmap };
   analyticsCache.set(cacheKey, { data: result, expiresAt: Date.now() + CACHE_TTL });
   return result;
 }

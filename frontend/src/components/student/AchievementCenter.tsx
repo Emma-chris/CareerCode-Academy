@@ -10,10 +10,8 @@ const iconMap: Record<string, any> = {
   Zap, Brain, Flame, Award, GraduationCap, HeartHandshake,
 };
 
-function XpBreakdown({ xp }: { xp: number }) {
-  const lessonsXp = Math.round(xp * 0.4);
-  const coursesXp = Math.round(xp * 0.35);
-  const certsXp = Math.round(xp * 0.25);
+function XpBreakdown({ lessonsXp, coursesXp, certsXp }: { lessonsXp: number; coursesXp: number; certsXp: number }) {
+  const xp = lessonsXp + coursesXp + certsXp;
   return (
     <motion.div
       initial={{ opacity: 0, height: 0 }}
@@ -27,12 +25,12 @@ function XpBreakdown({ xp }: { xp: number }) {
       <div className="space-y-1">
         {[
           { label: 'Lessons', value: lessonsXp, color: 'bg-blue-500' },
-          { label: 'Courses', value: coursesXp, color: 'bg-emerald-500' },
+          { label: 'Completed Courses', value: coursesXp, color: 'bg-emerald-500' },
           { label: 'Certificates', value: certsXp, color: 'bg-amber-500' },
         ].map(item => (
           <div key={item.label} className="flex items-center gap-2">
             <div className="flex-1 flex items-center gap-2">
-              <span className="text-gray-500 w-16">{item.label}</span>
+              <span className="text-gray-500 w-20">{item.label}</span>
               <div className="flex-1 h-1.5 bg-gray-200 dark:bg-gray-700 rounded-full">
                 <div className={`h-full rounded-full ${item.color}`} style={{ width: `${xp ? (item.value / xp) * 100 : 0}%` }} />
               </div>
@@ -61,6 +59,10 @@ export function AchievementCenter() {
   const xpProgress = totalXp - xpForCurrentLevel;
   const xpToNextLevel = xpPerLevel;
 
+  const lessonsXp = (stats?.completedLessons || 0) * 10;
+  const coursesXp = (stats?.completedCourses || 0) * 50;
+  const certsXp = (stats?.certificates || 0) * 100;
+
   return (
     <section>
       <div className="flex items-center justify-between mb-4">
@@ -76,7 +78,7 @@ export function AchievementCenter() {
               Level {currentLevel}
             </span>
             <div className="flex items-center gap-2">
-              <span className="text-gray-500 text-xs tabular-nums">{totalXp} / {currentLevel * xpPerLevel} XP</span>
+              <span className="text-gray-500 text-xs tabular-nums">{xpProgress} / {xpToNextLevel} XP</span>
               <button
                 onClick={() => setShowXpBreakdown(!showXpBreakdown)}
                 className="p-1 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
@@ -101,7 +103,7 @@ export function AchievementCenter() {
         </div>
 
         <AnimatePresence>
-          {showXpBreakdown && <XpBreakdown xp={totalXp} />}
+          {showXpBreakdown && <XpBreakdown lessonsXp={lessonsXp} coursesXp={coursesXp} certsXp={certsXp} />}
         </AnimatePresence>
 
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-3">

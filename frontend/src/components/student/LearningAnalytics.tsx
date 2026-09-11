@@ -32,17 +32,6 @@ const CustomTooltip = ({ active, payload, label }: any) => {
 const courseColors = ['#6366f1', '#7C3AED', '#06B6D4', '#F59E0B', '#10B981', '#EF4444'];
 const categoryColors = ['#6366f1', '#F59E0B', '#10B981', '#EF4444', '#EC4899', '#06B6D4'];
 
-const heatmapData = [
-  { week: 'W1', Mon: 2, Tue: 1, Wed: 3, Thu: 0, Fri: 2, Sat: 4, Sun: 1 },
-  { week: 'W2', Mon: 1, Tue: 2, Wed: 1, Thu: 3, Fri: 1, Sat: 2, Sun: 0 },
-  { week: 'W3', Mon: 3, Tue: 0, Wed: 2, Thu: 2, Fri: 3, Sat: 1, Sun: 2 },
-  { week: 'W4', Mon: 0, Tue: 3, Wed: 1, Thu: 1, Fri: 2, Sat: 3, Sun: 1 },
-  { week: 'W5', Mon: 2, Tue: 1, Wed: 3, Thu: 2, Fri: 0, Sat: 2, Sun: 3 },
-  { week: 'W6', Mon: 1, Tue: 2, Wed: 0, Thu: 1, Fri: 3, Sat: 1, Sun: 2 },
-  { week: 'W7', Mon: 3, Tue: 1, Wed: 2, Thu: 3, Fri: 1, Sat: 0, Sun: 1 },
-  { week: 'W8', Mon: 2, Tue: 3, Wed: 1, Thu: 0, Fri: 2, Sat: 3, Sun: 2 },
-];
-
 const days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
 
 function getHeatColor(val: number): string {
@@ -91,7 +80,7 @@ function findBestTime(weekly: { day: string; hours: number }[]): string {
 }
 
 export function LearningAnalytics() {
-  const { weeklyActivity, monthlyLearning, skillGrowth, recentCourses, isLoading } = useStudentStore();
+  const { weeklyActivity, monthlyLearning, skillGrowth, heatmap, recentCourses, isLoading } = useStudentStore();
   const [showForecast, setShowForecast] = useState(false);
 
   if (isLoading) {
@@ -105,7 +94,7 @@ export function LearningAnalytics() {
     );
   }
 
-  const hasData = weeklyActivity.length > 0 || monthlyLearning.length > 0 || skillGrowth.length > 0 || recentCourses.length > 0;
+  const hasData = weeklyActivity.length > 0 || monthlyLearning.length > 0 || skillGrowth.length > 0 || heatmap.length > 0 || recentCourses.length > 0;
   if (!hasData) return null;
 
   const topCourses = recentCourses.slice(0, 6);
@@ -195,7 +184,7 @@ export function LearningAnalytics() {
                     <div key={d} className="h-4 text-[10px] text-gray-400 leading-4">{d.slice(0, 1)}</div>
                   ))}
                 </div>
-                {heatmapData.map((week) => (
+                {heatmap.map((week) => (
                   <div key={week.week} className="flex flex-col gap-1">
                     <div className="h-4 text-[10px] text-gray-400 text-center">{week.week.slice(-1)}</div>
                     {days.map((day) => (
@@ -304,7 +293,6 @@ export function LearningAnalytics() {
                   <PolarRadiusAxis angle={30} domain={[0, 100]} tick={{ fontSize: 10 }} className="text-gray-500" />
                   <Tooltip content={<CustomTooltip />} />
                   <Radar name="Current" dataKey="current" stroke="#6366f1" fill="#6366f1" fillOpacity={0.2} strokeWidth={2} />
-                  <Radar name="Previous" dataKey="previous" stroke="#06B6D4" fill="#06B6D4" fillOpacity={0.1} strokeWidth={2} />
                 </RadarChart>
               </ResponsiveContainer>
             </div>

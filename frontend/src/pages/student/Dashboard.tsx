@@ -36,8 +36,8 @@ function ProgressRing({ progress, size = 56, strokeWidth = 4, color = 'text-prim
   );
 }
 
-function WeeklyProgress({ weeklyHours, weeklyGoal }: { weeklyHours: number; weeklyGoal: number }) {
-  const pct = weeklyGoal > 0 ? Math.min((weeklyHours / weeklyGoal) * 100, 100) : 0;
+function WeeklyProgress({ weeklyLessons, weeklyGoal }: { weeklyLessons: number; weeklyGoal: number }) {
+  const pct = weeklyGoal > 0 ? Math.min((weeklyLessons / weeklyGoal) * 100, 100) : 0;
   return (
     <GlassCard className="p-5 flex items-center gap-5" hover>
       <div className="relative flex-shrink-0">
@@ -48,7 +48,7 @@ function WeeklyProgress({ weeklyHours, weeklyGoal }: { weeklyHours: number; week
       </div>
       <div className="flex-1 min-w-0">
         <p className="text-sm font-semibold">Weekly Progress</p>
-        <p className="text-xs text-gray-500 mt-0.5">{weeklyHours}h of {weeklyGoal}h goal</p>
+        <p className="text-xs text-gray-500 mt-0.5">{weeklyLessons} lessons of {weeklyGoal} goal</p>
         <div className="w-full h-1.5 bg-gray-100 dark:bg-gray-800 rounded-full mt-2 overflow-hidden">
           <motion.div
             initial={{ width: 0 }}
@@ -57,7 +57,7 @@ function WeeklyProgress({ weeklyHours, weeklyGoal }: { weeklyHours: number; week
             className="h-full rounded-full bg-gradient-to-r from-primary-500 to-accent-500"
           />
         </div>
-        {weeklyHours >= weeklyGoal && (
+        {weeklyLessons >= weeklyGoal && (
           <div className="flex items-center gap-1 mt-1.5 text-xs text-success-500 font-medium">
             <CheckCircle2 className="w-3 h-3" />
             Goal reached!
@@ -68,12 +68,13 @@ function WeeklyProgress({ weeklyHours, weeklyGoal }: { weeklyHours: number; week
   );
 }
 
-function StreakTracker({ streak, bestStreak }: { streak: number; bestStreak: number }) {
+function StreakTracker({ streak, bestStreak, weekly }: { streak: number; bestStreak: number; weekly: { day: string; hours: number }[] }) {
   const days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
   const today = new Date().getDay();
+  const hoursByDay = new Map(weekly.map(d => [d.day, d.hours]));
   const weekDays = days.map((d, i) => ({
     day: d,
-    active: i < streak % 7,
+    lessons: hoursByDay.get(d) || 0,
     isToday: (i + 1) % 7 === today,
   }));
 
@@ -94,9 +95,10 @@ function StreakTracker({ streak, bestStreak }: { streak: number; bestStreak: num
             <div className={cn(
               'w-full h-8 rounded-lg flex items-center justify-center text-xs font-medium transition-all',
               d.isToday ? 'ring-2 ring-primary-500/50 ring-offset-1 ring-offset-gray-900' : '',
-              d.active ? 'bg-gradient-to-b from-orange-500 to-orange-600 text-white shadow-lg shadow-orange-500/30' : 'bg-gray-100 dark:bg-gray-800 text-gray-400'
+              d.lessons > 0 ? 'bg-gradient-to-b from-orange-500 to-orange-600 text-white shadow-lg shadow-orange-500/30' : 'bg-gray-100 dark:bg-gray-800 text-gray-400'
             )}>
-              {d.active ? <Flame className="w-3 h-3" /> : null}
+              {d.lessons > 0 ? <Flame className="w-3 h-3" /> : null}
+              {d.lessons > 1 ? <span className="ml-0.5 tabular-nums">{d.lessons}</span> : null}
             </div>
             <span className={cn('text-[10px]', d.isToday ? 'text-primary-500 font-medium' : 'text-gray-500')}>{d.day.slice(0, 2)}</span>
           </div>
@@ -119,8 +121,8 @@ export default function StudentDashboard() {
   const { socket } = useSocket();
   const carouselRef = useRef<HTMLDivElement>(null);
   const navigate = useNavigate();
-  const weeklyGoal = 10;
-  const weeklyHours = weeklyActivity.reduce((sum, d) => sum + d.hours, 0);
+  const weeklyGoal = Math.max(1, Math.ceil(((stats?.dailyXpGoal || 50) * 7) / 10));
+  const weeklyLessons = weeklyActivity.reduce((sum, d) => sum + d.hours, 0);
 
   useEffect(() => {
     fetchDashboard();
@@ -187,10 +189,10 @@ export default function StudentDashboard() {
       {/* Streak Tracker + Weekly Progress + Quick Actions Row */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
         <div className="sm:col-span-1">
-          <StreakTracker streak={stats?.currentStreak || 0} bestStreak={stats?.bestStreak || 0} />
+          <StreakTracker streak={stats?.currentStreak || 0} bestStreak={stats?.bestStreak || 0} weekly={weeklyActivity} />
         </div>
         <div className="sm:col-span-1">
-          <WeeklyProgress weeklyHours={weeklyHours} weeklyGoal={weeklyGoal} />
+          <WeeklyProgress weeklyLessons={weeklyLessons} weeklyGoal={weeklyGoal} />
         </div>
         <div className="sm:col-span-2 grid grid-cols-2 gap-3">
           {[
