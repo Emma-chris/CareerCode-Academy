@@ -595,6 +595,90 @@ router.put('/challenge-submissions/:id/grade', async (req: AuthRequest, res: Res
 });
 
 // ----------------------------------------------------------------------
+// REVIEWS
+// ----------------------------------------------------------------------
+// GET /instructor/reviews — reviews left on the instructor's courses
+router.get('/reviews', async (req: AuthRequest, res: Response, next: NextFunction) => {
+  try {
+    const instructorId = req.user!.userId;
+    const { rows } = await query(`
+      SELECT r.id,
+             r.rating,
+             r.comment,
+             r.created_at as "createdAt",
+             r.replied,
+             r.reply,
+             r.replied_at as "repliedAt",
+             r.course_id as "courseId",
+             c.title as "courseTitle",
+             r.user_id as "userId",
+             u.name as "userName",
+             u.avatar as "userAvatar"
+      FROM reviews r
+      JOIN courses c ON r.course_id = c.id
+      JOIN users u ON r.user_id = u.id
+      WHERE c.instructor_id = $1
+      ORDER BY r.created_at DESC
+    `, [instructorId]);
+    res.json({ success: true, data: rows });
+  } catch (error) {
+    next(error);
+  }
+});
+
+// PUT /instructor/reviews/:id/reply — reply to a review on the instructor's course
+router.put('/reviews/:id/reply', async (req: AuthRequest, res: Response, next: NextFunction) => {
+  try {
+    const instructorId = req.user!.userId;
+    const { id } = req.params;
+    const reply = (req.body?.reply || '').trim();
+    if (!reply) {
+      return res.status(400).json({ success: false, message: 'Reply cannot be empty' });
+    }
+
+    const result = await query(`
+      UPDATE reviews r
+      SET reply = $1, replied = true, replied_at = NOW()
+      FROM courses c
+      WHERE r.id = $2 AND c.id = r.course_id AND c.instructor_id = $3
+      RETURNING r.id
+    `, [reply, id, instructorId]);
+
+    if (result.rowCount === 0) {
+      return res.status(404).json({ success: false, message: 'Review not found' });
+    }
+
+    res.json({ success: true, data: { id: result.rows[0].id } });
+  } catch (error) {
+    next(error);
+  }
+});
+
+// PUT /instructor/reviews/:id/report — flag a review on the instructor's course
+router.put('/reviews/:id/report', async (req: AuthRequest, res: Response, next: NextFunction) => {
+  try {
+    const instructorId = req.user!.userId;
+    const { id } = req.params;
+
+    const result = await query(`
+      UPDATE reviews r
+      SET reported = true, reported_at = NOW()
+      FROM courses c
+      WHERE r.id = $1 AND c.id = r.course_id AND c.instructor_id = $2
+      RETURNING r.id
+    `, [id, instructorId]);
+
+    if (result.rowCount === 0) {
+      return res.status(404).json({ success: false, message: 'Review not found' });
+    }
+
+    res.json({ success: true, data: { id: result.rows[0].id } });
+  } catch (error) {
+    next(error);
+  }
+});
+
+// ----------------------------------------------------------------------
 // ANNOUNCEMENTS
 // ----------------------------------------------------------------------
 router.get('/announcements', async (req: AuthRequest, res: Response, next: NextFunction) => {
