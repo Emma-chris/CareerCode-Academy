@@ -19,6 +19,7 @@ import { useAuthStore } from '@/store/authStore';
 import { useSocket } from '@/hooks/useSocket';
 import SEO from '@/components/seo/SEO';
 import { StatsSkeleton, CardSkeleton, ChartSkeleton } from '@/components/student/SkeletonLoader';
+import { formatCurrency } from '@/lib/utils';
 
 const quickActions = [
   { label: 'New Course', path: '/instructor/courses/new', icon: BookMarked, color: 'text-blue-500', bg: 'bg-blue-500/10' },
@@ -110,7 +111,7 @@ export default function InstructorDashboard() {
     { icon: Star, label: 'Avg Rating', value: stats?.averageRating || '0', color: 'text-yellow-500', bg: 'bg-yellow-500/10' },
     { icon: Award, label: 'Certificates Issued', value: stats?.certificatesIssued?.toLocaleString() || '0', color: 'text-purple-500', bg: 'bg-purple-500/10' },
     { icon: Clock, label: 'Watch Time', value: stats?.totalWatchTime ? `${(stats.totalWatchTime / 3600).toFixed(1)}h` : '0h', color: 'text-orange-500', bg: 'bg-orange-500/10' },
-    { icon: DollarSign, label: 'Revenue', value: `$${(stats?.monthlyRevenue || 0).toLocaleString()}`, color: 'text-green-500', bg: 'bg-green-500/10' },
+    { icon: DollarSign, label: 'Revenue', value: formatCurrency(stats?.monthlyRevenue || 0), color: 'text-green-500', bg: 'bg-green-500/10' },
     { icon: MessageSquare, label: 'Pending Reviews', value: stats?.pendingReviews?.toString() || '0', color: 'text-red-500', bg: 'bg-red-500/10' },
     { icon: Calendar, label: 'Upcoming Sessions', value: stats?.upcomingLiveSessions?.toString() || '0', color: 'text-indigo-500', bg: 'bg-indigo-500/10' },
   ];
@@ -203,7 +204,7 @@ export default function InstructorDashboard() {
                       tick={{ fontSize: 12 }}
                       className="text-gray-500"
                     />
-                    <YAxis tick={{ fontSize: 12 }} tickFormatter={(val) => `$${val}`} className="text-gray-500" />
+                    <YAxis tick={{ fontSize: 12 }} tickFormatter={(val) => formatCurrency(Number(val))} className="text-gray-500" />
                     <Tooltip content={<CustomTooltip />} />
                     <defs>
                       <linearGradient id="instrRevGrad" x1="0" y1="0" x2="0" y2="1">
@@ -301,8 +302,10 @@ export default function InstructorDashboard() {
                         </div>
                       </div>
                       <div className="text-right">
-                        <div className="font-semibold text-sm">${course.revenue.toLocaleString()}</div>
-                        <Badge variant="success" size="sm">Active</Badge>
+                        <div className="font-semibold text-sm">{formatCurrency(course.revenue)}</div>
+                          {course.published
+                            ? <Badge variant="success" size="sm">Published</Badge>
+                            : <Badge variant="warning" size="sm">Draft</Badge>}
                       </div>
                     </div>
                   )) : (

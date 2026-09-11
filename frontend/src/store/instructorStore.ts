@@ -23,6 +23,7 @@ export interface TopCourse {
   id: string;
   title: string;
   slug: string;
+  published: boolean;
   students: number;
   rating: string;
   revenue: number;

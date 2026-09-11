@@ -55,9 +55,15 @@ router.get('/dashboard/stats', async (req: AuthRequest, res: Response, next: Nex
   try {
     const instructorId = req.user!.userId;
 
-    // Active courses count
+    // Course counts
     const coursesRes = await query('SELECT COUNT(*) as count FROM courses WHERE instructor_id = $1', [instructorId]);
-    const activeCourses = parseInt(coursesRes.rows[0].count, 10);
+    const totalCourses = parseInt(coursesRes.rows[0].count, 10);
+    const publishedCoursesRes = await query(
+      'SELECT COUNT(*) as count FROM courses WHERE instructor_id = $1 AND published = true',
+      [instructorId]
+    );
+    const publishedCourses = parseInt(publishedCoursesRes.rows[0].count, 10);
+    const draftCourses = Math.max(totalCourses - publishedCourses, 0);
 
     // Total students enrolled in instructor's courses
     const studentsRes = await query(`
@@ -68,6 +74,42 @@ router.get('/dashboard/stats', async (req: AuthRequest, res: Response, next: Nex
     `, [instructorId]);
     const totalStudents = parseInt(studentsRes.rows[0].count, 10);
 
+    // Active students (lesson progress activity in the last 30 days)
+    const activeStudentsRes = await query(`
+      SELECT COUNT(DISTINCT lp.user_id) as count
+      FROM lesson_progress lp
+      JOIN courses c ON lp.course_id = c.id
+      WHERE c.instructor_id = $1 AND lp.updated_at > NOW() - INTERVAL '30 days'
+    `, [instructorId]);
+    const activeStudents = parseInt(activeStudentsRes.rows[0].count, 10);
+
+    // Average completion rate across enrollments (0-100)
+    const completionRes = await query(`
+      SELECT COALESCE(AVG(e.progress), 0) as avg
+      FROM enrollments e
+      JOIN courses c ON e.course_id = c.id
+      WHERE c.instructor_id = $1
+    `, [instructorId]);
+    const completionRate = Math.round(parseFloat(completionRes.rows[0].avg));
+
+    // Certificates issued on instructor's courses
+    const certificatesRes = await query(`
+      SELECT COUNT(*) as count
+      FROM certificates cert
+      JOIN courses c ON cert.course_id = c.id
+      WHERE c.instructor_id = $1
+    `, [instructorId]);
+    const certificatesIssued = parseInt(certificatesRes.rows[0].count, 10);
+
+    // Total watch time (seconds) across instructor's courses
+    const watchTimeRes = await query(`
+      SELECT COALESCE(SUM(lp.watch_position), 0) as total
+      FROM lesson_progress lp
+      JOIN courses c ON lp.course_id = c.id
+      WHERE c.instructor_id = $1
+    `, [instructorId]);
+    const totalWatchTime = parseFloat(watchTimeRes.rows[0].total);
+
     // Total revenue
     const revenueRes = await query(`
       SELECT COALESCE(SUM(p.amount), 0) as total
@@ -76,6 +118,16 @@ router.get('/dashboard/stats', async (req: AuthRequest, res: Response, next: Nex
       WHERE c.instructor_id = $1 AND p.status = 'completed'
     `, [instructorId]);
     const totalRevenue = parseFloat(revenueRes.rows[0].total);
+
+    // Revenue this calendar month (stat card value)
+    const monthlyRevenueRes = await query(`
+      SELECT COALESCE(SUM(p.amount), 0) as total
+      FROM payments p
+      JOIN courses c ON p.course_id = c.id
+      WHERE c.instructor_id = $1 AND p.status = 'completed'
+        AND DATE_TRUNC('month', p.created_at) = DATE_TRUNC('month', NOW())
+    `, [instructorId]);
+    const monthlyRevenue = parseFloat(monthlyRevenueRes.rows[0].total);
 
     // Average rating
     const ratingRes = await query(`
@@ -86,13 +138,12 @@ router.get('/dashboard/stats', async (req: AuthRequest, res: Response, next: Nex
     `, [instructorId]);
     const averageRating = parseFloat(ratingRes.rows[0].avg).toFixed(1);
 
-    // Pending reviews (submissions not yet graded)
+    // Pending reviews (reviews awaiting an instructor reply)
     const pendingReviewsRes = await query(`
       SELECT COUNT(*) as count
-      FROM submissions s
-      JOIN assignments a ON s.assignment_id = a.id
-      JOIN courses c ON a.course_id = c.id
-      WHERE c.instructor_id = $1 AND s.score IS NULL
+      FROM reviews r
+      JOIN courses c ON r.course_id = c.id
+      WHERE c.instructor_id = $1 AND COALESCE(r.replied, false) = false
     `, [instructorId]);
     const pendingReviews = parseInt(pendingReviewsRes.rows[0].count, 10);
 
@@ -112,8 +163,15 @@ router.get('/dashboard/stats', async (req: AuthRequest, res: Response, next: Nex
     `, [instructorId]);
     const upcomingLiveSessions = parseInt(upcomingLiveSessionsRes.rows[0].count, 10);
 
-    // Assignments to grade (same as pending reviews, alias for clarity)
-    const assignmentsToGrade = pendingReviews;
+    // Assignments to grade (ungraded submissions)
+    const assignmentsToGradeRes = await query(`
+      SELECT COUNT(*) as count
+      FROM submissions s
+      JOIN assignments a ON s.assignment_id = a.id
+      JOIN courses c ON a.course_id = c.id
+      WHERE c.instructor_id = $1 AND s.score IS NULL
+    `, [instructorId]);
+    const assignmentsToGrade = parseInt(assignmentsToGradeRes.rows[0].count, 10);
 
     // Course-level enrollment trend (last 6 months)
     const enrollmentTrendRes = await query(`
@@ -128,7 +186,7 @@ router.get('/dashboard/stats', async (req: AuthRequest, res: Response, next: Nex
     `, [instructorId]);
 
     // Monthly revenue (last 6 months)
-    const monthlyRevenueRes = await query(`
+    const monthlyRevenueTrendRes = await query(`
       SELECT
         DATE_TRUNC('month', p.created_at)::date as month,
         COALESCE(SUM(p.amount), 0) as revenue
@@ -139,9 +197,51 @@ router.get('/dashboard/stats', async (req: AuthRequest, res: Response, next: Nex
       ORDER BY month ASC
     `, [instructorId]);
 
+    // Student engagement (last 6 months): active = distinct students with lesson
+    // activity that month; inactive = enrolled-by-month-end students without it.
+    const engagementRes = await query(`
+      WITH months AS (
+        SELECT DATE_TRUNC('month', d)::date as m
+        FROM generate_series(NOW() - INTERVAL '5 months', NOW(), INTERVAL '1 month') d
+      ),
+      active AS (
+        SELECT DATE_TRUNC('month', lp.updated_at)::date as m,
+               COUNT(DISTINCT lp.user_id)::int as active
+        FROM lesson_progress lp
+        JOIN courses c ON lp.course_id = c.id
+        WHERE c.instructor_id = $1 AND lp.updated_at > NOW() - INTERVAL '6 months'
+        GROUP BY 1
+      ),
+      active_users AS (
+        SELECT DISTINCT lp.user_id, DATE_TRUNC('month', lp.updated_at)::date as m
+        FROM lesson_progress lp
+        JOIN courses c ON lp.course_id = c.id
+        WHERE c.instructor_id = $1
+      ),
+      enrolled AS (
+        SELECT DISTINCT e.user_id, e.enrolled_at
+        FROM enrollments e
+        JOIN courses c ON e.course_id = c.id
+        WHERE c.instructor_id = $1
+      )
+      SELECT m.m as month,
+             COALESCE(a.active, 0) as active,
+             (SELECT COUNT(DISTINCT en.user_id)::int
+              FROM enrolled en
+              WHERE en.enrolled_at < (m.m + INTERVAL '1 month')
+                AND NOT EXISTS (SELECT 1 FROM active_users au
+                                WHERE au.user_id = en.user_id AND au.m = m.m)) as inactive
+      FROM months m
+      LEFT JOIN active a ON a.m = m.m
+      ORDER BY m.m ASC
+    `, [instructorId]);
+
     // Top courses
     const topCoursesRes = await query(`
-      SELECT c.title,
+      SELECT c.id,
+             c.title,
+             c.slug,
+             c.published,
              COUNT(DISTINCT e.user_id) as students,
              COALESCE(AVG(r.rating), 0) as rating,
              COALESCE(SUM(p.amount), 0) as revenue
@@ -155,7 +255,7 @@ router.get('/dashboard/stats', async (req: AuthRequest, res: Response, next: Nex
       LIMIT 5
     `, [instructorId]);
 
-    // Recent activity
+    // Recent activity (enrollments, submissions, reviews)
     const recentActivityRes = await query(`
       (SELECT 'enrollment' as type, c.title as details, e.enrolled_at as time
        FROM enrollments e
@@ -167,6 +267,11 @@ router.get('/dashboard/stats', async (req: AuthRequest, res: Response, next: Nex
        JOIN assignments a ON s.assignment_id = a.id
        JOIN courses c ON a.course_id = c.id
        WHERE c.instructor_id = $1)
+      UNION ALL
+      (SELECT 'review' as type, c.title as details, r.created_at as time
+       FROM reviews r
+       JOIN courses c ON r.course_id = c.id
+       WHERE c.instructor_id = $1)
       ORDER BY time DESC
       LIMIT 10
     `, [instructorId]);
@@ -175,23 +280,36 @@ router.get('/dashboard/stats', async (req: AuthRequest, res: Response, next: Nex
       success: true,
       data: {
         stats: {
-          activeCourses,
           totalStudents,
-          totalRevenue,
+          activeStudents,
+          totalCourses,
+          publishedCourses,
+          draftCourses,
+          completionRate,
           averageRating,
+          certificatesIssued,
+          totalWatchTime,
+          monthlyRevenue,
+          totalRevenue,
           pendingReviews,
           unreadMessages,
           upcomingLiveSessions,
           assignmentsToGrade,
         },
         topCourses: topCoursesRes.rows.map(c => ({
+          id: c.id,
           title: c.title,
+          slug: c.slug,
+          published: c.published,
           students: parseInt(c.students, 10),
           rating: parseFloat(c.rating).toFixed(1),
           revenue: parseFloat(c.revenue),
         })),
         recentActivity: recentActivityRes.rows.map(a => ({
-          action: a.type === 'enrollment' ? 'New enrollment' : a.type === 'submission' ? 'Assignment submitted' : a.type,
+          action: a.type === 'enrollment' ? 'New enrollment'
+            : a.type === 'submission' ? 'Assignment submitted'
+            : a.type === 'review' ? 'New review'
+            : a.type,
           details: a.details,
           time: a.time,
           type: a.type,
@@ -200,9 +318,20 @@ router.get('/dashboard/stats', async (req: AuthRequest, res: Response, next: Nex
           month: r.month,
           enrollments: parseInt(r.enrollments, 10),
         })),
-        monthlyRevenue: monthlyRevenueRes.rows.map(r => ({
+        monthlyRevenue: monthlyRevenueTrendRes.rows.map(r => ({
           month: r.month,
           revenue: parseFloat(r.revenue),
+        })),
+        engagementData: engagementRes.rows.map(r => ({
+          month: r.month,
+          active: parseInt(r.active, 10),
+          inactive: parseInt(r.inactive, 10),
+        })),
+        coursePerformance: topCoursesRes.rows.map(c => ({
+          course: c.title,
+          students: parseInt(c.students, 10),
+          rating: parseFloat(c.rating).toFixed(1),
+          revenue: parseFloat(c.revenue),
         })),
       },
     });
