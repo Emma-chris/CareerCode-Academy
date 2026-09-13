@@ -1,3 +1,16 @@
+/**
+ * ⚠️ DEPRECATED — replaced by the lesson production pipeline.
+ *
+ * This seeder downloaded third-party YouTube videos and re-hosted them as
+ * lesson content (yt-dlp → R2/S3). That violates the platform content policy:
+ * YouTube is now research/reference ONLY (see docs/LESSON-PRODUCTION-WORKFLOW.md).
+ *
+ * Use the original-content pipeline instead:
+ *   npm run lesson:reference|script|voiceover|scenes|render|migrate
+ * New lessons must ship original narrated videos generated from authored scripts.
+ *
+ * Kept on disk only for historical reference / rollback. Do not run.
+ */
 import { query as db } from './config/db';
 import { uploadFile } from './config/storage';
 import { exec } from 'child_process';

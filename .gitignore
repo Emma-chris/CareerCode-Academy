@@ -52,6 +52,8 @@ frontend/public/wasm/
 
 # Generated videos and temp media
 backend/generated-videos/
+backend/generated-lessons/
+backend/uploads/
 
 # Large media files
 *.mp4
