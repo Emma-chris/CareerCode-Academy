@@ -90,8 +90,12 @@ CREATE TABLE IF NOT EXISTS daily_checkins (
   blocks_completed INTEGER DEFAULT 0,
   claimed BOOLEAN DEFAULT false,
   created_at TIMESTAMPTZ DEFAULT NOW(),
+  updated_at TIMESTAMPTZ DEFAULT NOW(),
   UNIQUE(user_id, checkin_date)
 );
+
+-- Ensure updated_at exists on pre-existing daily_checkins tables (guided model uses it in ON CONFLICT DO UPDATE)
+ALTER TABLE daily_checkins ADD COLUMN IF NOT EXISTS updated_at TIMESTAMPTZ DEFAULT NOW();
 
 CREATE INDEX IF NOT EXISTS idx_job_applications_user ON job_applications(user_id);
 CREATE INDEX IF NOT EXISTS idx_job_applications_job ON job_applications(job_id);

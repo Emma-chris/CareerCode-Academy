@@ -42,7 +42,31 @@ export default function GuidedModePage() {
         try {
           const res = await api.get('/learning-paths/grouped-by-school').catch(() => api.get('/learning-paths/grouped'));
           const groups = res.data.data || [];
-          const flat = groups.flatMap((g: any) => g.paths || g.learning_paths || []);
+          const flat: any[] = [];
+          for (const g of groups) {
+            if (g.zones) {
+              for (const level of ['beginner', 'intermediate', 'advanced']) {
+                const zone = g.zones?.[level];
+                if (zone?.path) {
+                  flat.push({
+                    ...zone.path,
+                    level: zone.path.level || level,
+                    courses: zone.courses || [],
+                    courses_count: zone.courses_count,
+                    color: zone.color || zone.path.color,
+                    icon: zone.icon || zone.path.icon,
+                  });
+                }
+              }
+              continue;
+            }
+            const arr = g.paths || g.learning_paths;
+            if (Array.isArray(arr) && arr.length) {
+              flat.push(...arr);
+            } else if (g.slug && g.title) {
+              flat.push(g);
+            }
+          }
           setPaths(flat.length ? flat : groups);
         } catch {
           setError('Failed to load learning paths');

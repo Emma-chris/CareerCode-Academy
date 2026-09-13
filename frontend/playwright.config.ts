@@ -23,5 +23,10 @@ export default defineConfig({
       name: 'exam-proctoring',
       testMatch: 'exam-proctoring.spec.ts',
     },
+    {
+      name: 'guided-mode',
+      testMatch: 'guided-mode.spec.ts',
+      use: { headless: true, video: 'off', trace: 'retain-on-failure' },
+    },
   ],
 });
