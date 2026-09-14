@@ -14,6 +14,7 @@
     "seed:cert": "tsx --require dotenv/config src/seed-certificate-assets.ts",
     "seed:yt": "tsx --require dotenv/config src/seed-youtube-videos.ts",
     "seed:yt:urls": "tsx --require dotenv/config src/seed-youtube-videos.ts --urls-only",
+    "seed:yt:refs": "tsx --require dotenv/config src/seed-youtube-references.ts",
     "generate-videos": "tsx --require dotenv/config src/generate-lesson-videos.ts",
     "lesson:reference": "tsx --require dotenv/config src/lesson-pipeline/fetch-reference.ts",
     "lesson:script": "tsx --require dotenv/config src/lesson-pipeline/generate-script.ts",
@@ -27,6 +28,7 @@
     "migrate:videos": "tsx --require dotenv/config src/migrate-local-videos-to-s3.ts",
     "migrate:placeholders": "tsx --require dotenv/config src/link-unmatched-videos.ts",
     "lint": "eslint src --ext .ts",
+    "test": "node --experimental-test-module-mocks --import tsx --test src/__tests__/*.test.mjs",
     "test:env": "tsx --require dotenv/config src/scripts/validateEnv.ts",
     "env:check": "tsx --require dotenv/config src/scripts/validateEnv.ts",
     "dev:env": "npm run test:env && npm run dev"
@@ -41,6 +43,7 @@
     "cookie-parser": "^1.4.7",
     "cors": "^2.8.5",
     "dotenv": "^16.4.5",
+    "esbuild": "^0.28.2",
     "express": "^4.19.2",
     "express-rate-limit": "^7.2.0",
     "fluent-ffmpeg": "^2.1.3",
