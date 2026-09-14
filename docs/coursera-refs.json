@@ -1,0 +1,119 @@
+[
+  {
+    "courseSlug": "data-visualization",
+    "courseraTitle": "Data Visualization",
+    "courseraUrl": "https://www.coursera.org/learn/datavisualization",
+    "provider": "University of Illinois at Urbana-Champaign",
+    "rating": "4.5",
+    "skills": ["Data Mapping", "Tableau Software", "Data Visualization", "Graphing", "Dashboard Creation", "Data Presentation"],
+    "modules": ["Introduction to Data Visualization", "Data Visualization Tools", "Visualizing Geospatial Data", "Interactive Data Visualization"]
+  },
+  {
+    "courseSlug": "responsive-web-design",
+    "courseraTitle": "Learn Responsive Web Design",
+    "courseraUrl": "https://www.coursera.org/learn/learn-responsive-web-design",
+    "provider": "Scrimba",
+    "rating": "4.7",
+    "skills": ["Responsive Web Design", "HTML and CSS", "CSS Grid", "Flexbox", "Typography", "Front-End Web Development"],
+    "modules": ["CSS Fundamentals", "Starting to Think Responsively", "Stepping up our style", "Taking Flexbox to the next level", "CSS Grid: The Ultimate Layout Tool"]
+  },
+  {
+    "courseSlug": "software-engineering-design-patterns",
+    "courseraTitle": "Design Patterns",
+    "courseraUrl": "https://www.coursera.org/learn/design-patterns",
+    "provider": "University of Alberta",
+    "rating": "4.6",
+    "skills": ["Software Design Patterns", "Java", "Object Oriented Design", "Model View Controller", "Software Architecture", "Code Reusability", "UML"],
+    "modules": ["Introduction to Design Patterns: Creational & Structural Patterns", "Behavioural Design Patterns", "Working with Design Patterns & Anti-patterns", "Capstone Challenge"]
+  },
+  {
+    "courseSlug": "quality-assurance",
+    "courseraTitle": "Introduction to Software Quality Assurance",
+    "courseraUrl": "https://www.coursera.org/learn/introduction-to-software-quality-assurance",
+    "provider": "Board Infinity",
+    "rating": "4.4",
+    "skills": ["Software Testing", "Quality Assurance", "Test Case", "Test Planning", "Software Development Life Cycle", "Agile Methodology", "Defect Reporting"],
+    "modules": ["The Software Testing Process", "Basics of Software Testing", "Defect Reporting and Documentation"]
+  },
+  {
+    "courseSlug": "git-version-control-mastery",
+    "courseraTitle": "Introduction to Git and GitHub",
+    "courseraUrl": "https://www.coursera.org/learn/introduction-git-github",
+    "provider": "Google Career Certificates",
+    "rating": "4.8",
+    "skills": ["Git", "GitHub", "Version Control", "Command-Line Interface", "CI/CD", "Code Review", "Collaborative Software"],
+    "modules": ["Introduction to Version Control", "Using Git Locally", "Working with Remotes", "Collaboration using GitHub"]
+  },
+  {
+    "courseSlug": "graphic-design-with-figma",
+    "courseraTitle": "Figma UI UX Design Essentials Pt.1: Tools & Foundations",
+    "courseraUrl": "https://www.coursera.org/learn/figma-ui-ux-design-essentials-pt1-tools--foundations",
+    "provider": "Dan Scott / Designlab",
+    "rating": "4.7",
+    "skills": ["Figma", "UI Design", "UX Design", "Wireframing", "Prototyping", "Color Theory", "Typography"],
+    "modules": ["Getting Started with Figma", "Wireframing", "Color, Stroke & Manipulation", "Prototyping with Figma", "Color Styles & Layouts", "Typography in Figma", "Boolean Operations & Path Editing", "Working with Images"]
+  },
+  {
+    "courseSlug": "python-for-everybody",
+    "courseraTitle": "Programming for Everybody (Getting Started with Python)",
+    "courseraUrl": "https://www.coursera.org/learn/python",
+    "provider": "University of Michigan",
+    "rating": "4.8",
+    "skills": ["Python Programming", "Variables", "Functions", "Loops", "Conditionals", "Data Types"],
+    "modules": ["Why We Program", "Variables and Expressions", "Conditional Code", "Functions", "Loops and Iterations"]
+  },
+  {
+    "courseSlug": "scientific-computing-with-python",
+    "courseraTitle": "Introduction to Python for Scientific Computing",
+    "courseraUrl": "https://www.coursera.org/learn/introduction-python-scientific-computing",
+    "provider": "DeepLearning.AI",
+    "rating": "4.7",
+    "skills": ["Python", "NumPy", "SciPy", "Scientific Computing", "Data Visualization", "Numerical Methods", "Curve Fitting"],
+    "modules": ["Introduction to Python Programming", "Arrays, Math, and Visualization", "Numeric and Symbolic Computation"]
+  },
+  {
+    "courseSlug": "college-algebra-with-python",
+    "courseraTitle": "Algebra: Elementary to Advanced - Equations & Inequalities",
+    "courseraUrl": "https://www.coursera.org/learn/algebra-elementary-to-advanced-equations-inequalities",
+    "provider": "Johns Hopkins University",
+    "rating": "4.7",
+    "skills": ["Algebra", "Equations", "Inequalities", "Functions", "Polynomials", "Graphing"],
+    "modules": ["Properties of Real Numbers", "Algebraic Expressions", "Linear Equations", "Inequalities", "Functions and Graphs"]
+  },
+  {
+    "courseSlug": "machine-learning",
+    "courseraTitle": "Supervised Machine Learning: Regression and Classification",
+    "courseraUrl": "https://www.coursera.org/learn/machine-learning",
+    "provider": "Stanford Online / DeepLearning.AI",
+    "rating": "4.9",
+    "skills": ["Machine Learning", "Linear Regression", "Logistic Regression", "Neural Networks", "Python", "NumPy", "scikit-learn"],
+    "modules": ["Introduction to Machine Learning", "Regression with Multiple Input Variables", "Classification"]
+  },
+  {
+    "courseSlug": "artificial-intelligence",
+    "courseraTitle": "Introduction to Artificial Intelligence (AI)",
+    "courseraUrl": "https://www.coursera.org/learn/introduction-to-ai",
+    "provider": "IBM",
+    "rating": "4.6",
+    "skills": ["Artificial Intelligence", "Machine Learning", "Deep Learning", "Neural Networks", "NLP", "Computer Vision", "Generative AI"],
+    "modules": ["Introduction and Applications of AI", "AI Concepts, Terminology, and Application Domains", "AI in Business and the Future of Work", "Ethics and Governance in AI"]
+  },
+  {
+    "courseSlug": "database-systems-sql",
+    "courseraTitle": "Introduction to Structured Query Language (SQL)",
+    "courseraUrl": "https://www.coursera.org/learn/intro-sql",
+    "provider": "University of Michigan",
+    "rating": "4.7",
+    "skills": ["SQL", "Database Design", "Data Modeling", "Relational Databases", "JOIN", "Foreign Keys", "MySQL"],
+    "modules": ["Introduction to Structured Query Language (SQL)", "Database Design", "Many-to-Many Relationships", "SQL in Practice"]
+  },
+  {
+    "courseSlug": "ui-ux-design-fundamentals",
+    "courseraTitle": "Fundamentals of UI/UX Design",
+    "courseraUrl": "https://www.coursera.org/learn/fundamentals-of-uiux-design",
+    "provider": "Microsoft",
+    "rating": "4.8",
+    "skills": ["UI Design", "UX Design", "Design Thinking", "Wireframing", "Prototyping", "Human-Centered Design", "User Research"],
+    "modules": ["Introduction to user experience design", "Roles in a UX design team", "Frameworks and process: Design thinking", "Introducing the portfolio project"]
+  }
+]

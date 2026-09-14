@@ -1,0 +1,4 @@
+﻿# Local tools (yt-dlp binary)
+tools/
+# Scraping runtime artifacts
+yt_scrape_progress.json

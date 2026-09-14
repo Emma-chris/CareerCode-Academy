@@ -846,6 +846,7 @@ async function migrate() {
     await query('ALTER TABLE courses ADD COLUMN IF NOT EXISTS review_notes TEXT');
     await query('ALTER TABLE courses ADD COLUMN IF NOT EXISTS reviewed_by UUID REFERENCES users(id) ON DELETE SET NULL');
     await query('ALTER TABLE courses ADD COLUMN IF NOT EXISTS reviewed_at TIMESTAMPTZ');
+    await query('ALTER TABLE courses ADD COLUMN IF NOT EXISTS reference_url TEXT');
     console.log('✓ additional columns added to courses');
 
     await query('CREATE INDEX IF NOT EXISTS idx_modules_course ON modules(course_id)');
