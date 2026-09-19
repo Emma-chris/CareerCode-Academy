@@ -11,6 +11,7 @@
     "seed:admin": "tsx --require dotenv/config src/seed-admin.ts",
     "seed:exam": "tsx --require dotenv/config src/seed-exam-questions.ts",
     "seed:schools": "tsx --require dotenv/config src/seed-schools.ts",
+    "seed:career-goals": "tsx --require dotenv/config src/seed-career-goals.ts",
     "seed:cert": "tsx --require dotenv/config src/seed-certificate-assets.ts",
     "seed:yt": "tsx --require dotenv/config src/seed-youtube-videos.ts",
     "seed:yt:urls": "tsx --require dotenv/config src/seed-youtube-videos.ts --urls-only",

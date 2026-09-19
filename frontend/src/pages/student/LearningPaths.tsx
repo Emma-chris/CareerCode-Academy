@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Link, useNavigate } from 'react-router-dom';
-import { GitBranch, BookOpen, Clock, Award, Users, CheckCircle, PlayCircle, Rocket, BarChart3, Zap } from 'lucide-react';
+import { GitBranch, BookOpen, Clock, Award, Users, CheckCircle, PlayCircle, Rocket, BarChart3, Zap, Target, Briefcase, ArrowRight, LayoutDashboard, Server, Layers, Smartphone, Boxes, ShieldCheck, FlaskConical, BrainCircuit, Brain, Palette, PenTool } from 'lucide-react';
 import { GlassCard } from '@/components/ui/GlassCard';
 import { Badge } from '@/components/ui/Badge';
 import { Button } from '@/components/ui/Button';
@@ -9,6 +9,11 @@ import { PageSkeleton } from '@/components/student/SkeletonLoader';
 import api from '@/lib/axios';
 import { useAuthStore } from '@/store/authStore';
 import toast from 'react-hot-toast';
+
+const goalIcons: Record<string, any> = {
+  LayoutDashboard, Server, Layers, Smartphone, Boxes, ShieldCheck,
+  BarChart3, FlaskConical, BrainCircuit, Brain, Palette, PenTool,
+};
 
 const zoneMeta: Record<string, { label: string; icon: any; color: string; bg: string; border: string }> = {
   beginner: { label: 'Beginner', icon: BookOpen, color: 'from-emerald-500 to-teal-600', bg: 'bg-emerald-500/10', border: 'border-emerald-500/20' },
@@ -29,19 +34,25 @@ export default function LearningPaths() {
   const { isAuthenticated } = useAuthStore();
   const [grouped, setGrouped] = useState<any[]>([]);
   const [enrolledPaths, setEnrolledPaths] = useState<any[]>([]);
+  const [careerGoals, setCareerGoals] = useState<any[]>([]);
+  const [myGoals, setMyGoals] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [xpBalance, setXpBalance] = useState<any>(null);
 
   useEffect(() => {
     async function fetchData() {
       try {
-        const [groupedRes, enrolledRes, balanceRes] = await Promise.all([
+        const [groupedRes, enrolledRes, balanceRes, goalsRes, myGoalsRes] = await Promise.all([
           api.get('/learning-paths/grouped-by-school').catch(() => api.get('/learning-paths/grouped').catch(() => ({ data: { data: [] } }))),
           isAuthenticated ? api.get('/learning-paths/my/enrollments').catch(() => ({ data: { data: [] } })) : Promise.resolve({ data: { data: [] } }),
           isAuthenticated ? api.get('/gamification/balance').catch(() => null) : Promise.resolve(null),
+          api.get('/career-goals').catch(() => ({ data: { data: [] } })),
+          isAuthenticated ? api.get('/career-goals/my/goals').catch(() => ({ data: { data: [] } })) : Promise.resolve({ data: { data: [] } }),
         ]);
         setGrouped(groupedRes.data.data || []);
         setEnrolledPaths(enrolledRes.data.data || []);
+        setCareerGoals(goalsRes.data.data || []);
+        setMyGoals(myGoalsRes.data.data || []);
         if (balanceRes?.data?.data) setXpBalance(balanceRes.data.data);
       } catch {
         setGrouped([]);
@@ -84,6 +95,7 @@ export default function LearningPaths() {
   if (isLoading) return <PageSkeleton />;
 
   const enrolledMap = new Map(enrolledPaths.map((ep: any) => [ep.path_id, ep]));
+  const myGoalMap = new Map(myGoals.map((g: any) => [g.slug, g]));
 
   return (
     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-8">
@@ -141,6 +153,69 @@ export default function LearningPaths() {
               </motion.div>
             ))}
           </div>
+        </section>
+      )}
+
+      {careerGoals.length > 0 && (
+        <section>
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-lg font-semibold flex items-center gap-2">
+              <Target className="w-5 h-5 text-primary-500" /> Pick Your Career Goal
+            </h2>
+            <Badge variant="primary" size="sm">{myGoals.length} pursued</Badge>
+          </div>
+          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-4">
+            {careerGoals.map((goal: any, i: number) => {
+              const Icon = goalIcons[goal.icon] || Target;
+              const my = myGoalMap.get(goal.slug);
+              const isPursuing = !!my;
+              const isDone = my?.completed;
+              return (
+                <motion.div key={goal.slug} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.04 }}>
+                  <Link to={`/student/career-goals/${goal.slug}`} className="block group">
+                    <GlassCard className="h-full p-5" hover>
+                      <div className="flex items-start justify-between mb-3">
+                        <div className={`w-10 h-10 rounded-xl bg-primary-500/10 flex items-center justify-center`}>
+                          <Icon className="w-5 h-5 text-primary-500" />
+                        </div>
+                        {isPursuing && (
+                          <Badge variant={isDone ? 'success' : 'primary'} size="sm">
+                            {isDone ? 'Achieved' : `${my.progress}%`}
+                          </Badge>
+                        )}
+                      </div>
+                      <h3 className="font-semibold text-base mb-1 group-hover:text-primary-600 transition-colors">
+                        {goal.role_title}
+                      </h3>
+                      <div className="flex flex-wrap gap-1 mt-1 mb-3">
+                        {(goal.desired_skills || []).slice(0, 3).map((s: string) => (
+                          <span key={s} className="text-[10px] px-1.5 py-0.5 rounded-full bg-primary-500/10 text-primary-500 border border-primary-500/20">{s}</span>
+                        ))}
+                      </div>
+                      {isPursuing && (
+                        <div className="w-full h-1.5 bg-gray-100 dark:bg-gray-800 rounded-full overflow-hidden mb-3">
+                          <div className="h-full rounded-full bg-gradient-to-r from-primary-500 to-accent-500 transition-all duration-700" style={{ width: `${my.progress}%` }} />
+                        </div>
+                      )}
+                      <div className="flex items-center gap-3 text-xs text-gray-400 mb-3">
+                        <span className="flex items-center gap-1"><BookOpen className="w-3 h-3" /> {goal.courses_count}</span>
+                        <span className="flex items-center gap-1"><Clock className="w-3 h-3" /> {Math.floor((goal.total_duration || 0) / 60)}h</span>
+                        {goal.salary_band && (
+                          <span className="flex items-center gap-1 text-amber-600"><Briefcase className="w-3 h-3" /> {goal.salary_band}</span>
+                        )}
+                      </div>
+                      <Button size="sm" variant="outline" className="w-full">
+                        {isPursuing ? 'Continue Goal' : 'Start This Goal'} <ArrowRight className="w-3.5 h-3.5 ml-1" />
+                      </Button>
+                    </GlassCard>
+                  </Link>
+                </motion.div>
+              );
+            })}
+          </div>
+          <p className="text-xs text-gray-400 mt-3">
+            Each goal is a curated, phase-structured pathway (Foundations → Core → Build → Hire) that bundles the courses you need for that role.
+          </p>
         </section>
       )}
 

@@ -89,6 +89,7 @@ const StudentCertificate = lazy(() => import('@/pages/student/Certificate'));
 const StudentProfile = lazy(() => import('@/pages/student/Profile'));
 const StudentLearningPaths = lazy(() => import('@/pages/student/LearningPaths'));
 const StudentLearningPathDetail = lazy(() => import('@/pages/student/LearningPathDetail'));
+const StudentCareerGoalDetail = lazy(() => import('@/pages/student/CareerGoalDetail'));
 const StudentLeaderboard = lazy(() => import('@/pages/student/Leaderboard'));
 const StudentCalendar = lazy(() => import('@/pages/student/Calendar'));
 const StudentNotifications = lazy(() => import('@/pages/student/Notifications'));
@@ -271,6 +272,7 @@ function App() {
           <Route path="courses/:slug" element={<SuspenseWrapper><StudentCourseView /></SuspenseWrapper>} />
           <Route path="learning-paths" element={<SuspenseWrapper><StudentLearningPaths /></SuspenseWrapper>} />
           <Route path="learning-paths/:slug" element={<SuspenseWrapper><StudentLearningPathDetail /></SuspenseWrapper>} />
+          <Route path="career-goals/:slug" element={<SuspenseWrapper><StudentCareerGoalDetail /></SuspenseWrapper>} />
           <Route path="assignments" element={<SuspenseWrapper><StudentAssignments /></SuspenseWrapper>} />
           <Route path="certificates" element={<SuspenseWrapper><StudentCertificate /></SuspenseWrapper>} />
           <Route path="leaderboard" element={<SuspenseWrapper><StudentLeaderboard /></SuspenseWrapper>} />

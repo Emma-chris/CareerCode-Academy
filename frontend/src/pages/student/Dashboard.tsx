@@ -14,6 +14,7 @@ import { useStudentStore } from '@/store/studentStore';
 import { useAuthStore } from '@/store/authStore';
 import { useSocket } from '@/hooks/useSocket';
 import { HeroSection } from '@/components/student/HeroSection';
+import CareerGoalWidget from '@/components/student/CareerGoalWidget';
 import { StatsCards } from '@/components/student/StatsCards';
 import { LearningAnalytics } from '@/components/student/LearningAnalytics';
 import { RecommendedCourses } from '@/components/student/RecommendedCourses';
@@ -185,6 +186,9 @@ export default function StudentDashboard() {
 
       {/* Stats Cards */}
       <StatsCards stats={stats} />
+
+      {/* My Career Goal */}
+      <CareerGoalWidget />
 
       {/* Streak Tracker + Weekly Progress + Quick Actions Row */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">

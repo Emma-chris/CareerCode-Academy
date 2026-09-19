@@ -1,6 +1,7 @@
 import { query } from '../config/db';
 import { awardXp } from './gamification';
 import { upsertAlumni } from './career';
+import * as EnrollmentModel from './enrollment';
 
 export interface LearningPath {
   id: string;
@@ -311,6 +312,71 @@ export async function getLearningPathBySlug(slug: string): Promise<any | null> {
     [slug]
   );
   return rows[0] || null;
+}
+
+// Enrolls a user in a path: free courses are enrolled immediately; paid courses are flagged for checkout.
+export async function enrollInPath(userId: string, path: any): Promise<{ enrollment: any; enrolledCourseIds: string[]; paidCourses: any[] }> {
+  const existingRes = await query(
+    'SELECT id FROM learning_path_enrollments WHERE user_id = $1 AND path_id = $2',
+    [userId, path.id]
+  );
+  if (existingRes.rows.length > 0) {
+    throw new Error('Already enrolled in this learning path');
+  }
+
+  const { rows } = await query(`
+    INSERT INTO learning_path_enrollments (user_id, path_id)
+    VALUES ($1, $2)
+    RETURNING *
+  `, [userId, path.id]);
+
+  // Auto-enroll in free courses; flag paid ones for checkout
+  const { rows: courseRows } = await query(`
+    SELECT c.id, c.title, c.slug, c.price, c.instructor_id
+    FROM learning_path_courses lpc
+    JOIN courses c ON c.id = lpc.course_id
+    WHERE lpc.path_id = $1
+    ORDER BY lpc.order_index ASC
+  `, [path.id]);
+
+  const enrolledCourseIds: string[] = [];
+  const paidCourses: any[] = [];
+
+  for (const course of courseRows) {
+    const hasEnrollment = await query(
+      'SELECT id FROM enrollments WHERE user_id = $1 AND course_id = $2',
+      [userId, course.id]
+    );
+
+    if (Number(course.price) > 0) {
+      if (hasEnrollment.rows.length === 0) {
+        paidCourses.push({
+          id: course.id,
+          title: course.title,
+          slug: course.slug,
+          price: Number(course.price),
+        });
+      }
+      continue;
+    }
+
+    if (hasEnrollment.rows.length > 0) {
+      enrolledCourseIds.push(course.id);
+      continue;
+    }
+
+    await EnrollmentModel.createEnrollment({ user_id: userId, course_id: course.id });
+    enrolledCourseIds.push(course.id);
+
+    // Notify instructor
+    await query(
+      `INSERT INTO notifications (user_id, title, message, type)
+       VALUES ($1, 'New Enrollment', $2, 'enrollment')`,
+      [course.instructor_id, `A new student enrolled in "${course.title}"`]
+    );
+  }
+
+  return { enrollment: rows[0], enrolledCourseIds, paidCourses };
 }
 
 export async function getGroupedByCategory(): Promise<any[]> {
