@@ -7,10 +7,10 @@ import { Badge } from '@/components/ui/Badge';
 import { api } from '@/lib/axios';
 
 const typingTexts = [
-  'Land Your Dream Job',
-  'Build Production Apps',
+  'Master In-Demand Skills',
+  'Build Real-World Projects',
+  'Ship Production Apps',
   'Earn Industry Certification',
-  'Master Modern Frameworks',
 ];
 
 const floatingShapes = [
@@ -163,7 +163,7 @@ export function Hero() {
           <motion.div variants={itemVariants} className={styles.badgeWrapper}>
             <span className={styles.badge}>
               <Sparkles className={styles.badgeIcon} />
-              Industry-Recognized Curriculum
+              Skill-First, Career-Focused
             </span>
           </motion.div>
 
@@ -181,9 +181,9 @@ export function Hero() {
             variants={itemVariants}
             className={styles.subtitle}
           >
-            From zero to job-ready developer. Master in-demand technologies through
-            hands-on projects, expert mentorship, and a curriculum designed by
-            industry professionals.
+            Acquire job-ready skills through hands-on projects, guided mentorship,
+            and a curriculum built by industry professionals — skills you can use
+            from day one.
           </motion.p>
 
           <motion.div
@@ -192,7 +192,7 @@ export function Hero() {
           >
             <Link to="/signup">
               <NeonButton color="blue" size="lg" className={styles.button + " animate-glow"}>
-                Start Learning Free
+                Start Building Skills
                 <ArrowRight className={styles.buttonIcon} />
               </NeonButton>
             </Link>

@@ -4,8 +4,8 @@ import { ArrowRight, CheckCircle2, BookOpen, MessageSquare, Briefcase, Sparkles 
 import { NeonButton } from '@/components/ui/NeonButton';
 
 const valueProps = [
-  { icon: BookOpen, title: 'Project-Based Learning', desc: 'Build real-world projects for your portfolio' },
-  { icon: MessageSquare, title: '1-on-1 Mentorship', desc: 'Get guidance from industry experts' },
+  { icon: BookOpen, title: 'Project-Based Learning', desc: 'Build real-world projects that prove what you can do' },
+  { icon: MessageSquare, title: '1-on-1 Mentorship', desc: 'Get guidance from industry experts at every step' },
   { icon: Briefcase, title: 'Career Support', desc: 'In-platform job applications, role matching, and a public portfolio to get discovered' },
 ];
 
@@ -37,21 +37,22 @@ export function CTASection() {
             </motion.div>
 
             <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold mb-4">
-              Your Dream Tech Career <span className="gradient-text">Starts Here</span>
+              Build <span className="gradient-text">Hire-Ready</span> Skills
             </h2>
             <p className="text-lg text-gray-600 dark:text-gray-400 max-w-2xl mx-auto mb-4">
-              Join 15,000+ successful graduates who transformed their careers through our industry-aligned programs.
+              Join thousands of learners turning hands-on practice into a portfolio employers can verify —
+              then apply to roles directly through our in-platform career pipeline.
             </p>
 
             <div className="flex items-center justify-center gap-2 mb-10 text-sm text-gray-500">
               <CheckCircle2 className="w-4 h-4 text-success-500" />
-              <span>No credit card required</span>
+              <span>Portfolio you can show</span>
+              <span className="text-gray-300 dark:text-gray-700">·</span>
+              <CheckCircle2 className="w-4 h-4 text-success-500" />
+              <span>Verified certificates</span>
               <span className="text-gray-300 dark:text-gray-700">·</span>
               <CheckCircle2 className="w-4 h-4 text-success-500" />
               <span>Money-back guarantee</span>
-              <span className="text-gray-300 dark:text-gray-700">·</span>
-              <CheckCircle2 className="w-4 h-4 text-success-500" />
-              <span>Lifetime access</span>
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 mb-10 max-w-3xl mx-auto">
@@ -67,7 +68,7 @@ export function CTASection() {
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
               <Link to="/signup">
                 <NeonButton color="blue" size="lg" className="px-10 py-4 text-lg">
-                  Start Learning Free
+                  Start Building Skills
                   <ArrowRight className="w-5 h-5" />
                 </NeonButton>
               </Link>

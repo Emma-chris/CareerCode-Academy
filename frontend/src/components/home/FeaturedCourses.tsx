@@ -34,6 +34,25 @@ const careerOutcomes: Record<string, string> = {
   'Design': 'UI/UX Designer',
 };
 
+const skillSets: Record<string, string[]> = {
+  'Web Development': ['HTML/CSS', 'JavaScript', 'React'],
+  'Frontend': ['HTML/CSS', 'JavaScript', 'React'],
+  'Backend': ['Node.js', 'APIs', 'Databases'],
+  'Full-Stack': ['React', 'Node.js', 'Databases'],
+  'Data Science': ['Python', 'Statistics', 'Machine Learning'],
+  'Mobile': ['React Native', 'Flutter', 'Mobile UX'],
+  'AI': ['Python', 'Machine Learning', 'Neural Networks'],
+  'DevOps': ['Docker', 'CI/CD', 'Cloud Infrastructure'],
+  'Security': ['Network Security', 'Penetration Testing', 'Security Audits'],
+  'Design': ['User Research', 'Figma', 'Prototyping'],
+  'Programming': ['Algorithms', 'Problem Solving', 'Clean Code'],
+  'Cloud Computing': ['Cloud Architecture', 'AWS/Azure', 'Serverless'],
+  'Computer Science': ['Data Structures', 'Algorithms', 'System Design'],
+  'Networking': ['Networking Fundamentals', 'Routing', 'Security'],
+  'Databases': ['SQL', 'Data Modeling', 'Query Optimization'],
+  'Software Engineering': ['Design Patterns', 'Testing', 'System Design'],
+};
+
 export function FeaturedCourses() {
   const { courses, fetchCourses } = useCourseStore();
 
@@ -52,10 +71,10 @@ export function FeaturedCourses() {
           className="text-center mb-12"
         >
           <h2 className="text-3xl sm:text-4xl font-bold mb-4">
-            <span className="gradient-text">Featured Courses</span>
+            <span className="gradient-text">Skills You'll Master</span>
           </h2>
           <p className="text-lg text-gray-600 dark:text-gray-400 max-w-2xl mx-auto">
-            Industry-aligned curriculum designed to take you from beginner to job-ready developer.
+            Build the exact skills employers hire for — projects you can ship, not just courses you finish.
           </p>
         </motion.div>
 
@@ -65,10 +84,10 @@ export function FeaturedCourses() {
             const Icon = cfg.icon;
             const thumb = course.thumbnail ? optimizeImageUrl(course.thumbnail, 400, 250) : null;
             const outcome = careerOutcomes[course.category] || 'Software Developer';
+            const skills = skillSets[course.category] || skillSets['Software Engineering'];
             const rating = course.averageRating || course.avg_rating || 0;
             const studentCount = course.enrollmentCount || course.student_count || 0;
             const completionRate = (course as any).completion_rate || Math.floor(Math.random() * 20 + 75);
-            const isFree = Number(course.price) === 0;
             return (
             <motion.div
               key={course.id}
@@ -95,11 +114,6 @@ export function FeaturedCourses() {
                           Enroll Now →
                         </NeonButton>
                       </div>
-                      {isFree && (
-                        <div className="absolute top-2 right-2">
-                          <Badge variant="success" size="sm">Free</Badge>
-                        </div>
-                      )}
                       {course.discount_percentage > 0 && (
                         <div className="absolute top-2 left-2">
                           <Badge variant="danger" size="sm">-{course.discount_percentage}%</Badge>
@@ -146,9 +160,19 @@ export function FeaturedCourses() {
                       </div>
                     </div>
 
+                    <div className="flex items-start gap-1.5 mb-2">
+                      <Code2 className="w-3.5 h-3.5 text-primary-500 mt-0.5 flex-shrink-0" />
+                      <span className="text-xs text-gray-600 dark:text-gray-300 line-clamp-2">
+                        Master:
+                        {skills.slice(0, 3).map((s) => (
+                          <span key={s} className="ml-1.5 inline-block rounded-full bg-gray-100 dark:bg-gray-800 px-2 py-0.5">{s}</span>
+                        ))}
+                      </span>
+                    </div>
+
                     <div className="flex items-center gap-1.5 mb-3">
                       <Award className="w-3.5 h-3.5 text-amber-500" />
-                      <span className="text-xs text-amber-600 dark:text-amber-400">Leads to: {outcome}</span>
+                      <span className="text-xs text-amber-600 dark:text-amber-400">Career outcome: {outcome}</span>
                     </div>
 
                     <div className="flex items-center gap-4 text-xs text-gray-500 dark:text-gray-400 pt-3 border-t border-gray-100 dark:border-gray-800">
@@ -156,16 +180,10 @@ export function FeaturedCourses() {
                         <Clock className="w-3.5 h-3.5" />
                         {course.duration}h
                       </div>
-                      {isFree ? (
-                        <span className="text-success-500 font-semibold">Free</span>
-                      ) : course.discount_percentage > 0 ? (
-                        <div className="flex items-center gap-1.5">
-                          <span className="font-bold text-white">${(course.price * (1 - course.discount_percentage / 100)).toFixed(0)}</span>
-                          <span className="text-gray-500 line-through">${Number(course.price).toFixed(0)}</span>
-                        </div>
-                      ) : (
-                        <span className="font-bold text-white">${Number(course.price).toFixed(0)}</span>
-                      )}
+                      <div className="flex items-center gap-1">
+                        <TrendingUp className="w-3.5 h-3.5 text-success-500" />
+                        Hands-on projects
+                      </div>
                     </div>
                   </div>
                 </GlassCard>
@@ -185,7 +203,7 @@ export function FeaturedCourses() {
             to="/courses"
             className="inline-flex items-center gap-2 text-primary-600 dark:text-primary-400 font-semibold hover:gap-3 transition-all group"
           >
-            View All Courses
+            Explore All Programs
             <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
           </Link>
         </motion.div>

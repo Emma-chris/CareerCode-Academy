@@ -16,7 +16,7 @@ export default function Home() {
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
     >
-      <SEO title="Home" />
+      <SEO title="Learn In-Demand Tech Skills & Launch Your Career" />
       <Hero />
       <TrustSection />
       <FeaturedCourses />
