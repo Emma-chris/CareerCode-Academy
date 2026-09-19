@@ -28,5 +28,10 @@ export default defineConfig({
       testMatch: 'guided-mode.spec.ts',
       use: { headless: true, video: 'off', trace: 'retain-on-failure' },
     },
+    {
+      name: 'admin-calendar',
+      testMatch: 'admin-calendar.spec.ts',
+      use: { headless: true, video: 'off', trace: 'retain-on-failure' },
+    },
   ],
 });

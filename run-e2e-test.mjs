@@ -1,4 +1,4 @@
-import { spawn } from 'child_process';
+import { spawn, execSync } from 'child_process';
 import http from 'http';
 import path from 'path';
 import { fileURLToPath } from 'url';
@@ -44,14 +44,44 @@ function log(label, data) {
   }
 }
 
+// Kill any process currently listening on the given ports (stale dev servers
+// from a previous interrupted run would otherwise get hit instead of ours).
+function freePorts(...ports) {
+  for (const port of ports) {
+    try {
+      execSync(
+        `powershell -NoProfile -NonInteractive -Command "$ids = Get-NetTCPConnection -LocalPort ${port} -State Listen -ErrorAction SilentlyContinue | Select-Object -ExpandProperty OwningProcess -Unique; if ($ids) { foreach ($id in $ids) { Stop-Process -Id $id -Force -ErrorAction SilentlyContinue } }"`,
+        { stdio: 'ignore', timeout: 10000 }
+      );
+    } catch {}
+  }
+}
+
 async function main() {
   console.log('═══ E2E Test Runner ═══\n');
 
+  const PROJECT = process.env.E2E_PROJECT || process.argv[2] || 'admin-calendar';
+  console.log(`Project: ${PROJECT}`);
+
+  freePorts(3000, 5000);
+
+  const FRONTEND_URL = process.env.FRONTEND_URL || 'http://localhost:3000';
   const backend = spawn('npx.cmd', ['tsx', 'src/index.ts'], {
     cwd: BACKEND_DIR,
     stdio: ['ignore', 'pipe', 'pipe'],
     shell: true,
-    env: { ...process.env, FORCE_COLOR: '0' },
+    env: {
+      ...process.env,
+      FORCE_COLOR: '0',
+      FRONTEND_URL,
+      // e2e runs against a dev-only backend; localhost must be CORS-allowed
+      CORS_ORIGINS: process.env.CORS_ORIGINS || `${FRONTEND_URL},http://127.0.0.1:3000`,
+      // JWT secrets are required by the auth flow and missing from backend/.env
+      JWT_SECRET: process.env.JWT_SECRET || 'e2e-dev-jwt-secret-0123456789abcdef0123456789',
+      JWT_REFRESH_SECRET: process.env.JWT_REFRESH_SECRET || 'e2e-dev-refresh-secret-0123456789abcdef012345',
+      JWT_EXPIRES_IN: process.env.JWT_EXPIRES_IN || '15m',
+      JWT_REFRESH_EXPIRES_IN: process.env.JWT_REFRESH_EXPIRES_IN || '7d',
+    },
   });
   backend.stdout.on('data', d => log('backend', d));
   backend.stderr.on('data', d => log('backend-err', d));
@@ -77,7 +107,7 @@ async function main() {
     console.log('✓ Frontend ready');
 
     console.log('\nRunning Playwright tests...\n');
-    const pw = spawn('npx.cmd', ['playwright', 'test', '--project=exam-proctoring', '--reporter=list'], {
+    const pw = spawn('npx.cmd', ['playwright', 'test', `--project=${PROJECT}`, '--reporter=list'], {
       cwd: FRONTEND_DIR,
       stdio: 'inherit',
       shell: true,
@@ -101,9 +131,7 @@ async function main() {
     frontend.kill();
     // Give processes time to cleanup
     await new Promise(r => setTimeout(r, 2000));
-    try {
-      spawn('taskkill', ['/F', '/IM', 'node.exe', '/T'], { stdio: 'ignore' });
-    } catch {}
+    freePorts(3000, 5000);
   }
 
   console.log(`\nExit code: ${exitCode}`);

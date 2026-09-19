@@ -4,7 +4,7 @@ import { cn } from '@/lib/utils';
 interface EventActionsProps {
   event: {
     title: string;
-    date: string;
+    date?: string;
     time?: string;
     description?: string;
     meeting_url?: string;
@@ -13,7 +13,7 @@ interface EventActionsProps {
   className?: string;
 }
 
-function formatGoogleCalendarUrl(event: EventActionsProps['event']): string {
+export function formatGoogleCalendarUrl(event: EventActionsProps['event']): string {
   const startDate = event.date ? new Date(event.date) : new Date();
   const endDate = new Date(startDate.getTime() + 60 * 60 * 1000);
 
@@ -30,7 +30,7 @@ function formatGoogleCalendarUrl(event: EventActionsProps['event']): string {
   return `https://www.google.com/calendar/render?${params.toString()}`;
 }
 
-function generateIcsContent(event: EventActionsProps['event']): string {
+export function generateIcsContent(event: EventActionsProps['event']): string {
   const startDate = event.date ? new Date(event.date) : new Date();
   const endDate = new Date(startDate.getTime() + 60 * 60 * 1000);
 
@@ -50,7 +50,7 @@ function generateIcsContent(event: EventActionsProps['event']): string {
   ].join('\r\n');
 }
 
-function downloadIcs(event: EventActionsProps['event']) {
+export function downloadIcs(event: EventActionsProps['event']) {
   const content = generateIcsContent(event);
   const blob = new Blob([content], { type: 'text/calendar;charset=utf-8' });
   const url = URL.createObjectURL(blob);
