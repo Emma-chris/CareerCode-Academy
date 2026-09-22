@@ -41,7 +41,6 @@ export default function AdminCourseDetail() {
         category: c.category || 'Web Development',
         level: c.level || 'beginner',
         price: c.price || 0,
-        discount_percentage: c.discount_percentage || 0,
         duration: c.duration || 0,
         thumbnail: c.thumbnail || '',
         status: c.status || 'draft',
@@ -76,7 +75,6 @@ export default function AdminCourseDetail() {
         category: form.category,
         level: form.level,
         price: Number(form.price),
-        discount_percentage: Number(form.discount_percentage),
         duration: Number(form.duration),
         thumbnail: form.thumbnail,
         status: form.status,
@@ -148,7 +146,6 @@ export default function AdminCourseDetail() {
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
             <Input label="Price" type="number" value={form.price} onChange={e=>setForm({...form, price:e.target.value})} />
-            <Input label="Discount %" type="number" value={form.discount_percentage} onChange={e=>setForm({...form, discount_percentage:e.target.value})} />
             <Input label="Duration (min)" type="number" value={form.duration} onChange={e=>setForm({...form, duration:e.target.value})} />
           </div>
           <Input label="Thumbnail URL" value={form.thumbnail} onChange={e=>setForm({...form, thumbnail:e.target.value})} placeholder="https://..." />

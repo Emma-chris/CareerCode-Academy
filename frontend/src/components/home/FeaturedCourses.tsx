@@ -114,9 +114,9 @@ export function FeaturedCourses() {
                           Enroll Now →
                         </NeonButton>
                       </div>
-                      {course.discount_percentage > 0 && (
+                      {course.promotion && (
                         <div className="absolute top-2 left-2">
-                          <Badge variant="danger" size="sm">-{course.discount_percentage}%</Badge>
+                          <Badge variant="danger" size="sm">-{course.promotion.discount_percent}%</Badge>
                         </div>
                       )}
                     </div>

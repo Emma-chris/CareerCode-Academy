@@ -13,6 +13,7 @@
     "seed:schools": "tsx --require dotenv/config src/seed-schools.ts",
     "seed:career-goals": "tsx --require dotenv/config src/seed-career-goals.ts",
     "seed:cert": "tsx --require dotenv/config src/seed-certificate-assets.ts",
+    "seed:board": "tsx --require dotenv/config src/seed-board.ts",
     "seed:yt": "tsx --require dotenv/config src/seed-youtube-videos.ts",
     "seed:yt:urls": "tsx --require dotenv/config src/seed-youtube-videos.ts --urls-only",
     "seed:yt:refs": "tsx --require dotenv/config src/seed-youtube-references.ts",

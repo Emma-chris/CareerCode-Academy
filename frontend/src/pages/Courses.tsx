@@ -240,9 +240,9 @@ export default function Courses() {
                                   <Badge variant="success" size="sm">Free</Badge>
                                 </div>
                               )}
-                              {course.discount_percentage > 0 && (
+                              {course.promotion && (
                                 <div className="absolute top-2 left-2">
-                                  <Badge variant="danger" size="sm">-{course.discount_percentage}%</Badge>
+                                  <Badge variant="danger" size="sm">-{course.promotion.discount_percent}%</Badge>
                                 </div>
                               )}
                             </div>
@@ -293,13 +293,13 @@ export default function Courses() {
                             <div className="mb-3 pt-3 border-t border-gray-100 dark:border-gray-800">
                               {isFree ? (
                                 <span className="text-success-500 font-bold text-lg">Free</span>
-                              ) : course.discount_percentage > 0 ? (
-                                <div className="flex items-center gap-2">
+                              ) : course.promotion ? (
+                                <div className="flex items-center gap-2 flex-wrap">
                                   <span className="text-lg font-bold text-white">
-                                    {formatCurrency(course.price * (1 - course.discount_percentage / 100))}
+                                    {formatCurrency(Number(course.effective_price ?? Number(course.price) * (1 - Number(course.promotion.discount_percent) / 100)))}
                                   </span>
-                                  <span className="text-sm text-gray-500 line-through">{formatCurrency(course.price)}</span>
-                                  <Badge variant="success" size="sm">Save {formatCurrency(course.price * course.discount_percentage / 100)}</Badge>
+                                  <span className="text-sm text-gray-500 line-through">{formatCurrency(Number(course.price))}</span>
+                                  <span className="text-xs text-success-500 font-medium">Save {formatCurrency(Number(course.price) - Number(course.effective_price ?? Number(course.price) * (1 - Number(course.promotion.discount_percent) / 100)))}</span>
                                 </div>
                               ) : (
                                 <span className="text-lg font-bold text-white">{formatCurrency(Number(course.price))}</span>

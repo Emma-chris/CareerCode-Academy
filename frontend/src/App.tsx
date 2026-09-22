@@ -80,6 +80,7 @@ const Terms = lazy(() => import('@/pages/Terms'));
 const Privacy = lazy(() => import('@/pages/Privacy'));
 const Cookies = lazy(() => import('@/pages/Cookies'));
 const Accessibility = lazy(() => import('@/pages/Accessibility'));
+const Board = lazy(() => import('@/pages/public/Board'));
 // Student pages
 const StudentDashboard = lazy(() => import('@/pages/student/Dashboard'));
 const StudentMyCourses = lazy(() => import('@/pages/student/MyCourses'));
@@ -108,6 +109,7 @@ const StudentSkillTree = lazy(() => import('@/pages/student/SkillTree'));
 const StudentApplications = lazy(() => import('@/pages/student/Applications'));
 const StudentPortfolio = lazy(() => import('@/pages/student/Portfolio'));
 const StudentGuidedMode = lazy(() => import('@/pages/student/GuidedMode'));
+const StudentPathwayFinder = lazy(() => import('@/pages/student/PathwayFinder'));
 
 // Instructor pages
 const InstructorDashboard = lazy(() => import('@/pages/instructor/Dashboard'));
@@ -161,6 +163,8 @@ const AdminCalendar = lazy(() => import('@/pages/admin/CalendarManagement'));
 const AdminCommunityManagement = lazy(() => import('@/pages/admin/CommunityManagement'));
 const AdminCourseDetail = lazy(() => import('@/pages/admin/AdminCourseDetail'));
 const AdminCareer = lazy(() => import('@/pages/admin/CareerManagement'));
+const AdminPromotions = lazy(() => import('@/pages/admin/Promotions'));
+const AdminBoardOversight = lazy(() => import('@/pages/admin/BoardOversight'));
 
 function GuestRoute({ children }: { children: React.ReactNode }) {
   const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
@@ -264,6 +268,7 @@ function App() {
           <Route path="/privacy" element={<SuspenseWrapper><Privacy /></SuspenseWrapper>} />
           <Route path="/cookies" element={<SuspenseWrapper><Cookies /></SuspenseWrapper>} />
           <Route path="/accessibility" element={<SuspenseWrapper><Accessibility /></SuspenseWrapper>} />
+          <Route path="/board" element={<SuspenseWrapper><Board /></SuspenseWrapper>} />
         </Route>
 
         <Route path="/student" element={<DashboardLayout requiredRole="student" />}>
@@ -295,6 +300,7 @@ function App() {
           <Route path="portfolio" element={<SuspenseWrapper><StudentPortfolio /></SuspenseWrapper>} />
           <Route path="guided" element={<SuspenseWrapper><StudentGuidedMode /></SuspenseWrapper>} />
           <Route path="guided/:slug" element={<SuspenseWrapper><StudentGuidedMode /></SuspenseWrapper>} />
+          <Route path="pathway-finder" element={<SuspenseWrapper><StudentPathwayFinder /></SuspenseWrapper>} />
         </Route>
 
         <Route path="/instructor" element={<DashboardLayout requiredRole="instructor" />}>
@@ -352,6 +358,8 @@ function App() {
           <Route path="analytics" element={<SuspenseWrapper><AdminAnalytics /></SuspenseWrapper>} />
           <Route path="calendar" element={<SuspenseWrapper><AdminCalendar /></SuspenseWrapper>} />
           <Route path="career" element={<SuspenseWrapper><AdminCareer /></SuspenseWrapper>} />
+          <Route path="promotions" element={<SuspenseWrapper><AdminPromotions /></SuspenseWrapper>} />
+          <Route path="board-oversight" element={<SuspenseWrapper><AdminBoardOversight /></SuspenseWrapper>} />
           <Route path="settings" element={<SuspenseWrapper><AdminSettings /></SuspenseWrapper>} />
         </Route>
 

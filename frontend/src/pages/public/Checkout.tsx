@@ -372,10 +372,10 @@ export default function Checkout() {
                       <span>Original Price</span>
                       <span>₦{Number(course.price).toLocaleString()}</span>
                     </div>
-                    {course.discount_percentage > 0 && (
+                    {course.promotion && (
                       <div className="flex justify-between text-emerald-600 dark:text-emerald-400">
-                        <span>Discount ({course.discount_percentage}%)</span>
-                        <span>-₦{Number(course.price * course.discount_percentage / 100).toLocaleString()}</span>
+                        <span>Promotion Discount ({course.promotion.discount_percent}%)</span>
+                        <span>-₦{Number(course.price * Number(course.promotion.discount_percent) / 100).toLocaleString()}</span>
                       </div>
                     )}
                     {appliedDiscount !== null && codeStatus==='valid' && (
@@ -398,9 +398,9 @@ export default function Checkout() {
                         <span className="text-gray-800 dark:text-gray-300 font-medium">Total Amount</span>
                         <div className="text-right">
                           <span className="text-2xl sm:text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-purple-600 dark:from-blue-400 dark:to-purple-400">
-                            ₦{Math.max(0, Number(course.price * (1 - (course.discount_percentage || 0) / 100) - (appliedDiscount || 0))).toLocaleString()}
+                            ₦{Math.max(0, Number(course.effective_price ?? (course.price * (1 - (course.promotion?.discount_percent || 0) / 100))) - (appliedDiscount || 0)).toLocaleString()}
                           </span>
-                          {appliedDiscount !== null && codeStatus==='valid' && <div className="text-xs text-amber-600 line-through">₦{Number(course.price * (1 - (course.discount_percentage || 0) / 100)).toLocaleString()}</div>}
+                          {appliedDiscount !== null && codeStatus==='valid' && <div className="text-xs text-amber-600 line-through">₦{Number(course.effective_price ?? (course.price * (1 - (course.promotion?.discount_percent || 0) / 100))).toLocaleString()}</div>}
                         </div>
                       </div>
                     </div>

@@ -60,6 +60,9 @@ import uploadRoutes from './routes/upload.routes';
 import publicRoutes from './routes/public.routes';
 import portfolioRoutes from './routes/portfolio.routes';
 import guidedRoutes from './routes/guided.routes';
+import pathwayFinderRoutes from './routes/pathwayFinder.routes';
+import promotionRoutes from './routes/promotion.routes';
+import boardRoutes from './routes/board.routes';
 import { query } from './config/db';
 import passport, { configurePassport } from './config/passport';
 
@@ -194,6 +197,9 @@ app.use('/api/v1/upload', uploadRoutes);
 app.use('/api/v1/public', publicRoutes);
 app.use('/api/v1/portfolio', portfolioRoutes);
 app.use('/api/v1/guided', guidedRoutes);
+app.use('/api/v1/pathway-finder', pathwayFinderRoutes);
+app.use('/api/v1/promotions', promotionRoutes);
+app.use('/api/v1/board', boardRoutes);
 
 // E2E test helper routes (dev only)
 if (process.env.NODE_ENV === 'development') {

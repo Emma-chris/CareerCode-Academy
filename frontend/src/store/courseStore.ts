@@ -21,6 +21,20 @@ export interface Review {
   created_at: string;
 }
 
+export interface Promotion {
+  id: string;
+  title: string;
+  description?: string | null;
+  slug?: string | null;
+  discount_percent: number;
+  scope: 'all' | 'category' | 'course';
+  category_id?: string | null;
+  course_id?: string | null;
+  starts_at: string;
+  ends_at: string;
+  is_active: boolean;
+}
+
 export interface Course {
   id: string;
   title: string;
@@ -38,6 +52,10 @@ export interface Course {
   slug: string;
   created_at: string;
   updated_at: string;
+  
+  // Active promotion (decorated server-side) — discounts only come from promotions
+  promotion?: Promotion | null;
+  effective_price?: number;
   
   learningOutcomes?: string[];
   

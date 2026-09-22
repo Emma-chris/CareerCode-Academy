@@ -3,6 +3,7 @@ import { z } from 'zod';
 import { validate } from '../middleware/validate';
 import { authenticate, authorize, AuthRequest } from '../middleware/auth';
 import * as CourseModel from '../models/course';
+import * as PromotionModel from '../models/promotion';
 import * as LessonModel from '../models/lesson';
 import * as EnrollmentModel from '../models/enrollment';
 import * as PaymentModel from '../models/payment';
@@ -20,7 +21,6 @@ const createCourseSchema = z.object({
   title: z.string().min(3, 'Title must be at least 3 characters').max(200),
   description: z.string().min(10, 'Description must be at least 10 characters').max(5000),
   price: z.number().min(0, 'Price must be 0 or more'),
-  discountPercentage: z.number().min(0).max(100).optional(),
   category: z.string().min(2, 'Category is required'),
   level: z.enum(['beginner', 'intermediate', 'advanced']).optional(),
   duration: z.number().min(1).optional(),
@@ -33,7 +33,6 @@ const updateCourseSchema = z.object({
   title: z.string().min(3).max(200).optional(),
   description: z.string().min(10).max(5000).optional(),
   price: z.number().min(0).optional(),
-  discountPercentage: z.number().min(0).max(100).optional(),
   category: z.string().min(2).optional(),
   level: z.enum(['beginner', 'intermediate', 'advanced']).optional(),
   duration: z.number().min(1).optional(),
@@ -56,11 +55,12 @@ router.get('/', async (req: Request, res: Response, next: NextFunction) => {
     filters.published = true;
 
     const courses = await CourseModel.getAllCourses(limit, offset, filters);
+    const decorated = await PromotionModel.decorateCourses(courses);
     const total = await CourseModel.countCourses(true);
 
     res.json({
       success: true,
-      data: courses,
+      data: decorated,
       pagination: {
         page,
         limit,
@@ -140,11 +140,12 @@ router.get('/:id', async (req: Request, res: Response, next: NextFunction) => {
     const reviews = await ReviewModel.getReviewsByCourse(req.params.id);
     const averageRating = await ReviewModel.getAverageRating(req.params.id);
     const enrollmentCount = await EnrollmentModel.countEnrollments(req.params.id);
+    const decorated = await PromotionModel.decorateCourse(course);
 
     res.json({
       success: true,
       data: {
-        ...course,
+        ...decorated,
         lessons,
         reviews,
         averageRating,
@@ -166,10 +167,6 @@ router.post(
   async (req: AuthRequest, res: Response, next: NextFunction) => {
     try {
       const data = req.body;
-      if (data.discountPercentage !== undefined) {
-        data.discount_percentage = data.discountPercentage;
-        delete data.discountPercentage;
-      }
       const slug = slugify(data.title);
 
       const rawLevel = data.level || data.skill_level || 'beginner';
@@ -212,10 +209,6 @@ router.put(
       }
 
       const data: any = { ...req.body };
-      if (data.discountPercentage !== undefined) {
-        data.discount_percentage = data.discountPercentage;
-        delete data.discountPercentage;
-      }
       if (data.title) {
         data.slug = slugify(data.title);
       }

@@ -11,6 +11,7 @@ import { NotFoundError, ConflictError } from '../utils/errors';
 import { emitDashboardUpdate, emitStudentUpdate } from '../config/socket';
 import { query } from '../config/db';
 import * as Gamification from '../models/gamification';
+import { getActivePromotionForCourse } from '../models/promotion';
 import { isSupportedCurrency, getCurrencyInfo } from '../utils/currency';
 
 const router = Router();
@@ -56,20 +57,25 @@ router.post(
         throw new NotFoundError('Course');
       }
 
-      const discount = course.discount_percentage || 0;
-      const priceAfterCourseDiscount = course.price * (1 - discount / 100);
+      // Discounts are reserved for special promotional events only. Standing
+      // per-course discounts are deprecated — courses sell at full price unless
+      // an active promotion currently applies.
+      const promotion = await getActivePromotionForCourse(courseId, (course as any).category ?? null);
+      const promoDiscountPercent = promotion ? Number(promotion.discount_percent) : 0;
+      const promoDiscountAmount = promoDiscountPercent > 0 ? Number((course.price * promoDiscountPercent / 100).toFixed(2)) : 0;
+      const priceAfterPromotion = course.price * (1 - promoDiscountPercent / 100);
       let xpDiscount = 0;
       let discountCodeRow: any = null;
-      const amountBeforeDiscount = priceAfterCourseDiscount;
+      const amountBeforeDiscount = priceAfterPromotion;
       if (discountCode) {
-        const validation = await Gamification.validateDiscountCode(discountCode, userId, priceAfterCourseDiscount);
+        const validation = await Gamification.validateDiscountCode(discountCode, userId, priceAfterPromotion);
         if (!validation.valid) {
           return res.status(400).json({ success: false, message: validation.reason });
         }
         xpDiscount = validation.discount;
         discountCodeRow = validation.row;
       }
-      const effectivePrice = Math.max(0, priceAfterCourseDiscount - xpDiscount);
+      const effectivePrice = Math.max(0, priceAfterPromotion - xpDiscount);
 
       if (effectivePrice <= 0) {
         const existingEnrollment = await EnrollmentModel.getEnrollment(userId, courseId);
@@ -86,7 +92,9 @@ router.post(
           data: {
             amount: 0,
             course_slug: course.slug,
-            message: discountCodeRow ? `Enrolled successfully (XP discount ${currencyInfo.symbol}${xpDiscount} applied)` : 'Enrolled successfully (100% discount applied)',
+            message: discountCodeRow
+              ? `Enrolled successfully (XP discount ${currencyInfo.symbol}${xpDiscount} applied)`
+              : 'Enrolled successfully (100% promotional discount applied)',
           }
         });
       }
@@ -116,6 +124,10 @@ router.post(
         discount_code_id: discountCodeRow?.id || null,
         xp_discount: xpDiscount,
         amount_before_discount: amountBeforeDiscount,
+        promotion_id: promotion?.id || null,
+        promotion_title: promotion?.title || null,
+        promo_discount_percent: promoDiscountPercent || null,
+        promo_discount_amount: promoDiscountAmount || null,
       });
 
       let paymentData: any = {
@@ -124,6 +136,15 @@ router.post(
         amount: payment.amount,
         currency: payment.currency,
         course_slug: course.slug,
+        promotion: promoDiscountPercent > 0
+          ? {
+              id: promotion!.id,
+              title: promotion!.title,
+              discount_percent: promoDiscountPercent,
+              discount_amount: promoDiscountAmount,
+              price_after_promotion: priceAfterPromotion,
+            }
+          : null,
       };
 
       const paystackKey = process.env.PAYSTACK_SECRET_KEY || '';
@@ -415,7 +436,11 @@ router.post(
       let coursePrice: number | undefined;
       if (courseId) {
         const c = await CourseModel.getCourseById(courseId);
-        if (c) coursePrice = Number(c.price) * (1 - (Number(c.discount_percentage) || 0) / 100);
+        if (c) {
+          const promo = await getActivePromotionForCourse(courseId, (c as any).category ?? null);
+          const promoPct = promo ? Number(promo.discount_percent) : 0;
+          coursePrice = Number(c.price) * (1 - promoPct / 100);
+        }
       }
       const validation = await Gamification.validateDiscountCode(code, req.user!.userId, coursePrice);
       if (!validation.valid) return res.status(400).json({ success: false, message: validation.reason });

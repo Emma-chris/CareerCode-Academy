@@ -39,7 +39,7 @@ const faqs = [
     category: 'Pricing & Payments',
     items: [
       { q: 'What payment methods do you accept?', a: 'We accept all major credit cards (Visa, Mastercard, American Express), PayPal, and cryptocurrency. For enterprise plans, we also support invoicing.' },
-      { q: 'Do you offer student discounts?', a: 'Yes! We offer a 50% discount for verified students. You can apply through our support team with your student ID or institutional email.' },
+      { q: 'How do discounts work?', a: 'Courses are sold at a single list price. From time to time we run time-boxed promotional events (sales, seasonal offers, or verified-student campaigns) that apply a discount to selected courses or the whole catalog. Check the courses page for any active promotion — when a promotion ends, prices return to full.' },
       { q: 'What is your refund policy?', a: 'We offer a 30-day money-back guarantee on all paid plans. If you are not satisfied, contact our support team for a full refund.' },
       { q: 'Can I gift a subscription?', a: 'Yes! You can purchase gift subscriptions for friends and family. Gift recipients get full access to the plan you choose.' },
     ],

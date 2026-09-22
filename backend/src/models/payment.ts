@@ -22,12 +22,20 @@ export interface CreatePaymentInput {
   reference: string;
 }
 
-export async function createPayment(input: CreatePaymentInput & { discount_code_id?: string | null; xp_discount?: number; amount_before_discount?: number }): Promise<Payment> {
+export async function createPayment(input: CreatePaymentInput & {
+  discount_code_id?: string | null;
+  xp_discount?: number;
+  amount_before_discount?: number;
+  promotion_id?: string | null;
+  promotion_title?: string | null;
+  promo_discount_percent?: number | null;
+  promo_discount_amount?: number | null;
+}): Promise<Payment> {
   const { rows } = await query<Payment>(
-    `INSERT INTO payments (user_id, course_id, amount, currency, provider, reference, discount_code_id, xp_discount, amount_before_discount)
-      VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
+    `INSERT INTO payments (user_id, course_id, amount, currency, provider, reference, discount_code_id, xp_discount, amount_before_discount, promotion_id, promotion_title, promo_discount_percent, promo_discount_amount)
+      VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13)
       RETURNING *`,
-    [input.user_id, input.course_id, input.amount, input.currency || 'NGN', input.provider, input.reference, input.discount_code_id || null, input.xp_discount || 0, input.amount_before_discount || null]
+    [input.user_id, input.course_id, input.amount, input.currency || 'NGN', input.provider, input.reference, input.discount_code_id || null, input.xp_discount || 0, input.amount_before_discount || null, input.promotion_id || null, input.promotion_title || null, input.promo_discount_percent || null, input.promo_discount_amount || null]
   );
   return rows[0];
 }

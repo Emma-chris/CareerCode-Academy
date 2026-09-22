@@ -30,6 +30,9 @@ import {
   FolderOpen,
   Briefcase,
   Zap,
+  Compass,
+  BadgePercent,
+  Landmark,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useAuthStore } from '@/store/authStore';
@@ -46,6 +49,7 @@ const roleSidebarLinks: Record<string, { label: string; path: string; icon: any 
     { label: 'Dashboard', path: '/student/dashboard', icon: LayoutDashboard },
     { label: 'My Courses', path: '/student/courses', icon: BookOpen },
     { label: 'Learning Paths', path: '/student/learning-paths', icon: GitBranch },
+    { label: 'Pathway Finder', path: '/student/pathway-finder', icon: Compass },
     { label: 'Assignments', path: '/student/assignments', icon: ClipboardList },
     { label: 'Exams', path: '/student/exams', icon: ClipboardList },
     { label: 'Challenges', path: '/student/challenges', icon: ClipboardList },
@@ -91,6 +95,8 @@ const roleSidebarLinks: Record<string, { label: string; path: string; icon: any 
     { label: 'Career Pipeline', path: '/admin/career', icon: Target },
     { label: 'Applications', path: '/admin/applications', icon: ClipboardList },
     { label: 'Payments', path: '/admin/payments', icon: LayoutDashboard },
+    { label: 'Promotions', path: '/admin/promotions', icon: BadgePercent },
+    { label: 'Board Oversight', path: '/admin/board-oversight', icon: Landmark },
     { label: 'Exams', path: '/admin/exams', icon: ClipboardList },
     { label: 'Exam Monitor', path: '/admin/exams/monitor', icon: Monitor },
     { label: 'Certificates', path: '/admin/certificates', icon: Award },
@@ -114,6 +120,8 @@ const roleSidebarLinks: Record<string, { label: string; path: string; icon: any 
     { label: 'Career Pipeline', path: '/admin/career', icon: Target },
     { label: 'Applications', path: '/admin/applications', icon: ClipboardList },
     { label: 'Payments', path: '/admin/payments', icon: LayoutDashboard },
+    { label: 'Promotions', path: '/admin/promotions', icon: BadgePercent },
+    { label: 'Board Oversight', path: '/admin/board-oversight', icon: Landmark },
     { label: 'Exams', path: '/admin/exams', icon: ClipboardList },
     { label: 'Exam Monitor', path: '/admin/exams/monitor', icon: Monitor },
     { label: 'Certificates', path: '/admin/certificates', icon: Award },

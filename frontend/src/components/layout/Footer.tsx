@@ -27,6 +27,7 @@ const footerLinks = {
     { label: 'Contact', path: '/contact' },
     { label: 'Partners', path: '/partners' },
     { label: 'Press', path: '/press' },
+    { label: 'Board of Directors', path: '/board' },
   ],
   Support: [
     { label: 'Help Center', path: '/help' },

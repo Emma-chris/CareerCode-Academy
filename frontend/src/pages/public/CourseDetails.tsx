@@ -226,8 +226,8 @@ export default function CourseDetails() {
   const schoolName = (course as any).school_name;
   const schoolSlug = (course as any).school_slug;
 
-  const priceDisplay = isFree ? 'Free' : course.discount_percentage > 0
-    ? formatCurrency(course.price * (1 - course.discount_percentage / 100))
+  const priceDisplay = isFree ? 'Free' : course.promotion
+    ? formatCurrency(Number(course.effective_price ?? Number(course.price) * (1 - Number(course.promotion.discount_percent) / 100)))
     : formatCurrency(course.price);
 
   return (
@@ -353,11 +353,11 @@ export default function CourseDetails() {
                   <div className="text-3xl font-bold text-white">
                     {isFree ? (
                       <span className="text-emerald-400">Free</span>
-                    ) : course.discount_percentage > 0 ? (
+                    ) : course.promotion ? (
                       <div className="flex items-center gap-3 flex-wrap">
-                        <span className="text-emerald-400">{formatCurrency(course.price * (1 - course.discount_percentage / 100))}</span>
+                        <span className="text-emerald-400">{formatCurrency(Number(course.effective_price ?? Number(course.price) * (1 - Number(course.promotion.discount_percent) / 100)))}</span>
                         <span className="text-xl line-through text-gray-500">{formatCurrency(course.price)}</span>
-                        <span className="text-sm bg-emerald-500/20 text-emerald-400 px-2 py-0.5 rounded-full">-{course.discount_percentage}%</span>
+                        <span className="text-sm bg-emerald-500/20 text-emerald-400 px-2 py-0.5 rounded-full">-{course.promotion.discount_percent}% off</span>
                       </div>
                     ) : (
                       <>{formatCurrency(course.price)}</>
