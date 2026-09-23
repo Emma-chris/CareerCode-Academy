@@ -55,7 +55,18 @@ router.get('/', async (req: Request, res: Response, next: NextFunction) => {
     filters.published = true;
 
     const courses = await CourseModel.getAllCourses(limit, offset, filters);
-    const decorated = await PromotionModel.decorateCourses(courses);
+    let decorated;
+    try {
+      decorated = await PromotionModel.decorateCourses(courses);
+    } catch (promoErr) {
+      // Promotions are optional marketing data — never fail the courses list.
+      console.warn('decorateCourses failed, serving courses without promotions:', (promoErr as Error).message);
+      decorated = courses.map((c: any) => ({
+        ...c,
+        promotion: null,
+        effective_price: Number(c.price) || 0,
+      }));
+    }
     const total = await CourseModel.countCourses(true);
 
     res.json({

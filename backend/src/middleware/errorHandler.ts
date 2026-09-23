@@ -31,17 +31,20 @@ export function errorHandler(err: Error, _req: Request, res: Response, _next: Ne
     return;
   }
 
-  // Handle uninitialized database errors (table/column missing after cold boot)
+  // Handle uninitialized database errors (table/column missing after cold boot).
+  // NOTE: match precise Postgres "does not exist" phrases only — a bare
+  // substring check for "column" masks unrelated errors.
   function isUninitializedDb(e: any): boolean {
     const msg = (e?.message || '').toLowerCase();
-    return msg.includes('relation') || msg.includes('does not exist') || msg.includes('column');
+    return msg.includes('relation') && msg.includes('does not exist') ||
+           msg.includes('column') && msg.includes('does not exist');
   }
 
   if (isUninitializedDb(err)) {
     console.error('Database schema error — tables may not be initialized:', err.message);
     res.status(503).json({
       success: false,
-      message: 'Service temporarily unavailable — database is still initializing. Please try again in a moment.',
+      message: 'Service temporarily unavailable — database schema is missing an object. The team has been notified.',
     });
     return;
   }

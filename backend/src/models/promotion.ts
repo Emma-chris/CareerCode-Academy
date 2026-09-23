@@ -49,6 +49,17 @@ export interface UpdatePromotionInput {
   is_active?: boolean;
 }
 
+/**
+ * True when the error means the optional promotions feature hasn't been
+ * migrated yet (e.g. production DB missing the promotions table). Courses
+ * must keep working in that case — they just sell at full price.
+ */
+function isMissingPromotionsTable(err: any): boolean {
+  const code = (err as any)?.code;
+  const msg = ((err as any)?.message || '').toLowerCase();
+  return code === '42P01' || (msg.includes('promotions') && msg.includes('does not exist'));
+}
+
 const SELECT_META = `
   SELECT p.*,
     c.name as category_name,
@@ -59,17 +70,33 @@ const SELECT_META = `
 `;
 
 export async function listPromotions(): Promise<PromotionWithMeta[]> {
-  const { rows } = await query<PromotionWithMeta>(`${SELECT_META} ORDER BY p.created_at DESC`);
-  return rows;
+  try {
+    const { rows } = await query<PromotionWithMeta>(`${SELECT_META} ORDER BY p.created_at DESC`);
+    return rows;
+  } catch (err) {
+    if (isMissingPromotionsTable(err)) {
+      console.warn('promotions table missing — returning empty list');
+      return [];
+    }
+    throw err;
+  }
 }
 
 export async function getActivePromotions(): Promise<PromotionWithMeta[]> {
-  const { rows } = await query<PromotionWithMeta>(
-    `${SELECT_META}
-     WHERE p.is_active = true AND p.starts_at <= NOW() AND p.ends_at > NOW()
-     ORDER BY p.ends_at ASC`
-  );
-  return rows;
+  try {
+    const { rows } = await query<PromotionWithMeta>(
+      `${SELECT_META}
+       WHERE p.is_active = true AND p.starts_at <= NOW() AND p.ends_at > NOW()
+       ORDER BY p.ends_at ASC`
+    );
+    return rows;
+  } catch (err) {
+    if (isMissingPromotionsTable(err)) {
+      console.warn('promotions table missing — returning empty list');
+      return [];
+    }
+    throw err;
+  }
 }
 
 export async function getPromotionById(id: string): Promise<PromotionWithMeta | null> {
@@ -89,31 +116,42 @@ export async function getPromotionBySlug(slug: string): Promise<PromotionWithMet
  * `categoryName` is the course's category field (courses store category by name).
  */
 export async function getActivePromotionForCourse(courseId: string, categoryName?: string | null): Promise<Promotion | null> {
-  const { rows } = await query<Promotion>(
-    `SELECT p.*
-     FROM promotions p
-     LEFT JOIN categories cat ON cat.id = p.category_id
-     WHERE p.is_active = true
-       AND p.starts_at <= NOW()
-       AND p.ends_at > NOW()
-       AND (
-         (p.scope = 'course' AND p.course_id = $1)
-         OR (p.scope = 'category' AND cat.name = $2)
-         OR (p.scope = 'all')
-       )
-     ORDER BY
-       CASE WHEN p.scope = 'course' THEN 0 WHEN p.scope = 'category' THEN 1 ELSE 2 END,
-       p.discount_percent DESC,
-       p.ends_at ASC
-     LIMIT 1`,
-    [courseId, categoryName || null]
-  );
-  return rows[0] || null;
+  try {
+    const { rows } = await query<Promotion>(
+      `SELECT p.*
+       FROM promotions p
+       LEFT JOIN categories cat ON cat.id = p.category_id
+       WHERE p.is_active = true
+         AND p.starts_at <= NOW()
+         AND p.ends_at > NOW()
+         AND (
+           (p.scope = 'course' AND p.course_id = $1)
+           OR (p.scope = 'category' AND cat.name = $2)
+           OR (p.scope = 'all')
+         )
+       ORDER BY
+         CASE WHEN p.scope = 'course' THEN 0 WHEN p.scope = 'category' THEN 1 ELSE 2 END,
+         p.discount_percent DESC,
+         p.ends_at ASC
+       LIMIT 1`,
+      [courseId, categoryName || null]
+    );
+    return rows[0] || null;
+  } catch (err) {
+    if (isMissingPromotionsTable(err)) return null;
+    throw err;
+  }
 }
 
 /** Attach the active promotion + effective price to a single course row. */
 export async function decorateCourse<C extends Record<string, any>>(course: C): Promise<C & { promotion: Promotion | null; effective_price: number }> {
-  const promo = await getActivePromotionForCourse(course.id, course.category ?? null);
+  let promo: Promotion | null = null;
+  try {
+    promo = await getActivePromotionForCourse(course.id, course.category ?? null);
+  } catch (err) {
+    if (!isMissingPromotionsTable(err)) throw err;
+    promo = null;
+  }
   const percent = promo ? Number(promo.discount_percent) : 0;
   const price = Number(course.price) || 0;
   return {
@@ -125,7 +163,19 @@ export async function decorateCourse<C extends Record<string, any>>(course: C): 
 
 /** Attach the active promotion + effective price to courses list. */
 export async function decorateCourses<C extends Record<string, any>>(courses: C[]): Promise<Array<C & { promotion: Promotion | null; effective_price: number }>> {
-  return Promise.all(courses.map((c) => decorateCourse(c)));
+  try {
+    return await Promise.all(courses.map((c) => decorateCourse(c)));
+  } catch (err) {
+    if (isMissingPromotionsTable(err)) {
+      console.warn('promotions table missing — serving courses at full price');
+      return courses.map((c) => ({
+        ...c,
+        promotion: null,
+        effective_price: Number((c as any).price) || 0,
+      }));
+    }
+    throw err;
+  }
 }
 
 export async function createPromotion(input: CreatePromotionInput): Promise<Promotion> {
@@ -186,15 +236,22 @@ export interface PromotionSummary {
 }
 
 export async function getPromotionSummary(): Promise<PromotionSummary> {
-  const { rows } = await query(
-    `SELECT
-       COUNT(*) FILTER (WHERE is_active = true AND starts_at <= NOW() AND ends_at > NOW())::int as total_active,
-       COUNT(*) FILTER (WHERE is_active = true AND scope = 'all' AND starts_at <= NOW() AND ends_at > NOW())::int as platform_wide,
-       COUNT(*) FILTER (WHERE is_active = true AND starts_at > NOW())::int as scheduled,
-       COUNT(*) FILTER (WHERE ends_at <= NOW())::int as finished,
-       COALESCE(SUM(promo_discount_amount) FILTER (WHERE status = 'completed'), 0)::float as total_discount_granted
-     FROM promotions p
-     LEFT JOIN payments pay ON pay.promotion_id = p.id`
-  );
-  return rows[0];
+  try {
+    const { rows } = await query(
+      `SELECT
+         COUNT(*) FILTER (WHERE is_active = true AND starts_at <= NOW() AND ends_at > NOW())::int as total_active,
+         COUNT(*) FILTER (WHERE is_active = true AND scope = 'all' AND starts_at <= NOW() AND ends_at > NOW())::int as platform_wide,
+         COUNT(*) FILTER (WHERE is_active = true AND starts_at > NOW())::int as scheduled,
+         COUNT(*) FILTER (WHERE ends_at <= NOW())::int as finished,
+         COALESCE(SUM(promo_discount_amount) FILTER (WHERE status = 'completed'), 0)::float as total_discount_granted
+       FROM promotions p
+       LEFT JOIN payments pay ON pay.promotion_id = p.id`
+    );
+    return rows[0];
+  } catch (err) {
+    if (isMissingPromotionsTable(err)) {
+      return { totalActive: 0, platformWide: 0, scheduled: 0, finished: 0, totalDiscountGranted: 0 };
+    }
+    throw err;
+  }
 }
