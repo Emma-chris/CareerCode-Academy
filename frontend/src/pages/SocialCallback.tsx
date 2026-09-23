@@ -1,6 +1,7 @@
 import { useEffect } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useAuthStore } from '@/store/authStore';
+import api from '@/lib/axios';
 import { Loader2 } from 'lucide-react';
 
 export default function SocialCallback() {
@@ -14,32 +15,55 @@ export default function SocialCallback() {
       navigate(`/login?error=${error}`, { replace: true });
       return;
     }
-    // Cookie-only flow — no token in URL. Just fetch /auth/me via httpOnly cookie
-    const token = params.get('token');
-    const refreshToken = params.get('refreshToken');
-    // Legacy support: if token present (old flow), still handle via setTokens
-    if (token && refreshToken) {
-      useAuthStore.getState().setTokens(token, refreshToken).then(() => {
-        const user = useAuthStore.getState().user;
-        const target = user?.role === 'instructor' ? '/instructor/dashboard' : user?.role === 'admin' || user?.role === 'super_admin' ? '/admin/dashboard' : '/student/dashboard';
-        navigate(target, { replace: true });
-      }).catch(() => navigate('/login?error=oauth_auth_failed', { replace: true }));
-      return;
-    }
-    fetchUser().then(() => {
+
+    const targetFor = (role?: string) =>
+      role === 'instructor'
+        ? '/instructor/dashboard'
+        : role === 'admin' || role === 'super_admin'
+          ? '/admin/dashboard'
+          : '/student/dashboard';
+
+    const finish = () => {
       const user = useAuthStore.getState().user;
       if (!user) {
         navigate('/login?error=oauth_no_user', { replace: true });
         return;
       }
-      const intent = params.get('intent');
-      const target = user.role === 'instructor' ? '/instructor/dashboard' : user.role === 'admin' || user.role === 'super_admin' ? '/admin/dashboard' : '/student/dashboard';
-      // For signup intent, optionally show welcome toast
-      if (intent === 'signup') {
-        // could navigate to onboarding
-      }
-      navigate(target, { replace: true });
-    }).catch(() => navigate('/login?error=oauth_auth_failed', { replace: true }));
+      navigate(targetFor(user.role), { replace: true });
+    };
+
+    const fail = () => navigate('/login?error=oauth_auth_failed', { replace: true });
+
+    const code = params.get('code');
+    const token = params.get('token');
+    const refreshToken = params.get('refreshToken');
+
+    // Primary flow: exchange the short-lived code for real tokens over a normal
+    // request. This works even when third-party auth cookies are blocked.
+    if (code) {
+      api
+        .post('/auth/oauth/exchange', { code })
+        .then(({ data }) => {
+          const d = data.data;
+          return useAuthStore.getState().setTokens(d.token, d.refreshToken);
+        })
+        .then(finish)
+        .catch(fail);
+      return;
+    }
+
+    // Legacy support: tokens present in URL (old flow)
+    if (token && refreshToken) {
+      useAuthStore
+        .getState()
+        .setTokens(token, refreshToken)
+        .then(finish)
+        .catch(fail);
+      return;
+    }
+
+    // Fallback: cookie-only flow — fetch /auth/me via httpOnly cookie
+    fetchUser().then(finish).catch(fail);
   }, [params, navigate, fetchUser]);
 
   return (

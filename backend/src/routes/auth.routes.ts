@@ -16,6 +16,8 @@ import {
   verifyRefreshToken,
   generateVerificationCode,
   generatePasswordResetToken,
+  generateOAuthExchangeCode,
+  verifyOAuthExchangeCode,
   sendVerificationEmail,
   sendPasswordResetEmail,
   sendWelcomeEmail,
@@ -685,21 +687,82 @@ router.get(
     res.clearCookie('oauth_state', { path: '/' });
     // keep intent for passport verify via cookie
     passport.authenticate('google', { session: false }, (err: any, data: any) => {
+      const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:3000';
+      // Read intent BEFORE clearing the cookie, otherwise it is always lost.
+      const intent = (req as any).cookies?.oauth_intent || 'login';
       if (err || !data) {
         console.error('Google OAuth callback error:', err || 'No user data returned');
-        const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:3000';
         res.clearCookie('oauth_intent', { path: '/' });
         const msg = err?.message === 'Account suspended' ? 'account_suspended' : 'google_auth_failed';
         return res.redirect(`${frontendUrl}/login?error=${msg}`);
       }
       const { token, refreshToken } = data;
+      // Best-effort cookies (works when cookies are first-party / allowed).
       setAuthCookies(res, token, refreshToken);
       res.clearCookie('oauth_intent', { path: '/' });
-      const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:3000';
-      const intent = (req as any).cookies?.oauth_intent || 'login';
-      // Redirect without token in URL — frontend will use httpOnly cookie + /auth/me
-      res.redirect(`${frontendUrl}/auth/callback?intent=${intent}`);
+      // Primary mechanism: a short-lived one-time code the SPA exchanges for
+      // real tokens over a normal (non-cookie) request. This is what makes OAuth
+      // work even when third-party cookies are blocked.
+      const code = generateOAuthExchangeCode({ userId: data.userId, role: data.role });
+      res.redirect(
+        `${frontendUrl}/auth/callback?code=${encodeURIComponent(code)}&intent=${intent}`
+      );
     })(req, res, next);
+  }
+);
+
+// POST /oauth/exchange — swap a short-lived OAuth code for real tokens
+const oauthExchangeSchema = z.object({
+  code: z.string().min(1, 'OAuth code is required'),
+});
+
+router.post(
+  '/oauth/exchange',
+  loginLimiter,
+  validate(oauthExchangeSchema),
+  async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const { code } = req.body;
+
+      let decoded;
+      try {
+        decoded = verifyOAuthExchangeCode(code);
+      } catch {
+        throw new UnauthorizedError('Invalid or expired OAuth code');
+      }
+
+      const user = await UserModel.getUserById(decoded.userId);
+      if (!user) {
+        throw new UnauthorizedError('User not found');
+      }
+      if ((user as any).is_suspended) {
+        throw new ForbiddenError('Your account has been suspended. Please contact support.');
+      }
+
+      const tokenPayload = { userId: user.id, role: user.role };
+      const token = generateToken(tokenPayload);
+      const refreshToken = generateRefreshToken(tokenPayload);
+      const refreshTokenExpiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
+      await TokenModel.createRefreshToken(user.id, refreshToken, refreshTokenExpiresAt);
+
+      setAuthCookies(res, token, refreshToken);
+
+      res.json({
+        success: true,
+        data: {
+          userId: user.id,
+          name: user.name,
+          email: user.email,
+          role: user.role,
+          avatar: (user as any).avatar,
+          isVerified: (user as any).is_verified,
+          token,
+          refreshToken,
+        },
+      });
+    } catch (error) {
+      next(error);
+    }
   }
 );
 

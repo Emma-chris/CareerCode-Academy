@@ -27,6 +27,26 @@ export function verifyRefreshToken(token: string): TokenPayload {
   return jwt.verify(token, process.env.JWT_REFRESH_SECRET!) as TokenPayload;
 }
 
+/**
+ * Short-lived, single-purpose code handed to the SPA after a cross-site OAuth
+ * redirect. It lets the frontend obtain real tokens via a same-request POST
+ * instead of relying on third-party auth cookies (which browsers block when the
+ * API lives on a different site than the frontend, e.g. onrender.com -> vercel.app).
+ */
+export function generateOAuthExchangeCode(payload: TokenPayload): string {
+  return jwt.sign({ ...payload, purpose: 'oauth_exchange' }, process.env.JWT_SECRET!, {
+    expiresIn: '2m',
+  });
+}
+
+export function verifyOAuthExchangeCode(code: string): TokenPayload {
+  const decoded = jwt.verify(code, process.env.JWT_SECRET!) as TokenPayload & { purpose?: string };
+  if (decoded?.purpose !== 'oauth_exchange') {
+    throw new Error('Invalid OAuth exchange code');
+  }
+  return { userId: decoded.userId, role: decoded.role };
+}
+
 export function generateVerificationCode(): string {
   return crypto.randomInt(100000, 999999).toString();
 }
@@ -41,10 +61,19 @@ export function generateCertificateCode(): string {
   return `CERT-${rand(8)}-${rand(6)}`;
 }
 
+// Cookies must be SameSite=None; Secure whenever the frontend and API live on
+// different sites (the production setup: vercel.app -> onrender.com), otherwise
+// browsers refuse to attach them to the SPA's cross-site requests. Relying on
+// NODE_ENV alone is brittle (Render does not always set it), so also infer from
+// an https FRONTEND_URL.
+const CROSS_SITE_COOKIES =
+  process.env.NODE_ENV === 'production' ||
+  (process.env.FRONTEND_URL || '').startsWith('https://');
+
 const COOKIE_OPTIONS = {
   httpOnly: true,
-  secure: process.env.NODE_ENV === 'production',
-  sameSite: process.env.NODE_ENV === 'production' ? 'none' as const : 'lax' as const,
+  secure: CROSS_SITE_COOKIES,
+  sameSite: (CROSS_SITE_COOKIES ? 'none' : 'lax') as 'none' | 'lax',
   path: '/',
 };
 
